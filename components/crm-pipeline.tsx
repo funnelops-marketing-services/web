@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
-import { Phone, Calendar, GripVertical, Send, Bot, LogOut, Search, Bell } from "lucide-react"
+import { Phone, Calendar, GripVertical, Send, Bot } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -98,51 +97,7 @@ export function CrmPipeline() {
   const [draggedLead, setDraggedLead] = useState<string | null>(null)
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-violet-900/15 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] bg-fuchsia-900/10 rounded-full blur-[120px]" />
-      </div>
-
-      {/* Top bar */}
-      <header className="relative z-20 border-b border-white/5 bg-black/40 backdrop-blur-xl">
-        <div className="px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
-            <span className="text-white font-bold text-xs tracking-[0.2em]">MIRKO • CRM</span>
-            <div className="w-px h-4 bg-zinc-800 mx-2" />
-            <span className="text-zinc-500 text-sm font-normal">Pipeline de leads</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
-              <Input
-                placeholder="Buscar lead..."
-                className="pl-9 w-64 h-9 bg-white/5 border-white/10 text-white placeholder:text-zinc-600 text-sm font-normal rounded-full focus:border-violet-500/50"
-              />
-            </div>
-            <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full">
-              <Bell className="w-4 h-4" />
-            </Button>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white text-xs font-bold">
-                M
-              </div>
-              <span className="text-white text-sm font-normal hidden sm:inline">Mirko</span>
-            </div>
-            <Button asChild variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-white/5 rounded-full">
-              <Link href="/" aria-label="Cerrar sesión">
-                <LogOut className="w-4 h-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main grid */}
-      <div className="relative z-10 h-[calc(100vh-4rem)] flex">
+    <div className="flex h-[calc(100vh-4rem)]">
         {/* Left - Kanban */}
         <div className="w-full lg:w-[70%] p-6 overflow-hidden flex flex-col">
           <div className="mb-5 flex items-center justify-between">
@@ -340,6 +295,6 @@ export function CrmPipeline() {
           )}
         </div>
       </div>
-    </div>
   )
 }
+

@@ -14,3 +14,19 @@ next.user-config.*
 node_modules
 .next/
 .DS_Store
+
+# Build artifacts
+tsconfig.tsbuildinfo
+dist/
+build/
+
+# Lock files (use pnpm)
+package-lock.json
+npm-shrinkwrap.json
+
+# pnpm v11 auto-generated approval file (placeholders only)
+pnpm-workspace.yaml
+
+# Internal handoff & deployment docs with sensitive data
+_handoff_*.md
+HANDOFF_*.md

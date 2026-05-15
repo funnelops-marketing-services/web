@@ -1,17 +1,17 @@
 import type { Metadata } from 'next'
 import { Montserrat } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
+import { QueryProvider } from '@/lib/query/provider'
+import { Toaster } from '@/components/ui/sonner'
 
-const montserrat = Montserrat({ 
+const montserrat = Montserrat({
   subsets: ["latin"],
   variable: '--font-montserrat'
 });
 
 export const metadata: Metadata = {
-  title: 'Inmobiliaria CRM | Tu Hogar Ideal',
-  description: 'Encuentra tu próximo hogar con nuestra plataforma inmobiliaria premium',
-  generator: 'v0.app',
+  title: 'Mirko Calzadilla',
+  description: 'Cursos y producción audiovisual por Mirko Calzadilla',
   icons: {
     icon: [
       {
@@ -39,8 +39,10 @@ export default function RootLayout({
   return (
     <html lang="es" className="dark bg-black">
       <body className={`${montserrat.variable} font-sans antialiased bg-black text-white`}>
-        {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        <QueryProvider>
+          {children}
+          <Toaster richColors position="top-right" />
+        </QueryProvider>
       </body>
     </html>
   )
