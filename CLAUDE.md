@@ -36,5 +36,5 @@ Package manager is **pnpm** (`npx pnpm`).
 
 ## UI / UX
 
-- The application is the staff-facing CRM/Inbox (`app.mirkocalzadilla.com`) and the public landing page (`mirkocalzadilla.com`).
+- The application is the staff-facing CRM/Inbox (served at the `/crm` path, e.g. `mirkocalzadilla.com/crm`) and the public landing page (`mirkocalzadilla.com`). A dedicated `app.` subdomain was considered but not implemented; the CRM lives under `/crm` (no hostname-based routing/middleware).
 - Preserve the existing dark mode aesthetic with violet/fuchsia accents.
