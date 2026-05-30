@@ -11,7 +11,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: 'Mirko Calzadilla',
-  description: 'Cursos y producción audiovisual por Mirko Calzadilla',
+  description: 'Producción y edición audiovisual con IA para marcas y creadores. Paquetes exclusivos por Mirko Calzadilla.',
   other: {
     'facebook-domain-verification': 'lqzg91iaq50gwivufzg1n32f0kvj5f',
   },
