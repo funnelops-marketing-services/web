@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-06 · Natalia · docs — RBAC 3 niveles (alinear con server)
+- Qué cambió: `docs/FRONTEND_SPEC.md` (pantalla 4 ABM + sección RBAC) y `CLAUDE.md` (invariante config) reescritos a **RBAC de 3 niveles**: `platform_operator` (Natalia+equipo, p. ej. Chris) ve config/users/roles/agente; `client_admin` (Mirko) y `staff` solo operan (inbox + CRM). Anula "admin = Mirko".
+- Por qué: alinear el front con el cambio ya mergeado/en PR del server (PR #9: SPECS_MVP §RBAC + FLUJO §4); el cliente no es admin de plataforma.
+- Spec/decisión que respeta: `server/docs/SPECS_MVP.md` §RBAC (modelo canónico); decisión de negocio (Natalia, 2026-06-06).
+- Prueba local: docs-only, ningún `.ts/.tsx` tocado → `lint`/`tsc`/`build` N/A.
+- Commit: (completar después del commit)
+
 ### 2026-06-05 · Natalia · docs + workflow
 - Qué cambió:
   - **Workflow:** `.claude/commands/close.md` — reescrito completo; ahora crea branch, commitea, pushea y abre PR a main con validación de paradigma (RBAC, realtime, takeover, contratos backend) antes de cada paso.
