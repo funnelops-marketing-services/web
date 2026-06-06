@@ -1,40 +1,44 @@
 # CLAUDE.md — Frontend Conventions
 
-This file provides guidance to Claude Code (claude.ai/code) when working with the frontend code.
+Guidance for Claude Code (and any dev) working on the frontend. **Read before touching code.** Front spec: [`docs/FRONTEND_SPEC.md`](docs/FRONTEND_SPEC.md). El diseño canónico del agente vive en el repo **server** (`server/docs/`).
 
 ## Commands
 
 Package manager is **pnpm** (`npx pnpm`).
 
 - `npx pnpm dev` — start Next.js dev server
-- `npx pnpm build` — production build (strict type checking enabled)
-- `npx pnpm lint` — ESLint validation
+- `npx pnpm build` — production build (strict type checking)
+- `npx pnpm lint` — ESLint
 - `npx pnpm tsc --noEmit` — strict type checking
 
 ## Architecture & Stack
 
 - **Framework:** Next.js 16 (App Router)
 - **UI:** Tailwind CSS v4 + shadcn/ui + Lucide icons
-- **State Management:** Zustand (global UI state), React Query (server state / API)
-- **Data Fetching:** Axios + React Query
-- **Validation:** Zod
+- **State:** Zustand (UI global) · React Query (server state) · Axios · Zod
+
+## Paradigm / invariants (front) — NO romper sin actualizar el diseño primero
+
+- La app es el **CRM/Inbox del staff** (en `/crm`) + la landing pública (`mirkocalzadilla.com`). Sin subdominio `app.` (el CRM vive en `/crm`, sin routing por hostname).
+- **Inbox + takeover:** lista de conversaciones + hilo; toggle **IA on/off** por conversación (`is_ai_active`); badge 🔥 cuando `handed_off`.
+- **Pipeline "Gestión Humana"** (kanban): los leads derivados entran acá; acción `/generarEntrada` al validar el pago.
+- **Config del agente (ABM): solo admin (Mirko)** — prompt, nivel de emojis (mucho/poco/nada), temperatura. El **staff NO** la ve (RBAC admin/staff).
+- **Realtime:** mensajes nuevos llegan por WebSocket/SSE propio alimentado desde Redis Pub/Sub del backend — **NO** socket.io de terceros.
+- Contratos con el backend: `server/docs/SPECS_MVP.md`.
 
 ## Clean Code Rules
 
-- **TypeScript Strict:** No `any`, no implicit `any`. Do not use `as` casting unless absolutely necessary.
-- **Component size:** Keep components under 200 lines. Extract custom hooks for complex logic.
-- **Styling:** Use `cn()` utility (`lib/utils.ts`) for class merging. Design is dark mode by default (`dark bg-black`).
-- **Language:** Code in English (variables, functions, components). UI copy and comments explaining business logic in Spanish.
+- **Clean code siempre.** TypeScript estricto: sin `any`/implicit `any`; evitar `as` salvo que sea imprescindible.
+- **Tamaño:** componentes <200 líneas; extraé hooks para lógica compleja.
+- **Estilo:** `cn()` (`lib/utils.ts`) para merge de clases. Dark mode por defecto (`dark bg-black`), acentos violeta/fucsia.
+- **Pruebas end-to-end / por módulo antes de dar por terminado un cambio — no romper lo existente.** Hasta integrar con el backend: trabajar contra stubs/mocks de la API, pruebas locales con la estructura correcta.
+- **Idioma:** código en **inglés**; **comentarios mínimos, solo cuando sean necesarios, en inglés**; **UI copy (cliente boliviano) y documentación en español**.
+
+## Antes de commitear
+
+Usá **`/close`**: muestra el diff, lo verifica contra `docs/FRONTEND_SPEC.md` + estas reglas, registra la entrada en [BITACORA.md](BITACORA.md), corre `pnpm lint`/`tsc`/`build` y arma el commit. **No se commitea contra el diseño.**
 
 ## Project Structure
 
-- `app/` — routes (Next.js App Router).
-- `components/` — UI components. Primitives go in `components/ui/`.
-- `hooks/` — custom React hooks.
-- `lib/` — utility functions, Axios instance, generic helpers.
-- `store/` — Zustand stores.
-
-## UI / UX
-
-- The application is the staff-facing CRM/Inbox (served at the `/crm` path, e.g. `mirkocalzadilla.com/crm`) and the public landing page (`mirkocalzadilla.com`). A dedicated `app.` subdomain was considered but not implemented; the CRM lives under `/crm` (no hostname-based routing/middleware).
-- Preserve the existing dark mode aesthetic with violet/fuchsia accents.
+- `app/` — rutas (App Router). `components/` — UI (primitivos en `components/ui/`). `hooks/` — hooks. `lib/` — utils, Axios. `store/` — Zustand.
+- `docs/` — `FRONTEND_SPEC.md`, `CONTEXT.md`, `archive/`. `BITACORA.md` — registro de cambios.
