@@ -1,5 +1,5 @@
-import { CrmPipeline } from "@/components/crm-pipeline"
+import { CrmBoard } from '@/components/crm/crm-board'
 
 export default function Crm() {
-  return <CrmPipeline />
+  return <CrmBoard />
 }
