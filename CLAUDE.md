@@ -22,7 +22,7 @@ Package manager is **pnpm** (`npx pnpm`).
 - La app es el **CRM/Inbox del staff** (en `/crm`) + la landing pública (`mirkocalzadilla.com`). Sin subdominio `app.` (el CRM vive en `/crm`, sin routing por hostname).
 - **Inbox + takeover:** lista de conversaciones + hilo; toggle **IA on/off** por conversación (`is_ai_active`); badge 🔥 cuando `handed_off`.
 - **Pipeline "Gestión Humana"** (kanban): los leads derivados entran acá; acción `/generarEntrada` al validar el pago.
-- **Config del agente (ABM): solo admin (Mirko)** — prompt, nivel de emojis (mucho/poco/nada), temperatura. El **staff NO** la ve (RBAC admin/staff).
+- **Config del agente (ABM) + crear users/roles: solo `platform_operator`** (Natalia + equipo, p. ej. Chris) — prompt, nivel de emojis (mucho/poco/nada), temperatura. El **cliente (`client_admin` = Mirko) y el `staff` NO** lo ven. RBAC de 3 niveles, ver `server/docs/SPECS_MVP.md` §RBAC. (Anula el "solo admin (Mirko)" anterior.)
 - **Realtime:** mensajes nuevos llegan por WebSocket/SSE propio alimentado desde Redis Pub/Sub del backend — **NO** socket.io de terceros.
 - Contratos con el backend: `server/docs/SPECS_MVP.md`.
 

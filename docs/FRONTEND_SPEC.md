@@ -8,11 +8,17 @@
 1. **Inbox de conversaciones** — lista (contacto, último mensaje, etapa del funnel, **badge 🔥 cuando `handed_off`**) + panel de hilo con burbujas. Reutilizable: burbujas de chat de Firefly-App (`conversation-message.tsx`).
 2. **Takeover** — toggle **IA on/off** por conversación (`is_ai_active`). Con IA on, el input se deshabilita; con IA off (humano tomó), el humano escribe por el hilo (envío vía backend → Meta).
 3. **Pipeline "Gestión Humana"** (kanban) — los leads derivados (handoff) entran acá. Stages: `Por validar pago → Pago validado → Entrada enviada (Cerrado)` → [Fase 2] `Asistió / No asistió / Lost`. Acción **`/generarEntrada`** (dispara al backend) desde la card al validar el pago.
-4. **Config del agente (ABM) — solo admin (Mirko):** editar system prompt (textarea), nivel de emojis (switch mucho/poco/nada), temperatura (slider); guardar crea `agent_version`. El **staff NO** ve esta pantalla.
+4. **Config del agente (ABM) — solo `platform_operator` (Natalia + equipo):** editar system prompt (textarea), nivel de emojis (switch mucho/poco/nada), temperatura (slider); guardar crea `agent_version`. **Mirko (`client_admin`) y el staff NO** ven esta pantalla.
 
-## RBAC (front)
+## RBAC (front) — 3 niveles
 
-- **admin** (Mirko): ve todo, incl. config del agente. **staff** (la hermana): ve inbox + Gestión Humana, **NO** la config. Guards de ruta + ocultar UI; el backend revalida (no confiar solo en el front).
+> **Actualizado 2026-06-06** (anula "admin = Mirko"). Modelo canónico: `server/docs/SPECS_MVP.md` §RBAC.
+
+- **`platform_operator`** (Natalia + equipo, p. ej. Chris): ve **todo**, incl. config del agente, crear users/roles, settings.
+- **`client_admin`** (Mirko): **solo operación** de su organización — inbox + tablero CRM + sus leads. **NO** config, **NO** users/roles, **NO** edición del agente.
+- **`staff`** (la hermana): inbox + pipeline Gestión Humana + takeover. **NO** config.
+
+Guards de ruta + ocultar UI (reusar `use-permissions.ts` de Firefly-App); el backend **revalida** (no confiar solo en el front).
 
 ## Realtime
 
