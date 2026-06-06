@@ -29,4 +29,4 @@
 - Por qué: versionar el conocimiento en el repo, dejar lista la división de trabajo y establecer el flujo de cierre con branch + PR.
 - Spec/decisión que respeta: decisiones 2026-06-05 (CRM en `/crm`, takeover, WebSocket/SSE propio, RBAC admin/staff).
 - Prueba local: n/a (docs + config).
-- Commit: (pendiente)
+- Commit: cabf00f — PR #1
