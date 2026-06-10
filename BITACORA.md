@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-10 · Natalia · docs — spec B5 commiteada + DoD de runtime validado
+- Qué cambió: se agrega `docs/SPEC_B5_sse-front.md` al repo (quedó local sin commitear al cerrar B5) con el header actualizado a implementada (PR #11). Sin cambios de código.
+- Por qué: housekeeping — la spec es el registro durable de B5 y faltaba en main; además cierra el DoD de runtime que la entrada de B5 dejó pendiente.
+- Spec/decisión que respeta: la propia `docs/SPEC_B5_sse-front.md`; CLAUDE.md (docs en español).
+- Prueba local: DoD de runtime ejecutado contra backend Docker (headless Chrome + CDP): login real → EventSource abierto a `/crm/events?token=<jwt>`; move de card vía API externa → `card_moved` recibido en el browser y refetch del board en <1s (vs. 10s del polling); la card cruza de columna en el DOM sin reload (ida y vuelta, estado restaurado); probe sin auth (incógnito) → redirect a `/login`, 0 streams; cleanup verificado: redis `CLIENT LIST` con `sub=1` con el stream abierto → 0 subscribers al cerrar.
+- Commit: (pendiente)
+
 ### 2026-06-10 · Natalia · crm — B6: M-Config front (`/crm/agents` + `/crm/settings`)
 - Qué cambió: `lib/api/agent-config.ts` (schemas Zod + llamadas tipadas: `listAgents`/`getAgent`/`updateAgent`/`listUsers`/`changeUserRole`), `hooks/use-agent-config.ts` (`useAgentConfig` flujo single-call sobre `listAgents()[0]`; `useUpdateAgentConfig` con toast de versión + mensaje del 422 del backend), `hooks/use-users.ts` (`useUsers` + `useChangeUserRole` optimista con rollback), `components/crm/config/agent-config-form.tsx` (editor del agente con react-hook-form), `components/crm/config/users-table.tsx` (tabla + Select de rol; operador `is_superuser` read-only), páginas `agents`/`settings` (WIP → funcional, guard `canManageConfig` preservado). Incluye `docs/SPEC_B6_m-config-front.md`.
 - Por qué: las dos pantallas de config de plataforma estaban en placeholder WIP; B6 las vuelve funcionales contra los endpoints M-Config del server.
