@@ -26,7 +26,7 @@
 - Por qué: reemplazar el lag del polling (10s board / 5s card) por push reactivo; el server ya expone el stream (PR #35 en main). El polling se mantiene como fallback conservador del MVP.
 - Spec/decisión que respeta: `docs/SPEC_B5_sse-front.md` (contrato §2, mapeo §3.2, schema §3.3, fallback de polling §3.5); CLAUDE.md invariante Realtime = SSE/WebSocket propio (NO socket.io ni terceros — `EventSource` nativo del browser).
 - Prueba local: `pnpm lint` 0 errores (4 warnings preexistentes ajenas); `pnpm tsc --noEmit` limpio; `pnpm build` ✓ (11 rutas). DoD de runtime (mover card desde otro tab, fila `eventsource` en DevTools, hilo auto-actualizándose) **pendiente** — requiere `docker compose up -d` con el server.
-- Commit:
+- Commit: edb2ea7be81cd9b649db9f01af0674deaacf030e
 
 ### 2026-06-10 · Natalia · repo — .gitignore: untrack de `next-env.d.ts`
 - Qué cambió: `next-env.d.ts` agregado a `.gitignore` (sección Build artifacts) y desrastreado del repo con `git rm --cached` (el archivo permanece en disco).
