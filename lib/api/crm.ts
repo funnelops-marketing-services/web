@@ -8,10 +8,14 @@ import { apiClient } from '@/lib/api/client'
 
 export const threadSenderSchema = z.enum(['lead', 'agent', 'human'])
 
+// type: 'text' | 'image' | 'document' — plain string so unknown types
+// degrade to the text fallback instead of failing the parse.
 export const threadMessageSchema = z.object({
   sender: threadSenderSchema,
   text: z.string(),
   at: z.string(),
+  type: z.string().default('text'),
+  media_url: z.string().nullable().optional(),
 })
 
 export const cardSchema = z.object({

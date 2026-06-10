@@ -17,6 +17,32 @@ const senderLabel: Record<ThreadMessage['sender'], string> = {
   human: 'Gestión Humana',
 }
 
+/** Contenido de la burbuja según el tipo de mensaje (texto, imagen, documento). */
+function MessageContent({ message }: { message: ThreadMessage }) {
+  if (message.type === 'image' && message.media_url) {
+    return (
+      <img
+        src={message.media_url}
+        alt={message.text}
+        className="max-w-xs rounded"
+      />
+    )
+  }
+  if (message.type === 'document' && message.media_url) {
+    return (
+      <a
+        href={message.media_url}
+        target="_blank"
+        rel="noreferrer"
+        className="text-sm font-normal leading-relaxed underline"
+      >
+        {message.text || 'Documento adjunto'}
+      </a>
+    )
+  }
+  return <p className="text-sm font-normal leading-relaxed">{message.text}</p>
+}
+
 /** Burbuja del hilo espejo de WhatsApp, según el emisor. */
 export function ConversationMessage({ message }: { message: ThreadMessage }) {
   const isLead = message.sender === 'lead'
@@ -53,7 +79,7 @@ export function ConversationMessage({ message }: { message: ThreadMessage }) {
             !isLead && !isAgent && 'rounded-br-md bg-fuchsia-600 text-white',
           )}
         >
-          <p className="text-sm font-normal leading-relaxed">{message.text}</p>
+          <MessageContent message={message} />
         </div>
         {time && (
           <p
