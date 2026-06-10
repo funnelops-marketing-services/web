@@ -98,7 +98,7 @@ export default function RegisterPage() {
 
         <h1 className="text-3xl font-bold text-white mb-2">Crear cuenta</h1>
         <p className="text-zinc-500 text-sm mb-10">
-          Tu workspace inicial te asignará como OWNER.
+          Serás el administrador de tu workspace.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
