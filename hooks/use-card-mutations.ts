@@ -7,10 +7,12 @@ import { toast } from 'sonner'
 import {
   generateEntry,
   moveCard,
+  sendHumanReply,
   setAiActive,
   type Boards,
   type Card,
   type QrEntryOut,
+  type ThreadMessage,
 } from '@/lib/api/crm'
 import { boardKeys } from '@/hooks/use-board'
 import { cardKeys } from '@/hooks/use-card'
@@ -102,6 +104,21 @@ export function useGenerateEntry(cardId: string) {
       } else {
         toast.error('No se pudo generar la entrada.')
       }
+    },
+  })
+}
+
+/** Reply humano por WhatsApp en takeover (POST send). Refresca el hilo al éxito. */
+export function useSendHumanReply(cardId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation<ThreadMessage, Error, string>({
+    mutationFn: (text: string) => sendHumanReply(cardId, text),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
+    },
+    onError: () => {
+      toast.error('No se pudo enviar el mensaje. Reintentá.')
     },
   })
 }

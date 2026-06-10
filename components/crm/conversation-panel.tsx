@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Bot, Lock, MessageSquare, QrCode, Send } from 'lucide-react'
+import { Bot, MessageSquare, QrCode, Send } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -10,7 +10,11 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { useCard } from '@/hooks/use-card'
 import { useBoard } from '@/hooks/use-board'
-import { useGenerateEntry, useSetAiActive } from '@/hooks/use-card-mutations'
+import {
+  useGenerateEntry,
+  useSendHumanReply,
+  useSetAiActive,
+} from '@/hooks/use-card-mutations'
 import { usePermissions } from '@/hooks/use-permissions'
 import { ConversationMessage } from '@/components/crm/conversation-message'
 
@@ -27,13 +31,15 @@ function EmptyState({ text }: { text: string }) {
   )
 }
 
-/** Panel derecho: hilo espejo + toggle IA + input humano (bloqueado por M-Meta). */
+/** Panel derecho: hilo espejo + toggle IA + input humano (takeover). */
 export function ConversationPanel({ cardId }: { cardId: string | null }) {
   const { data: card, isLoading, isError } = useCard(cardId)
   const { data: boards } = useBoard()
   const { canOperateCrm } = usePermissions()
   const setAiActive = useSetAiActive()
   const generateEntryMutation = useGenerateEntry(cardId ?? '')
+  const sendReply = useSendHumanReply(cardId ?? '')
+  const [reply, setReply] = useState('')
 
   // El contrato de lectura (GET /cards/{id}) aún no expone `is_ai_active`
   // (SPEC_CRM_FRONT §8): sembramos "activo" y reflejamos lo que confirma el PUT.
@@ -118,26 +124,35 @@ export function ConversationPanel({ cardId }: { cardId: string | null }) {
           </Button>
         )}
 
-        {/* Input humano: visible pero deshabilitado — envío por WhatsApp
-            bloqueado por M-Meta-inv (SPEC_CRM_FRONT §5/§8). */}
-        <div className="flex gap-2">
-          <Input
-            placeholder="Respuesta humana — disponible al integrar WhatsApp"
-            disabled
-            className="h-10 flex-1 cursor-not-allowed rounded-full border-white/10 bg-white/[0.03] text-sm font-normal text-white opacity-50 placeholder:text-zinc-600"
-          />
-          <Button
-            disabled
-            aria-label="Enviar (no disponible)"
-            className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-b from-violet-500 to-violet-700 p-0 opacity-30"
+        {/* Input humano: solo en takeover (is_ai_active=false) y con permiso. */}
+        {!card.is_ai_active && canOperateCrm && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              const text = reply.trim()
+              if (!text || sendReply.isPending) return
+              sendReply.mutate(text, { onSuccess: () => setReply('') })
+            }}
+            className="flex gap-2"
           >
-            <Send className="size-4" />
-          </Button>
-        </div>
-        <p className="flex items-center gap-1.5 text-[10px] font-normal text-zinc-600">
-          <Lock className="size-2.5" />
-          La respuesta humana se habilita al integrar la API de WhatsApp.
-        </p>
+            <Input
+              value={reply}
+              onChange={(e) => setReply(e.target.value)}
+              placeholder="Escribí tu respuesta…"
+              maxLength={4096}
+              disabled={sendReply.isPending}
+              className="h-10 flex-1 rounded-full border-white/10 bg-white/[0.03] text-sm font-normal text-white placeholder:text-zinc-600 disabled:opacity-50"
+            />
+            <Button
+              type="submit"
+              disabled={sendReply.isPending || reply.trim().length === 0}
+              aria-label="Enviar"
+              className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-b from-violet-500 to-violet-700 p-0 hover:from-violet-400 hover:to-violet-600 disabled:opacity-40"
+            >
+              <Send className="size-4" />
+            </Button>
+          </form>
+        )}
       </div>
     </>
   )
