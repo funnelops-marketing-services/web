@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-10 · Natalia · repo — .gitignore: untrack de `next-env.d.ts`
+- Qué cambió: `next-env.d.ts` agregado a `.gitignore` (sección Build artifacts) y desrastreado del repo con `git rm --cached` (el archivo permanece en disco).
+- Por qué: aparecía perpetuamente como `M next-env.d.ts` ensuciando working tree y diffs. Next.js lo regenera en cada build/dev (el import alterna entre `./.next/dev/types/routes.d.ts` y `./.next/types/routes.d.ts`) y el propio archivo declara *"should not be edited"*. Omisión del scaffolding inicial — Next.js no lo trackea por defecto.
+- Spec/decisión que respeta: housekeeping de repo; no toca paradigma, RBAC, contratos ni código. CLAUDE.md (estructura de proyecto).
+- Prueba local: cambio solo en `.gitignore` + untrack de archivo autogenerado; sin impacto posible en lint/tsc/build (no se toca código y el archivo se regenera igual). Hecho en worktree aislado desde `main` para no interferir con la sesión paralela (B5 SSE-front) activa en el checkout compartido.
+- Commit:
+
 ### 2026-06-09 · Natalia · crm — B4 (parte 2): espejo de media en el hilo
 - Qué cambió: `lib/api/crm.ts` (`threadMessageSchema` + `type` con default `'text'` y `media_url` nullable/opcional — espejo del contrato server), `components/crm/conversation-message.tsx` (nuevo `MessageContent`: `type === 'image'` → `<img>` nativo con la URL, `type === 'document'` → `<a target="_blank" rel="noreferrer">`, default/tipo desconocido → texto plano como hoy; sin `media_url` → fallback de texto).
 - Por qué: el server (PR #37) ya espeja `type`/`media_url` en el hilo de la card; el front mostraba solo el fallback textual `"[image: caption]"`. Cierra la parte web del CR media-espejo.
