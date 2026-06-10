@@ -26,7 +26,7 @@
 - Por qué: la spec entró al repo dentro del PR #12 con el header pre-implementación; cierre documental pendiente anotado al cerrar B6 (patrón de PR #40/#42 en server).
 - Spec/decisión que respeta: la propia spec (DoD §5 cumplido en el cierre de B6, smoke e2e contra Docker).
 - Prueba local: n/a (docs).
-- Commit: (pendiente)
+- Commit: da94c0c69e3ae30e0f13bb92209300148d80dd40
 
 ### 2026-06-10 · Natalia · docs — spec B5 commiteada + DoD de runtime validado
 - Qué cambió: se agrega `docs/SPEC_B5_sse-front.md` al repo (quedó local sin commitear al cerrar B5) con el header actualizado a implementada (PR #11). Sin cambios de código.
