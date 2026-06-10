@@ -1,15 +1,19 @@
 'use client'
 
+import { isAxiosError } from 'axios'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import {
+  generateEntry,
   moveCard,
   setAiActive,
   type Boards,
   type Card,
+  type QrEntryOut,
 } from '@/lib/api/crm'
 import { boardKeys } from '@/hooks/use-board'
+import { cardKeys } from '@/hooks/use-card'
 
 interface MoveArgs {
   cardId: string
@@ -81,6 +85,25 @@ export function useMoveCard() {
 interface AiActiveArgs {
   conversationId: string
   isAiActive: boolean
+}
+
+/** Genera entrada QR para una card en "Pago validado" (POST generate-entry). */
+export function useGenerateEntry(cardId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation<QrEntryOut, Error>({
+    mutationFn: () => generateEntry(cardId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
+    },
+    onError: (error) => {
+      if (isAxiosError(error) && error.response?.status === 400) {
+        toast.info('La entrada ya fue generada.')
+      } else {
+        toast.error('No se pudo generar la entrada.')
+      }
+    },
+  })
 }
 
 /** Toggle IA por conversación (PUT ai-active). El backend confirma el valor. */

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Bot, Lock, MessageSquare, Send } from 'lucide-react'
+import { Bot, Lock, MessageSquare, QrCode, Send } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { useCard } from '@/hooks/use-card'
-import { useSetAiActive } from '@/hooks/use-card-mutations'
+import { useBoard } from '@/hooks/use-board'
+import { useGenerateEntry, useSetAiActive } from '@/hooks/use-card-mutations'
 import { usePermissions } from '@/hooks/use-permissions'
 import { ConversationMessage } from '@/components/crm/conversation-message'
 
@@ -29,8 +30,10 @@ function EmptyState({ text }: { text: string }) {
 /** Panel derecho: hilo espejo + toggle IA + input humano (bloqueado por M-Meta). */
 export function ConversationPanel({ cardId }: { cardId: string | null }) {
   const { data: card, isLoading, isError } = useCard(cardId)
+  const { data: boards } = useBoard()
   const { canOperateCrm } = usePermissions()
   const setAiActive = useSetAiActive()
+  const generateEntryMutation = useGenerateEntry(cardId ?? '')
 
   // El contrato de lectura (GET /cards/{id}) aún no expone `is_ai_active`
   // (SPEC_CRM_FRONT §8): sembramos "activo" y reflejamos lo que confirma el PUT.
@@ -40,6 +43,10 @@ export function ConversationPanel({ cardId }: { cardId: string | null }) {
   if (!cardId) return <EmptyState text="Seleccioná un lead para ver la conversación" />
   if (isLoading) return <EmptyState text="Cargando conversación…" />
   if (isError || !card) return <EmptyState text="No se pudo cargar la conversación" />
+
+  const stageName =
+    boards?.pipelines.flatMap((p) => p.stages).find((s) => s.id === card.stage_id)?.name ?? ''
+  const showGenerateEntry = stageName === 'Pago validado' && !card.is_ai_active
 
   const handleToggle = (next: boolean) => {
     setAiActiveState(next)
@@ -99,6 +106,17 @@ export function ConversationPanel({ cardId }: { cardId: string | null }) {
             className="data-[state=checked]:bg-violet-600"
           />
         </div>
+
+        {showGenerateEntry && (
+          <Button
+            onClick={() => generateEntryMutation.mutate()}
+            disabled={generateEntryMutation.isPending}
+            className="h-10 w-full gap-2 rounded-xl bg-gradient-to-b from-violet-500 to-violet-700 text-sm font-medium text-white hover:from-violet-400 hover:to-violet-600 disabled:opacity-60"
+          >
+            <QrCode className="size-4 flex-shrink-0" />
+            {generateEntryMutation.isPending ? 'Generando…' : 'Generar entrada'}
+          </Button>
+        )}
 
         {/* Input humano: visible pero deshabilitado — envío por WhatsApp
             bloqueado por M-Meta-inv (SPEC_CRM_FRONT §5/§8). */}
