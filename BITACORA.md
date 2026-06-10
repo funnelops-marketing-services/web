@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-10 · Natalia · docs/crm — versionar spec /generarEntrada UI (B2)
+- Qué cambió: se trackea `docs/SPEC_generar_entrada_ui.md` (estaba untracked). Documenta el botón "Generar entrada" ya implementado en PR #6 (`conversation-panel.tsx`, `useGenerateEntry`, `generateEntry` + `qrEntrySchema`); marcado como ✅ implementada.
+- Por qué: cerrar el gap de tracking — el código shippeó en PR #6 pero el spec nunca se commiteó.
+- Spec/decisión que respeta: documenta el contrato `POST /crm/cards/{id}/generate-entry` (server PR #28) y el gating ya vigente (`is_ai_active` + stage "Pago validado").
+- Prueba local: N/A — cambio solo de documentación (markdown), sin tocar código; no se corre lint/tsc/build.
+- Commit:
+
 ### 2026-06-09 · Natalia · crm — B4 (parte 2): espejo de media en el hilo
 - Qué cambió: `lib/api/crm.ts` (`threadMessageSchema` + `type` con default `'text'` y `media_url` nullable/opcional — espejo del contrato server), `components/crm/conversation-message.tsx` (nuevo `MessageContent`: `type === 'image'` → `<img>` nativo con la URL, `type === 'document'` → `<a target="_blank" rel="noreferrer">`, default/tipo desconocido → texto plano como hoy; sin `media_url` → fallback de texto).
 - Por qué: el server (PR #37) ya espeja `type`/`media_url` en el hilo de la card; el front mostraba solo el fallback textual `"[image: caption]"`. Cierra la parte web del CR media-espejo.
