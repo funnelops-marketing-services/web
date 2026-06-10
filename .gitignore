@@ -19,6 +19,7 @@ node_modules
 tsconfig.tsbuildinfo
 dist/
 build/
+next-env.d.ts
 
 # Lock files (use pnpm)
 package-lock.json
