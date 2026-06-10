@@ -21,6 +21,14 @@
 
 ## Entradas
 
+### 2026-06-10 · Natalia · crm — B6: M-Config front (`/crm/agents` + `/crm/settings`)
+- Qué cambió: `lib/api/agent-config.ts` (schemas Zod + llamadas tipadas: `listAgents`/`getAgent`/`updateAgent`/`listUsers`/`changeUserRole`), `hooks/use-agent-config.ts` (`useAgentConfig` flujo single-call sobre `listAgents()[0]`; `useUpdateAgentConfig` con toast de versión + mensaje del 422 del backend), `hooks/use-users.ts` (`useUsers` + `useChangeUserRole` optimista con rollback), `components/crm/config/agent-config-form.tsx` (editor del agente con react-hook-form), `components/crm/config/users-table.tsx` (tabla + Select de rol; operador `is_superuser` read-only), páginas `agents`/`settings` (WIP → funcional, guard `canManageConfig` preservado). Incluye `docs/SPEC_B6_m-config-front.md`.
+- Por qué: las dos pantallas de config de plataforma estaban en placeholder WIP; B6 las vuelve funcionales contra los endpoints M-Config del server.
+- Spec/decisión que respeta: `docs/SPEC_B6_m-config-front.md` (DoD §5); RBAC 3 niveles (config solo `platform_operator`, CLAUDE.md); contratos M-Config server (PR #36) + `GET /agents` (lista) recién agregada.
+- Prueba local: `pnpm lint` 0 errores (4 warnings preexistentes ajenos); `pnpm tsc --noEmit` limpio; `pnpm build` ✓; smoke e2e contra server vivo (GET /agents y /users parsean, PUT versiona preservando ofertas/faq, 422 temperature legible, cambio de rol persiste + rollback).
+- Mejora de flujo: el form reconstruye `config` como spread sobre el `config` cargado y solo pisa los campos editados (`dirtyFields`) — evita perder claves no expuestas (p.ej. `emojis`) en el replace completo del PUT.
+- Commit: 211d05c5ef0ee07ab1d7d1f1284586e592dfacad
+
 ### 2026-06-10 · Natalia · crm — B5: SSE en el front (realtime sin polling)
 - Qué cambió: nuevo `hooks/use-realtime-events.ts` (abre un `EventSource` a `/crm/events?token=<jwt>`, parsea cada evento con un `z.discriminatedUnion` y despacha invalidaciones puntuales de React Query) + nuevo `components/crm/realtime-sync.tsx` (componente invisible `return null` que monta el hook). `app/crm/layout.tsx` inyecta `<RealtimeSync />` dentro de `<AuthGuard>`. `lib/crm/realtime.ts`: comentario actualizado (el SSE aterrizó; el polling queda como fallback). Mapeo de eventos: `card_moved` → invalida `boardKeys.all` + `cardKeys.detail(card_id)`; `handoff` → `boardKeys.all`; `ai_active_changed` → `boardKeys.all` + (mapea `conversation_id`→`card.id` recorriendo el cache del board) `cardKeys.detail`. Sin token → no abre el stream; cleanup (`es.close()`) en unmount y al cambiar el token; heartbeat `: ping` y payloads no-JSON/desconocidos se ignoran sin romper.
 - Por qué: reemplazar el lag del polling (10s board / 5s card) por push reactivo; el server ya expone el stream (PR #35 en main). El polling se mantiene como fallback conservador del MVP.
