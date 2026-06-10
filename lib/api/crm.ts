@@ -102,3 +102,11 @@ export async function setAiActive(
   )
   return aiActiveSchema.parse(data)
 }
+
+export async function sendHumanReply(
+  cardId: string,
+  text: string,
+): Promise<ThreadMessage> {
+  const { data } = await apiClient.post(`/crm/cards/${cardId}/send`, { text })
+  return threadMessageSchema.parse(data)
+}
