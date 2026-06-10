@@ -1,0 +1,113 @@
+'use client'
+
+import { useEffect } from 'react'
+
+import { useQueryClient, type QueryClient } from '@tanstack/react-query'
+import { z } from 'zod'
+
+import type { Boards } from '@/lib/api/crm'
+import { boardKeys } from '@/hooks/use-board'
+import { cardKeys } from '@/hooks/use-card'
+import { useAuthStore } from '@/store/auth-store'
+
+// SPEC_B5_sse-front §2: contrato del stream `GET /crm/events?token=<jwt>`.
+const crmEventSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('card_moved'),
+    card_id: z.string(),
+    stage: z.string(),
+    pipeline_kind: z.string().optional(),
+    conversation_id: z.string().optional(),
+  }),
+  z.object({
+    type: z.literal('handoff'),
+    conversation_id: z.string(),
+    external_id: z.string(),
+    reason: z.string(),
+    summary: z.string(),
+  }),
+  z.object({
+    type: z.literal('ai_active_changed'),
+    conversation_id: z.string(),
+    is_ai_active: z.boolean(),
+  }),
+])
+
+type CrmEvent = z.infer<typeof crmEventSchema>
+
+const DEFAULT_BASE_URL = 'http://localhost:8000/api/v1'
+
+/** Busca el card.id cuya conversación coincide, recorriendo el cache del board. */
+function findCardIdByConversation(
+  queryClient: QueryClient,
+  conversationId: string,
+): string | null {
+  const boards = queryClient.getQueryData<Boards>(boardKeys.all)
+  if (!boards) return null
+  for (const pipeline of boards.pipelines) {
+    for (const stage of pipeline.stages) {
+      const card = stage.cards.find((c) => c.conversation_id === conversationId)
+      if (card) return card.id
+    }
+  }
+  return null
+}
+
+/** Traduce cada evento del stream a invalidaciones puntuales de React Query. */
+function handleEvent(event: CrmEvent, queryClient: QueryClient) {
+  switch (event.type) {
+    case 'card_moved':
+      queryClient.invalidateQueries({ queryKey: boardKeys.all })
+      queryClient.invalidateQueries({ queryKey: cardKeys.detail(event.card_id) })
+      break
+    case 'handoff':
+      queryClient.invalidateQueries({ queryKey: boardKeys.all })
+      break
+    case 'ai_active_changed': {
+      queryClient.invalidateQueries({ queryKey: boardKeys.all })
+      // El evento trae conversation_id; cardKeys.detail se indexa por card.id.
+      const cardId = findCardIdByConversation(queryClient, event.conversation_id)
+      if (cardId) {
+        queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
+      }
+      break
+    }
+  }
+}
+
+/**
+ * Abre un EventSource al stream SSE del CRM y despacha invalidaciones de React
+ * Query por tipo de evento. El browser reconecta solo ante cortes; el polling
+ * de `use-board`/`use-card` queda como fallback (SPEC_B5 §3.5).
+ */
+export function useRealtimeEvents() {
+  const token = useAuthStore((s) => s.token)
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    if (!token) return
+
+    // EventSource no admite headers custom → el JWT viaja en ?token=.
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_BASE_URL
+    const url = `${baseUrl}/crm/events?token=${encodeURIComponent(token)}`
+    const es = new EventSource(url)
+
+    es.onmessage = (e) => {
+      let raw: unknown
+      try {
+        raw = JSON.parse(e.data)
+      } catch {
+        return // payload no-JSON → ignorar
+      }
+      const parsed = crmEventSchema.safeParse(raw)
+      if (!parsed.success) return // tipo desconocido → ignorar
+      handleEvent(parsed.data, queryClient)
+    }
+
+    es.onerror = () => {
+      // El EventSource nativo reintenta solo; no cerrar acá.
+    }
+
+    return () => es.close()
+  }, [token, queryClient])
+}

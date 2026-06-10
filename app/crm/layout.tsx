@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react'
 
 import { AuthGuard } from '@/components/auth/auth-guard'
+import { RealtimeSync } from '@/components/crm/realtime-sync'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
 
 export default function CrmLayout({ children }: { children: ReactNode }) {
   return (
     <AuthGuard>
+      <RealtimeSync />
       <div className="relative min-h-screen overflow-hidden bg-black text-white">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/4 top-0 h-[400px] w-[600px] rounded-full bg-violet-900/15 blur-[120px]" />
