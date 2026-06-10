@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-10 · Natalia · docs — SPEC_B6 alineada a implementada
+- Qué cambió: header de `docs/SPEC_B6_m-config-front.md` de "pendiente de implementar" a implementada (PR #12 + `GET /agents` server PR #46). Sin cambios de código.
+- Por qué: la spec entró al repo dentro del PR #12 con el header pre-implementación; cierre documental pendiente anotado al cerrar B6 (patrón de PR #40/#42 en server).
+- Spec/decisión que respeta: la propia spec (DoD §5 cumplido en el cierre de B6, smoke e2e contra Docker).
+- Prueba local: n/a (docs).
+- Commit: (pendiente)
+
 ### 2026-06-10 · Natalia · docs — spec B5 commiteada + DoD de runtime validado
 - Qué cambió: se agrega `docs/SPEC_B5_sse-front.md` al repo (quedó local sin commitear al cerrar B5) con el header actualizado a implementada (PR #11). Sin cambios de código.
 - Por qué: housekeeping — la spec es el registro durable de B5 y faltaba en main; además cierra el DoD de runtime que la entrada de B5 dejó pendiente.

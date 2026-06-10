@@ -1,6 +1,6 @@
 # Spec — B6: M-Config front (`/crm/agents` + `/crm/settings`)
 
-> **Estado:** spec aprobada, pendiente de implementar.
+> **Estado:** implementada (PR #12, en main; `GET /agents` server en PR #46). Smoke e2e contra Docker en el cierre de B6.
 > **Owner:** Natalia (web). **Contexto server:** `SPEC_M-Config.md` (implementada en PR #36).
 > **Depende de:** server endpoints M-Config (`GET/PUT /agents/{id}`, `GET /users`, `PUT /users/{id}/role`) — todos en main (PR #36) — **más** un nuevo `GET /api/v1/agents` (lista) descrito en §6.
 
