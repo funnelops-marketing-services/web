@@ -22,7 +22,14 @@ export const cardSchema = z.object({
 })
 
 export const cardDetailSchema = cardSchema.extend({
+  is_ai_active: z.boolean(),
   thread: z.array(threadMessageSchema),
+})
+
+export const qrEntrySchema = z.object({
+  card_id: z.string(),
+  token: z.string(),
+  qr_ref: z.string(),
 })
 
 export const stageSchema = z.object({
@@ -59,6 +66,7 @@ export type Stage = z.infer<typeof stageSchema>
 export type Pipeline = z.infer<typeof pipelineSchema>
 export type Boards = z.infer<typeof boardsSchema>
 export type AiActive = z.infer<typeof aiActiveSchema>
+export type QrEntryOut = z.infer<typeof qrEntrySchema>
 
 // ---------- Llamadas tipadas ----------
 
@@ -77,6 +85,11 @@ export async function moveCard(cardId: string, stageId: string): Promise<Card> {
     stage_id: stageId,
   })
   return cardSchema.parse(data)
+}
+
+export async function generateEntry(cardId: string): Promise<QrEntryOut> {
+  const { data } = await apiClient.post(`/crm/cards/${cardId}/generate-entry`)
+  return qrEntrySchema.parse(data)
 }
 
 export async function setAiActive(

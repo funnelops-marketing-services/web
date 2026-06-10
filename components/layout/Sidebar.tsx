@@ -21,20 +21,22 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { usePermissions } from '@/hooks/use-permissions'
 import { Logo } from './Logo'
 
 interface NavItem {
   label: string
   href: string
   icon: LucideIcon
+  requiresConfig?: boolean
 }
 
 const navItems: readonly NavItem[] = [
   { label: 'Inbox', href: '/crm/inbox', icon: Inbox },
   { label: 'Conversaciones', href: '/crm/conversations', icon: MessagesSquare },
   { label: 'Contactos', href: '/crm/contacts', icon: Users },
-  { label: 'Agentes', href: '/crm/agents', icon: Bot },
-  { label: 'Ajustes', href: '/crm/settings', icon: Settings },
+  { label: 'Agentes', href: '/crm/agents', icon: Bot, requiresConfig: true },
+  { label: 'Ajustes', href: '/crm/settings', icon: Settings, requiresConfig: true },
 ]
 
 function isActive(pathname: string, href: string): boolean {
@@ -47,9 +49,12 @@ interface NavListProps {
 }
 
 function NavList({ pathname, onSelect }: NavListProps) {
+  const { canManageConfig } = usePermissions()
+  const visibleItems = navItems.filter((item) => !item.requiresConfig || canManageConfig)
+
   return (
     <nav className="flex flex-col gap-1 px-3 py-4">
-      {navItems.map((item) => {
+      {visibleItems.map((item) => {
         const Icon = item.icon
         const active = isActive(pathname, item.href)
         return (

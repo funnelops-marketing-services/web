@@ -7,6 +7,7 @@ interface SessionData {
   user: UserRead
   tenant: TenantRead
   role: TenantUserRole
+  is_platform_operator: boolean
 }
 
 interface AuthState {
@@ -14,6 +15,7 @@ interface AuthState {
   user: UserRead | null
   tenant: TenantRead | null
   role: TenantUserRole | null
+  is_platform_operator: boolean
   hasHydrated: boolean
   setToken: (token: string) => void
   setSession: (session: SessionData | AuthenticatedUser) => void
@@ -28,6 +30,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       tenant: null,
       role: null,
+      is_platform_operator: false,
       hasHydrated: false,
       setToken: (token) => set({ token }),
       setSession: (session) =>
@@ -35,8 +38,9 @@ export const useAuthStore = create<AuthState>()(
           user: session.user,
           tenant: session.tenant,
           role: session.role,
+          is_platform_operator: session.is_platform_operator,
         }),
-      clear: () => set({ token: null, user: null, tenant: null, role: null }),
+      clear: () => set({ token: null, user: null, tenant: null, role: null, is_platform_operator: false }),
       _setHasHydrated: (value) => set({ hasHydrated: value }),
     }),
     {

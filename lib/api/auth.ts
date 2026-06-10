@@ -27,7 +27,7 @@ export const tokenResponseSchema = z.object({
   expires_in: z.number(),
 })
 
-export const tenantUserRoleSchema = z.enum(['owner', 'admin', 'member'])
+export const tenantUserRoleSchema = z.enum(['client_admin', 'staff'])
 
 export const userReadSchema = z.object({
   id: z.string().uuid(),
@@ -52,6 +52,7 @@ export const authenticatedUserSchema = z.object({
   user: userReadSchema,
   tenant: tenantReadSchema,
   role: tenantUserRoleSchema,
+  is_platform_operator: z.boolean().default(false),
 })
 
 // ---------- Tipos derivados ----------
