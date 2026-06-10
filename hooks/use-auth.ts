@@ -24,6 +24,7 @@ export function useAuth(): UseAuthResult {
   const user = useAuthStore((s) => s.user)
   const tenant = useAuthStore((s) => s.tenant)
   const role = useAuthStore((s) => s.role)
+  const is_platform_operator = useAuthStore((s) => s.is_platform_operator)
   const hasHydrated = useAuthStore((s) => s.hasHydrated)
   const setSession = useAuthStore((s) => s.setSession)
   const clear = useAuthStore((s) => s.clear)
@@ -52,7 +53,7 @@ export function useAuth(): UseAuthResult {
   }, [isError, token, clear])
 
   const session: AuthenticatedUser | null =
-    user && tenant && role ? { user, tenant, role } : null
+    user && tenant && role ? { user, tenant, role, is_platform_operator } : null
 
   return {
     token,
