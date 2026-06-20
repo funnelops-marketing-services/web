@@ -21,7 +21,13 @@
 
 ## Entradas
 
-### 2026-06-10 · Natalia · docs — SPEC_B6 alineada a implementada
+### 2026-06-20 · Natalia · deploy — CRM en Vercel apuntaba a localhost:8000
+- Qué cambió: se agrega `web/.env.production` con `NEXT_PUBLIC_API_URL=https://api.mirkocalzadilla.com/api/v1`. Sin cambios de código.
+- Por qué: el build de Vercel no tenía la variable, así que el CRM deployado (`www.mirkocalzadilla.com/crm`) llamaba al default del código (`http://localhost:8000/api/v1`) → el front intentaba pegar al localhost del visitante y no veía datos reales de prod. `.env.production` (commiteado, no ignorado por `.gitignore`) es durable y no depende de la cuenta Vercel de nadie. URL pública, no secreto. CORS de prod ya permite el origen `https://mirkocalzadilla.com`.
+- Spec/decisión que respeta: CLAUDE.md (API base por `NEXT_PUBLIC_API_URL`; única var pública del front, no usada por la landing → no la rompe); docs en español.
+- Prueba local: CRM en `localhost:3000` levantado con `.env.local`=misma URL → login operador HTTP 200 contra `api.mirkocalzadilla.com/api/v1` y datos reales visibles (mecanismo env→cliente→API→CORS probado). Verificación final del bundle live tras merge (Vercel auto-deploya main).
+- Commit: <pendiente>
+
 - Qué cambió: header de `docs/SPEC_B6_m-config-front.md` de "pendiente de implementar" a implementada (PR #12 + `GET /agents` server PR #46). Sin cambios de código.
 - Por qué: la spec entró al repo dentro del PR #12 con el header pre-implementación; cierre documental pendiente anotado al cerrar B6 (patrón de PR #40/#42 en server).
 - Spec/decisión que respeta: la propia spec (DoD §5 cumplido en el cierre de B6, smoke e2e contra Docker).
