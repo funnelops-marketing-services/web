@@ -36,15 +36,10 @@ export function ConversationPanel({ cardId }: { cardId: string | null }) {
   const { data: card, isLoading, isError } = useCard(cardId)
   const { data: boards } = useBoard()
   const { canOperateCrm } = usePermissions()
-  const setAiActive = useSetAiActive()
+  const setAiActive = useSetAiActive(cardId ?? '')
   const generateEntryMutation = useGenerateEntry(cardId ?? '')
   const sendReply = useSendHumanReply(cardId ?? '')
   const [reply, setReply] = useState('')
-
-  // El contrato de lectura (GET /cards/{id}) aún no expone `is_ai_active`
-  // (SPEC_CRM_FRONT §8): sembramos "activo" y reflejamos lo que confirma el PUT.
-  // El reset por card lo da el `key` en el padre (remonta), no un efecto.
-  const [aiActive, setAiActiveState] = useState(true)
 
   if (!cardId) return <EmptyState text="Seleccioná un lead para ver la conversación" />
   if (isLoading) return <EmptyState text="Cargando conversación…" />
@@ -55,14 +50,7 @@ export function ConversationPanel({ cardId }: { cardId: string | null }) {
   const showGenerateEntry = stageName === 'Pago validado' && !card.is_ai_active
 
   const handleToggle = (next: boolean) => {
-    setAiActiveState(next)
-    setAiActive.mutate(
-      { conversationId: card.conversation_id, isAiActive: next },
-      {
-        onSuccess: (data) => setAiActiveState(data.is_ai_active),
-        onError: () => setAiActiveState(!next),
-      },
-    )
+    setAiActive.mutate({ conversationId: card.conversation_id, isAiActive: next })
   }
 
   return (
@@ -94,7 +82,7 @@ export function ConversationPanel({ cardId }: { cardId: string | null }) {
             <Bot
               className={cn(
                 'size-4 flex-shrink-0',
-                aiActive ? 'text-violet-400' : 'text-zinc-600',
+                card.is_ai_active ? 'text-violet-400' : 'text-zinc-600',
               )}
             />
             <Label
@@ -106,7 +94,7 @@ export function ConversationPanel({ cardId }: { cardId: string | null }) {
           </div>
           <Switch
             id="ai-active"
-            checked={aiActive}
+            checked={card.is_ai_active}
             onCheckedChange={handleToggle}
             disabled={!canOperateCrm || setAiActive.isPending}
             className="data-[state=checked]:bg-violet-600"

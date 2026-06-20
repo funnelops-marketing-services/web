@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 
+import { cn } from '@/lib/utils'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useBoard } from '@/hooks/use-board'
@@ -66,15 +67,30 @@ export function CrmBoard() {
             className="flex min-h-0 flex-1 flex-col"
           >
             <TabsList className="w-fit border border-white/5 bg-white/[0.03]">
-              {pipelines.map((pipeline) => (
-                <TabsTrigger
-                  key={pipeline.id}
-                  value={pipeline.id}
-                  className="data-[state=active]:bg-violet-600 data-[state=active]:text-white"
-                >
-                  {pipeline.name}
-                </TabsTrigger>
-              ))}
+              {pipelines.map((pipeline) => {
+                const count = pipeline.stages.reduce((n, s) => n + s.cards.length, 0)
+                // El pipeline humano con leads = derivados sin atender → señal de alerta.
+                const alert = pipeline.kind === 'human' && count > 0
+                return (
+                  <TabsTrigger
+                    key={pipeline.id}
+                    value={pipeline.id}
+                    className="data-[state=active]:bg-violet-600 data-[state=active]:text-white"
+                  >
+                    {pipeline.name}
+                    {count > 0 && (
+                      <span
+                        className={cn(
+                          'ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold',
+                          alert ? 'bg-fuchsia-500 text-white' : 'bg-white/10 text-zinc-400',
+                        )}
+                      >
+                        {count}
+                      </span>
+                    )}
+                  </TabsTrigger>
+                )
+              })}
             </TabsList>
 
             {pipelines.map((pipeline) => (

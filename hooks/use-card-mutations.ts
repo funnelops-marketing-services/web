@@ -9,8 +9,10 @@ import {
   moveCard,
   sendHumanReply,
   setAiActive,
+  type AiActive,
   type Boards,
   type Card,
+  type CardDetail,
   type QrEntryOut,
   type ThreadMessage,
 } from '@/lib/api/crm'
@@ -89,6 +91,10 @@ interface AiActiveArgs {
   isAiActive: boolean
 }
 
+interface AiActiveContext {
+  previous?: CardDetail
+}
+
 /** Genera entrada QR para una card en "Pago validado" (POST generate-entry). */
 export function useGenerateEntry(cardId: string) {
   const queryClient = useQueryClient()
@@ -123,13 +129,35 @@ export function useSendHumanReply(cardId: string) {
   })
 }
 
-/** Toggle IA por conversación (PUT ai-active). El backend confirma el valor. */
-export function useSetAiActive() {
-  return useMutation({
-    mutationFn: ({ conversationId, isAiActive }: AiActiveArgs) =>
+/** Toggle IA por conversación (PUT ai-active) con update optimista del detalle.
+ * El Switch lee `card.is_ai_active`; el optimismo + rollback evita el desfasaje
+ * que mostraba "on" tras un handoff. */
+export function useSetAiActive(cardId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation<AiActive, Error, AiActiveArgs, AiActiveContext>({
+    mutationFn: ({ conversationId, isAiActive }) =>
       setAiActive(conversationId, isAiActive),
-    onError: () => {
+    onMutate: async ({ isAiActive }) => {
+      await queryClient.cancelQueries({ queryKey: cardKeys.detail(cardId) })
+      const previous = queryClient.getQueryData<CardDetail>(cardKeys.detail(cardId))
+      if (previous) {
+        queryClient.setQueryData<CardDetail>(cardKeys.detail(cardId), {
+          ...previous,
+          is_ai_active: isAiActive,
+        })
+      }
+      return { previous }
+    },
+    onError: (_error, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(cardKeys.detail(cardId), context.previous)
+      }
       toast.error('No se pudo cambiar el estado del agente IA.')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
+      queryClient.invalidateQueries({ queryKey: boardKeys.all })
     },
   })
 }
