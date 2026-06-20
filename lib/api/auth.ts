@@ -21,6 +21,11 @@ export const registerRequestSchema = z.object({
     .regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$/, 'Slug inválido (a-z, 0-9, guiones)'),
 })
 
+export const changePasswordRequestSchema = z.object({
+  current_password: z.string().min(1, 'Contraseña actual requerida'),
+  new_password: z.string().min(8, 'Mínimo 8 caracteres').max(128),
+})
+
 export const tokenResponseSchema = z.object({
   access_token: z.string(),
   token_type: z.string(),
@@ -59,6 +64,7 @@ export const authenticatedUserSchema = z.object({
 
 export type LoginPayload = z.infer<typeof loginRequestSchema>
 export type RegisterPayload = z.infer<typeof registerRequestSchema>
+export type ChangePasswordPayload = z.infer<typeof changePasswordRequestSchema>
 export type TokenResponse = z.infer<typeof tokenResponseSchema>
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>
 export type UserRead = z.infer<typeof userReadSchema>
@@ -80,4 +86,9 @@ export async function register(payload: RegisterPayload): Promise<TokenResponse>
 export async function me(): Promise<AuthenticatedUser> {
   const { data } = await apiClient.get('/auth/me')
   return authenticatedUserSchema.parse(data)
+}
+
+/** Cambia la contraseña del usuario autenticado. 204 sin body; el server resuelve el user del JWT. */
+export async function changePassword(payload: ChangePasswordPayload): Promise<void> {
+  await apiClient.post('/auth/change-password', payload)
 }
