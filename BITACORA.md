@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-20 · Natalia · observabilidad — Sentry Fase 1 (error tracking front)
+- Qué cambió: integración de **Sentry** (`@sentry/nextjs` ^10) para error tracking del front. Archivos nuevos: `sentry.server.config.ts`, `sentry.edge.config.ts`, `instrumentation-client.ts` (init por runtime; `enabled` solo si hay DSN; `tracesSampleRate: 0`; `sendDefaultPii: false`; `onRouterTransitionStart`), `instrumentation.ts` (`register()` + `onRequestError = captureRequestError` para Server Components/route handlers/middleware), `app/global-error.tsx` (captura errores de render del App Router, UI dark). `next.config.mjs` envuelto con `withSentryConfig` (sin source maps en Fase 1: sin authToken). DSN por `NEXT_PUBLIC_SENTRY_DSN` (se setea en Vercel).
+- Por qué: centralizar errores del front junto con el back en Sentry (Fase 1 = solo errores, SaaS free) — pedido de Natalia. Spec: `server/docs/SPEC_observability_phase1.md` (PR-B).
+- Spec/decisión que respeta: `server/docs/SPEC_observability_phase1.md`; CLAUDE.md (TS estricto sin `any`, dark, UI copy ES). Cambio aditivo de observabilidad; no toca CRM/takeover/pipeline/config del agente/realtime ni contratos del backend.
+- Prueba local: `pnpm lint` (0 errores; 4 warnings preexistentes), `pnpm tsc --noEmit` (OK), `pnpm build` (OK con Turbopack + withSentryConfig, sin warnings). Sin DSN el SDK es no-op (`enabled:false`). Test real de envío = tras setear `NEXT_PUBLIC_SENTRY_DSN` en Vercel.
+- Commit: a57a9c46887f5955290dac0afae1ee0beefd1e39
+
 ### 2026-06-20 · Natalia · auth — toggle mostrar/ocultar contraseña (login/register/cambiar clave)
 - Qué cambió: nuevo primitivo `components/ui/password-input.tsx` (`PasswordInput`) = campo de contraseña con botón ojito (Eye/EyeOff de lucide) para mostrar/ocultar el texto y poder validarlo antes de enviar. Aplicado en `components/login-page.tsx` (campo de login), `app/(auth)/register/page.tsx` (FormField usa PasswordInput cuando `type==='password'`) y `components/crm/account/change-password-form.tsx` (los 3 campos). Accesible: `aria-label`/`aria-pressed`, focuseable.
 - Por qué: pedido directo — poder ver la contraseña tecleada previo a login (y por consistencia, en registro y cambio de clave).
