@@ -36,7 +36,8 @@ const navItems: readonly NavItem[] = [
   { label: 'Conversaciones', href: '/crm/conversations', icon: MessagesSquare },
   { label: 'Contactos', href: '/crm/contacts', icon: Users },
   { label: 'Agentes', href: '/crm/agents', icon: Bot, requiresConfig: true },
-  { label: 'Ajustes', href: '/crm/settings', icon: Settings, requiresConfig: true },
+  // Ajustes contiene "Mi cuenta" (todos) + config de plataforma (solo operador, gateada en la página).
+  { label: 'Ajustes', href: '/crm/settings', icon: Settings },
 ]
 
 function isActive(pathname: string, href: string): boolean {

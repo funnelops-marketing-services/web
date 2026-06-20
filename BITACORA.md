@@ -21,6 +21,14 @@
 
 ## Entradas
 
+### 2026-06-20 · Natalia · settings — "Mi cuenta": cambiar contraseña propia
+- Qué cambió: nueva sección "Mi cuenta" en `/crm/settings` para que **cualquier usuario logueado** cambie su propia contraseña. Archivos: `lib/api/auth.ts` (`changePasswordRequestSchema` + `changePassword()` → `POST /auth/change-password`), `hooks/use-change-password.ts` (mutation + clasificador 400/422), `components/crm/account/change-password-form.tsx` (form react-hook-form + Zod: actual / nueva min 8 / confirmar == nueva), `app/crm/settings/page.tsx` (deja de redirigir a no-operadores: "Mi cuenta" para todos, "Usuarios y roles" solo operador), `components/layout/Sidebar.tsx` (link "Ajustes" visible para todos). Spec: `docs/SPEC_change_password_ui.md`.
+- Por qué: todo usuario debe poder rotar su propia clave sin pasar por un operador; es self-service de cuenta, no config de plataforma.
+- Spec/decisión que respeta: `docs/SPEC_change_password_ui.md` (contrato §2, DoD §4); CLAUDE.md (TS estricto sin `any`, <200 líneas, `cn()`, copy ES); FRONTEND_SPEC §RBAC (la config de plataforma sigue operador-only).
+- Mejora de flujo: `/crm/settings` pasa de operador-only a ruta compartida — la sección de config de plataforma (UsersTable) sigue gateada por `canManageConfig`; solo se agregó la sección de cuenta universal. Consistente con el diseño (cambiar la clave propia es para todos).
+- Prueba local: construido contra el contrato (S2 aún sin mergear). `pnpm lint` (0 errores), `tsc --noEmit` (0 errores), `pnpm build` (OK, `/crm/settings` prerenderizada) — todos verdes con el workaround pnpm v11. Validación de form (min 8, mismatch confirmar) y render condicional verificados por tipos/build. Integración real e2e cuando S2 esté en prod.
+- Commit: 87d32fed1e975fce4fa92e0f924b6da8655894dc
+
 ### 2026-06-20 · Natalia · deploy — CRM en Vercel apuntaba a localhost:8000
 - Qué cambió: se agrega `web/.env.production` con `NEXT_PUBLIC_API_URL=https://api.mirkocalzadilla.com/api/v1`. Sin cambios de código.
 - Por qué: el build de Vercel no tenía la variable, así que el CRM deployado (`www.mirkocalzadilla.com/crm`) llamaba al default del código (`http://localhost:8000/api/v1`) → el front intentaba pegar al localhost del visitante y no veía datos reales de prod. `.env.production` (commiteado, no ignorado por `.gitignore`) es durable y no depende de la cuenta Vercel de nadie. URL pública, no secreto. CORS de prod ya permite el origen `https://mirkocalzadilla.com`.
