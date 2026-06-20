@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-20 · Natalia · crm — visibilidad del lead derivado (handoff)
+- Qué cambió: (1) el Switch "Agente IA" del panel de conversación ahora lee directo de `card.is_ai_active` (verdad del server) en vez de un estado local sembrado en `true`; `useSetAiActive(cardId)` hace update optimista del cache del detalle (mismo patrón que `useMoveCard`) + rollback + invalidación. (2) `crm-board.tsx`: cada tab de pipeline muestra un contador de cards; el tab "Gestión Humana" se resalta (acento fucsia) cuando tiene leads. Nuevo `docs/SPEC_handoff_visibility.md`.
+- Por qué: tras un handoff el lead "desaparecía" para el staff — la card se mueve al pipeline "Gestión Humana" (2º tab, sin señal) y el switch mostraba "on" pese a `is_ai_active=false`, así que el staff creía que la IA seguía atendiendo y no cambiaba de tab. No era bug de API/datos (el board devuelve todo correcto): eran dos defectos de front que se potenciaban.
+- Spec/decisión que respeta: docs/SPEC_handoff_visibility.md (alcance mínimo acordado); extiende la señal "badge 🔥 cuando handed_off" ya prevista en CLAUDE.md; toggle `is_ai_active` honesto (sin workaround). Sin cambio de contrato ni de paradigma.
+- Prueba local: `tsc --noEmit` ✓, `eslint .` ✓ (0 errores, 0 warnings nuevos — mis archivos limpios), `next build` ✓. No se corrió repro de handoff en vivo: sin credenciales de prod y backend dev no levantado. (El `npx pnpm <tool>` falla por el bug conocido de pnpm v11 `verify-deps-before-run`; se corrieron los binarios directos / env var `PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false` en el hook.)
+- Commit: 7dcd3c0 · PR #20
+
 ### 2026-06-20 · Natalia · observabilidad — Sentry Fase 1 (error tracking front)
 - Qué cambió: integración de **Sentry** (`@sentry/nextjs` ^10) para error tracking del front. Archivos nuevos: `sentry.server.config.ts`, `sentry.edge.config.ts`, `instrumentation-client.ts` (init por runtime; `enabled` solo si hay DSN; `tracesSampleRate: 0`; `sendDefaultPii: false`; `onRouterTransitionStart`), `instrumentation.ts` (`register()` + `onRequestError = captureRequestError` para Server Components/route handlers/middleware), `app/global-error.tsx` (captura errores de render del App Router, UI dark). `next.config.mjs` envuelto con `withSentryConfig` (sin source maps en Fase 1: sin authToken). DSN por `NEXT_PUBLIC_SENTRY_DSN` (se setea en Vercel).
 - Por qué: centralizar errores del front junto con el back en Sentry (Fase 1 = solo errores, SaaS free) — pedido de Natalia. Spec: `server/docs/SPEC_observability_phase1.md` (PR-B).
