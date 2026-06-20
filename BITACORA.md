@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-20 · Natalia · landing — página pública de Política de Privacidad
+- Qué cambió: nueva ruta `app/privacidad/page.tsx` (URL pública `/privacidad`) con la Política de Privacidad en español, válida para Meta/WhatsApp. Contenido dirigido por datos en `app/privacidad/content.ts` (responsable + contacto `mirko@mirkocalzadilla.com`, datos recogidos, finalidad, terceros Meta/OpenAI/hosting, conservación, derechos, canal WhatsApp/Meta, última actualización). Enlace discreto "Política de privacidad" → `/privacidad` en el footer compartido (`components/landing/site-footer.tsx`). Spec: `docs/SPEC_privacy_policy.md`.
+- Por qué: Meta exige una "Privacy Policy URL" para poder pasar la app de WhatsApp a modo Activo. Esto deja la URL lista (pasar a Activo NO es obligatorio: el bot funciona en Desarrollo).
+- Spec/decisión que respeta: `docs/SPEC_privacy_policy.md`; CLAUDE.md (TS estricto sin `any`, componentes <200 líneas, copy UI en ES, dark violeta/fucsia, contenido data-driven al estilo `landing/data.ts`). No toca CRM, takeover, pipeline, config del agente ni realtime.
+- Prueba local: `pnpm lint` (0 errores; 4 warnings preexistentes en otros archivos), `pnpm tsc --noEmit` (OK), `pnpm build` (OK, `/privacidad` prerenderizada estática). HTML generado verificado: contiene responsable, datos, OpenAI, Meta/WhatsApp, derechos y fecha.
+- Commit:
+
 ### 2026-06-20 · Natalia · settings — "Mi cuenta": cambiar contraseña propia
 - Qué cambió: nueva sección "Mi cuenta" en `/crm/settings` para que **cualquier usuario logueado** cambie su propia contraseña. Archivos: `lib/api/auth.ts` (`changePasswordRequestSchema` + `changePassword()` → `POST /auth/change-password`), `hooks/use-change-password.ts` (mutation + clasificador 400/422), `components/crm/account/change-password-form.tsx` (form react-hook-form + Zod: actual / nueva min 8 / confirmar == nueva), `app/crm/settings/page.tsx` (deja de redirigir a no-operadores: "Mi cuenta" para todos, "Usuarios y roles" solo operador), `components/layout/Sidebar.tsx` (link "Ajustes" visible para todos). Spec: `docs/SPEC_change_password_ui.md`.
 - Por qué: todo usuario debe poder rotar su propia clave sin pasar por un operador; es self-service de cuenta, no config de plataforma.
