@@ -9,6 +9,7 @@ import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import {
   login as loginApi,
@@ -142,9 +143,8 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
               <Label htmlFor="password" className="text-zinc-500 text-xs font-normal tracking-widest uppercase">
                 Contraseña
               </Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-transparent border-0 border-b border-zinc-800 rounded-none px-0 h-11 text-white placeholder:text-zinc-700 focus:border-violet-500 focus-visible:ring-0 focus-visible:ring-offset-0 font-normal"

@@ -10,6 +10,7 @@ import { ArrowLeft } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import {
   register as registerApi,
@@ -169,19 +170,32 @@ interface FormFieldProps {
 }
 
 function FormField({ id, label, value, onChange, type = 'text', error, placeholder }: FormFieldProps) {
+  const fieldClassName =
+    'bg-transparent border-0 border-b border-zinc-800 rounded-none px-0 h-11 text-white placeholder:text-zinc-700 focus:border-violet-500 focus-visible:ring-0 focus-visible:ring-offset-0 font-normal'
   return (
     <div className="space-y-2">
       <Label htmlFor={id} className="text-zinc-500 text-xs font-normal tracking-widest uppercase">
         {label}
       </Label>
-      <Input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="bg-transparent border-0 border-b border-zinc-800 rounded-none px-0 h-11 text-white placeholder:text-zinc-700 focus:border-violet-500 focus-visible:ring-0 focus-visible:ring-offset-0 font-normal"
-      />
+      {type === 'password' ? (
+        <PasswordInput
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          autoComplete="new-password"
+          className={fieldClassName}
+        />
+      ) : (
+        <Input
+          id={id}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={fieldClassName}
+        />
+      )}
       {error ? <p className="text-xs text-fuchsia-400">{error}</p> : null}
     </div>
   )

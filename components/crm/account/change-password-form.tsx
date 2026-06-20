@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { classifyChangePasswordError, useChangePassword } from '@/hooks/use-change-password'
 
@@ -60,9 +60,8 @@ export function ChangePasswordForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-md space-y-5">
       <Field label="Contraseña actual" htmlFor="current_password" error={errors.current_password?.message}>
-        <Input
+        <PasswordInput
           id="current_password"
-          type="password"
           autoComplete="current-password"
           {...register('current_password')}
           className="border-white/10 bg-white/[0.03] text-sm text-white"
@@ -70,9 +69,8 @@ export function ChangePasswordForm() {
       </Field>
 
       <Field label="Nueva contraseña" htmlFor="new_password" error={errors.new_password?.message}>
-        <Input
+        <PasswordInput
           id="new_password"
-          type="password"
           autoComplete="new-password"
           {...register('new_password')}
           className="border-white/10 bg-white/[0.03] text-sm text-white"
@@ -84,9 +82,8 @@ export function ChangePasswordForm() {
         htmlFor="confirm_password"
         error={errors.confirm_password?.message}
       >
-        <Input
+        <PasswordInput
           id="confirm_password"
-          type="password"
           autoComplete="new-password"
           {...register('confirm_password')}
           className="border-white/10 bg-white/[0.03] text-sm text-white"
