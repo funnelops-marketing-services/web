@@ -26,7 +26,7 @@
 - Por qué: pedido directo — poder ver la contraseña tecleada previo a login (y por consistencia, en registro y cambio de clave).
 - Spec/decisión que respeta: CLAUDE.md (primitivo en `components/ui/`, `cn()` para merge de clases, TS estricto sin `any`, componente <200 líneas (33), dark violeta, UI copy en ES). Cambio de UI puro; no toca CRM/takeover/pipeline/config del agente/realtime ni contratos del backend.
 - Prueba local: `pnpm lint` (0 errores; 4 warnings preexistentes en otros archivos), `pnpm tsc --noEmit` (OK), `pnpm build` (OK, `/login` y `/register` prerenderizadas).
-- Commit:
+- Commit: 12dc000261c63b9dc8de7688073aed1edb8bda2c
 
 ### 2026-06-20 · Natalia · landing — página pública de Política de Privacidad
 - Qué cambió: nueva ruta `app/privacidad/page.tsx` (URL pública `/privacidad`) con la Política de Privacidad en español, válida para Meta/WhatsApp. Contenido dirigido por datos en `app/privacidad/content.ts` (responsable + contacto `mirko@mirkocalzadilla.com`, datos recogidos, finalidad, terceros Meta/OpenAI/hosting, conservación, derechos, canal WhatsApp/Meta, última actualización). Enlace discreto "Política de privacidad" → `/privacidad` en el footer compartido (`components/landing/site-footer.tsx`). Spec: `docs/SPEC_privacy_policy.md`.
