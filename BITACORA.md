@@ -27,7 +27,7 @@
 - Spec/decisión que respeta: `docs/SPEC_change_password_ui.md` (contrato §2, DoD §4); CLAUDE.md (TS estricto sin `any`, <200 líneas, `cn()`, copy ES); FRONTEND_SPEC §RBAC (la config de plataforma sigue operador-only).
 - Mejora de flujo: `/crm/settings` pasa de operador-only a ruta compartida — la sección de config de plataforma (UsersTable) sigue gateada por `canManageConfig`; solo se agregó la sección de cuenta universal. Consistente con el diseño (cambiar la clave propia es para todos).
 - Prueba local: construido contra el contrato (S2 aún sin mergear). `pnpm lint` (0 errores), `tsc --noEmit` (0 errores), `pnpm build` (OK, `/crm/settings` prerenderizada) — todos verdes con el workaround pnpm v11. Validación de form (min 8, mismatch confirmar) y render condicional verificados por tipos/build. Integración real e2e cuando S2 esté en prod.
-- Commit: bf9e3328298e514d9632dd89dad93c068188974a
+- Commit: 87d32fed1e975fce4fa92e0f924b6da8655894dc
 
 ### 2026-06-20 · Natalia · deploy — CRM en Vercel apuntaba a localhost:8000
 - Qué cambió: se agrega `web/.env.production` con `NEXT_PUBLIC_API_URL=https://api.mirkocalzadilla.com/api/v1`. Sin cambios de código.
