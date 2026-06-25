@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-25 · Natalia · crm — quick wins UAT Lote 3 (Mi cuenta, cerrar panel, refresh toggle)
+- Qué cambió: (1) `components/layout/Topbar.tsx`: el item "Mi cuenta" del menú de usuario era un `DropdownMenuItem` **sin `onSelect`** (muerto) → ahora `router.push('/crm/settings')` (F1-F5). (2) `components/crm/conversation-panel.tsx`: nuevo prop opcional `onClose` + botón **X** en el header del panel; `crm-board.tsx` lo mapea a `setSelectedCardId(null)` para liberar el dashboard (New#2). (3) `hooks/use-realtime-events.ts`: el evento `handoff` ahora también invalida `cardKeys.detail` de la card abierta (vía `findCardIdByConversation`, igual que `ai_active_changed`) → el toggle "Agente IA" refleja `is_ai_active=false` tras un handoff sin reload (New#1a).
+- Por qué: gaps de la UAT 2026-06-20 — F1-F5 ("no puedo entrar a mi cuenta": el item no navegaba; la pantalla ya existía en `/crm/settings`), New#2 (el panel de chat no se cerraba y tapaba el tablero), New#1a (tras handoff el check IA seguía mostrándose "on" hasta recargar).
+- Spec/decisión que respeta: `server/docs/SPEC_UAT_remediation.md` Lote 3 (3.1/3.2/3.3). Sin cambio de contrato ni de paradigma; extiende el patrón de invalidación ya usado en `ai_active_changed`.
+- Prueba local: `tsc --noEmit` ✓ (binario directo), `eslint` ✓ (sin salida) sobre los 4 archivos. Build completo = gate del CI del PR. Repro en vivo (handoff/realtime) no corrido: sin backend dev levantado. (`npx pnpm <tool>` sigue fallando por el bug pnpm v11; se usan binarios directos.)
+- Commit:
+
 ### 2026-06-20 · Natalia · crm — visibilidad del lead derivado (handoff)
 - Qué cambió: (1) el Switch "Agente IA" del panel de conversación ahora lee directo de `card.is_ai_active` (verdad del server) en vez de un estado local sembrado en `true`; `useSetAiActive(cardId)` hace update optimista del cache del detalle (mismo patrón que `useMoveCard`) + rollback + invalidación. (2) `crm-board.tsx`: cada tab de pipeline muestra un contador de cards; el tab "Gestión Humana" se resalta (acento fucsia) cuando tiene leads. Nuevo `docs/SPEC_handoff_visibility.md`.
 - Por qué: tras un handoff el lead "desaparecía" para el staff — la card se mueve al pipeline "Gestión Humana" (2º tab, sin señal) y el switch mostraba "on" pese a `is_ai_active=false`, así que el staff creía que la IA seguía atendiendo y no cambiaba de tab. No era bug de API/datos (el board devuelve todo correcto): eran dos defectos de front que se potenciaban.
