@@ -138,7 +138,10 @@ export function Topbar() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-white/5" />
-              <DropdownMenuItem className="text-zinc-300 focus:bg-white/5 focus:text-white">
+              <DropdownMenuItem
+                onSelect={() => router.push('/crm/settings')}
+                className="text-zinc-300 focus:bg-white/5 focus:text-white"
+              >
                 <UserCog className="size-4" />
                 Mi cuenta
               </DropdownMenuItem>

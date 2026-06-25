@@ -115,6 +115,7 @@ export function CrmBoard() {
         <ConversationPanel
           key={selectedCardId ?? 'empty'}
           cardId={selectedCardId}
+          onClose={() => setSelectedCardId(null)}
         />
       </div>
     </div>

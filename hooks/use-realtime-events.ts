@@ -60,9 +60,16 @@ function handleEvent(event: CrmEvent, queryClient: QueryClient) {
       queryClient.invalidateQueries({ queryKey: boardKeys.all })
       queryClient.invalidateQueries({ queryKey: cardKeys.detail(event.card_id) })
       break
-    case 'handoff':
+    case 'handoff': {
       queryClient.invalidateQueries({ queryKey: boardKeys.all })
+      // El handoff apaga is_ai_active server-side; refrescar la card abierta para que el
+      // toggle lo refleje sin reload (New#1a). El evento trae conversation_id.
+      const cardId = findCardIdByConversation(queryClient, event.conversation_id)
+      if (cardId) {
+        queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
+      }
       break
+    }
     case 'ai_active_changed': {
       queryClient.invalidateQueries({ queryKey: boardKeys.all })
       // El evento trae conversation_id; cardKeys.detail se indexa por card.id.

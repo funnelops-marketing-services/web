@@ -1,3 +1,5 @@
+allowBuilds:
+  '@sentry/cli': set this to true or false
 # Overrides de seguridad (pnpm v11 lee la config desde aquí, ya no del campo "pnpm" de package.json).
 # Fuerzan versiones parcheadas en dependencias transitivas reportadas por Dependabot:
 #   - lodash <4.18.0  llega vía recharts  -> CVE corregido en 4.18.0
