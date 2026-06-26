@@ -1,0 +1,120 @@
+import { z } from 'zod'
+
+import { apiClient } from '@/lib/api/client'
+
+// ---------- Enums de negocio (espejo de catalog_schemas.py) ----------
+
+export const offerCategories = ['formacion', 'produccion', 'edicion', 'general'] as const
+export const offerCurrencies = ['BOB', 'USD'] as const
+export const offerClosings = ['pago_qr', 'handoff_consultivo'] as const
+
+export const categorySchema = z.enum(offerCategories)
+export const currencySchema = z.enum(offerCurrencies)
+export const closingSchema = z.enum(offerClosings)
+
+// ---------- Schemas (espejo del contrato server Fase 1) ----------
+
+export const assetReadSchema = z.object({
+  id: z.string(),
+  kind: z.enum(['pdf', 'image']),
+  filename: z.string(),
+  public_url: z.string(),
+  bytes: z.number(),
+  created_at: z.string(),
+})
+
+export const offerReadSchema = z.object({
+  id: z.string(),
+  organization_id: z.string(),
+  agent_id: z.string(),
+  slug: z.string(),
+  nombre: z.string(),
+  categoria: z.string(),
+  resumen: z.string(),
+  detalle: z.string().nullable(),
+  precio: z.string(),
+  moneda: z.string(),
+  flujo_cierre: z.string(),
+  asset_id: z.string().nullable(),
+  asset: assetReadSchema.nullable(),
+  orden: z.number(),
+  is_active: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
+})
+
+export const catalogPublishResultSchema = z.object({
+  version_id: z.string(),
+  version_number: z.number(),
+  offers_published: z.number(),
+})
+
+// ---------- Tipos derivados ----------
+
+export type AssetRead = z.infer<typeof assetReadSchema>
+export type OfferRead = z.infer<typeof offerReadSchema>
+export type CatalogPublishResult = z.infer<typeof catalogPublishResultSchema>
+export type OfferCategory = (typeof offerCategories)[number]
+export type OfferCurrency = (typeof offerCurrencies)[number]
+export type OfferClosing = (typeof offerClosings)[number]
+
+export interface OfferCreate {
+  slug: string
+  nombre: string
+  categoria: OfferCategory
+  resumen: string
+  detalle?: string | null
+  precio: string
+  moneda: OfferCurrency
+  flujo_cierre?: OfferClosing
+  asset_id?: string | null
+  orden?: number
+}
+
+export interface OfferUpdate {
+  nombre?: string
+  categoria?: OfferCategory
+  resumen?: string
+  detalle?: string | null
+  precio?: string
+  moneda?: OfferCurrency
+  flujo_cierre?: OfferClosing
+  asset_id?: string | null
+  orden?: number
+  is_active?: boolean
+}
+
+// ---------- Llamadas tipadas ----------
+
+export async function listOffers(agentId: string): Promise<OfferRead[]> {
+  const { data } = await apiClient.get(`/agents/${agentId}/offers`)
+  return z.array(offerReadSchema).parse(data)
+}
+
+export async function createOffer(agentId: string, body: OfferCreate): Promise<OfferRead> {
+  const { data } = await apiClient.post(`/agents/${agentId}/offers`, body)
+  return offerReadSchema.parse(data)
+}
+
+export async function updateOffer(offerId: string, body: OfferUpdate): Promise<OfferRead> {
+  const { data } = await apiClient.put(`/offers/${offerId}`, body)
+  return offerReadSchema.parse(data)
+}
+
+export async function deleteOffer(offerId: string): Promise<void> {
+  await apiClient.delete(`/offers/${offerId}`)
+}
+
+export async function uploadAsset(file: File): Promise<AssetRead> {
+  const formData = new FormData()
+  formData.append('file', file)
+  const { data } = await apiClient.post('/assets', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return assetReadSchema.parse(data)
+}
+
+export async function publishCatalog(agentId: string): Promise<CatalogPublishResult> {
+  const { data } = await apiClient.post(`/agents/${agentId}/catalog/publish`)
+  return catalogPublishResultSchema.parse(data)
+}
