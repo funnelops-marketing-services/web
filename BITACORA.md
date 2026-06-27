@@ -26,7 +26,7 @@
 - Por qué: la implementación previa del cierre (PR #21, *quick wins UAT Lote 3*, autora Natalia) dejaba el panel siempre montado: al cerrar, la card se deseleccionaba pero la columna vacía seguía ocupando espacio del kanban. Esta versión colapsa la columna (era el cambio del PR #67, cerrado por basarse en un main viejo; se rehace sobre main actual). Decisión: prevalece esta versión por mejor UX.
 - Spec/decisión que respeta: CLAUDE.md — "Inbox + takeover". Supersede el detalle de layout de #31/PR #21 sin cambiar contrato ni paradigma; no toca `is_ai_active`, routing `/crm`, pipeline ni realtime. `inbox-view` intacto (ya colapsaba su propio panel).
 - Prueba local: `pnpm lint` ✓ (0 errores; 5 warnings preexistentes) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
-- Commit:
+- Commit: 13d6c76
 
 ### 2026-06-27 · Natalia · lib/validation — helper de validación de inputs (#46)
 - Qué cambió: nuevo módulo `lib/validation/` (base que reusan todos los forms). (1) `messages.ts`: mensajes de error en español, fuente única. (2) `fields.ts`: validadores zod reusables — `email`, `phoneBO` (8 dígitos locales `[67]…`), `requiredText(max)`/`optionalText(max)`, `slug` (regex + `SLUG_MAX=20`), `currency` (enum BOB/USD), `priceText` (legacy display) y `priceInput` (numérico > 0), `enumField` factory; sanitizadores que **bloquean el ingreso** del dato no permitido (`digitsOnly`, `sanitizePhoneInput` tope 8, `sanitizeSlugInput`); helpers de display `formatPrice`/`currencySymbol` (concatena precio+moneda) y `normalizePhoneBO` (forma canónica `591…` para `external_id`). (3) `index.ts`: API pública.
