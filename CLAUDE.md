@@ -38,6 +38,21 @@ Package manager is **pnpm** (`npx pnpm`).
 
 Usá **`/close`**: muestra el diff, lo verifica contra `docs/FRONTEND_SPEC.md` + estas reglas, registra la entrada en [BITACORA.md](BITACORA.md), corre `pnpm lint`/`tsc`/`build` y arma el commit. **No se commitea contra el diseño.**
 
+## Flujo de issues (GitHub Projects) — obligatorio para todos (humanos e IA)
+
+Antes de tocar código de un issue, y a lo largo del trabajo, **mové la tarjeta en el board**:
+
+1. **Al empezar** a trabajar un issue → moverlo a **In Progress** (no dejarlo en Todo mientras lo trabajás).
+2. **Al testear / abrir el PR** → moverlo a **Review**.
+3. **Al mergear el PR** → debe pasar **solo** a **Done** (lo hace el workflow del Project + el `Closes #N` del PR; ver abajo).
+
+Reglas que lo hacen automático y evitan issues huérfanos en Todo:
+
+- **Una rama por issue, desde `main` actualizado.** Antes de crear la rama: `git checkout main && git pull --ff-only`. Nunca ramificar de un `main` viejo (causa trabajo duplicado).
+- **El PR SIEMPRE enlaza su issue** con `Closes #<n>` (o `Fixes #<n>`) en el cuerpo. Sin eso, al mergear el issue no se cierra ni pasa a Done.
+- **Un PR combo que resuelve varios issues** debe listar `Closes #a`, `Closes #b`, `Closes #c` (uno por línea). No enlazar = tarjetas que quedan en Todo aunque el trabajo ya esté en `main`.
+- Antes de empezar un issue, verificá que **no esté ya hecho en `main`** (puede haberse entregado en otro PR sin enlazar).
+
 ## Project Structure
 
 - `app/` — rutas (App Router). `components/` — UI (primitivos en `components/ui/`). `hooks/` — hooks. `lib/` — utils, Axios. `store/` — Zustand.

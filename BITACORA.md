@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-27 · Nova · workflow — flujo de issues obligatorio + autofetch de VSCode
+- Qué cambió: (1) `CLAUDE.md`: nueva sección **"Flujo de issues (GitHub Projects)"** — obligatoria para humanos e IA: mover la tarjeta a In Progress al empezar, a Review al testear/abrir PR, y a Done solo al mergear (vía workflow del Project + `Closes #N`); una rama por issue desde `main` actualizado; el PR siempre enlaza su issue (combo = un `Closes #` por issue); verificar que el issue no esté ya hecho en main. (2) `.vscode/settings.json` (nuevo, versionado): `git.autofetch` + `autofetchPeriod` + `pullBeforeCheckout` + aviso al commitear directo a `main`. (3) `.vscode/tasks.json` (nuevo): task `git fetch` con `runOn: folderOpen`.
+- Por qué: issues quedaban huérfanos en Todo aunque el trabajo estuviera en main (PR combo sin `Closes`), y el `main` local desactualizado provocó trabajo duplicado (PR #67 rehízo algo ya entregado en #21). Esto lo previene a nivel proceso + tooling.
+- Spec/decisión que respeta: CLAUDE.md (convenciones del repo + gobernanza de PRs ya existente en CONTRIBUTING.md). Cambio de proceso/config; cero impacto en runtime/CRM/contratos.
+- Prueba local: no aplica build (solo docs + config de editor). `pnpm lint/tsc/build` siguen verdes (heredados del fix apilado).
+- Commit:
+
 ### 2026-06-27 · Nova · crm — colapsar la columna del panel al cerrar la conversación (#31, mejora)
 - Qué cambió: `crm-board.tsx` ahora **renderiza la columna del panel solo cuando hay `selectedCardId`** (envuelto en `{selectedCardId && (…)}`, `key={selectedCardId}`); al cerrar, la columna del 30% desaparece y el tablero recupera el ancho completo. Antes quedaba una columna vacía muerta con EmptyState. `conversation-panel.tsx`: pulido del botón de cierre (`type="button"`, `rounded-lg`). `onClose` sigue opcional (no rompe el reuso en `inbox-view`).
 - Por qué: la implementación previa del cierre (PR #21, *quick wins UAT Lote 3*, autora Natalia) dejaba el panel siempre montado: al cerrar, la card se deseleccionaba pero la columna vacía seguía ocupando espacio del kanban. Esta versión colapsa la columna (era el cambio del PR #67, cerrado por basarse en un main viejo; se rehace sobre main actual). Decisión: prevalece esta versión por mejor UX.

@@ -1,0 +1,10 @@
+{
+  // Mantener el repo sincronizado y evitar ramificar de un main viejo.
+  "git.autofetch": true,
+  "git.autofetchPeriod": 180,
+  "git.pullBeforeCheckout": true,
+  "git.fetchOnPull": true,
+  // Avisar antes de commitear directo sobre main (se trabaja por ramas + PR).
+  "git.branchProtection": ["main"],
+  "git.branchProtectionPrompt": "alwaysCommitToNewBranch"
+}
