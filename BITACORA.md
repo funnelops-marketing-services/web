@@ -26,7 +26,7 @@
 - Por qué: issues quedaban huérfanos en Todo aunque el trabajo estuviera en main (PR combo sin `Closes`), y el `main` local desactualizado provocó trabajo duplicado (PR #67 rehízo algo ya entregado en #21). Esto lo previene a nivel proceso + tooling.
 - Spec/decisión que respeta: CLAUDE.md (convenciones del repo + gobernanza de PRs ya existente en CONTRIBUTING.md). Cambio de proceso/config; cero impacto en runtime/CRM/contratos.
 - Prueba local: no aplica build (solo docs + config de editor). `pnpm lint/tsc/build` siguen verdes (heredados del fix apilado).
-- Commit:
+- Commit: 8b60801
 
 ### 2026-06-27 · Nova · crm — colapsar la columna del panel al cerrar la conversación (#31, mejora)
 - Qué cambió: `crm-board.tsx` ahora **renderiza la columna del panel solo cuando hay `selectedCardId`** (envuelto en `{selectedCardId && (…)}`, `key={selectedCardId}`); al cerrar, la columna del 30% desaparece y el tablero recupera el ancho completo. Antes quedaba una columna vacía muerta con EmptyState. `conversation-panel.tsx`: pulido del botón de cierre (`type="button"`, `rounded-lg`). `onClose` sigue opcional (no rompe el reuso en `inbox-view`).
