@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-27 · Natalia · crm — botón cerrar en el panel de conversación
+- Qué cambió: `conversation-panel.tsx` agrega un botón ✕ ("Cerrar conversación") en el header del hilo, con prop `onClose: () => void`. `crm-board.tsx` ahora renderiza el panel solo cuando hay `selectedCardId` (antes el panel ocupaba el 30% del ancho con un EmptyState permanente); al cerrar se limpia `selectedCardId` y el tablero recupera el ancho completo.
+- Por qué: el staff no podía colapsar el hilo una vez abierto; el panel quedaba fijo ocupando espacio del kanban. El botón de cerrar devuelve el control y el espacio.
+- Spec/decisión que respeta: UX del inbox del CRM (CLAUDE.md — "Inbox + takeover"). No toca el toggle `is_ai_active`, ni el routing `/crm`, ni contratos con el backend. Sin cambio de paradigma.
+- Prueba local: `pnpm lint` ✓ (0 errores; 4 warnings preexistentes en hooks/use-mobile.ts), `pnpm tsc --noEmit` ✓, `pnpm build` ✓ (con `PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false` por el bug conocido de pnpm v11). `pnpm-workspace.yaml` quedó modificado con placeholders inválidos de pnpm v11 (`allowBuilds: set this to true or false`) — NO se commitea acá; se resuelve aparte definiendo los true/false reales.
+- Commit:
+
 ### 2026-06-20 · Natalia · crm — visibilidad del lead derivado (handoff)
 - Qué cambió: (1) el Switch "Agente IA" del panel de conversación ahora lee directo de `card.is_ai_active` (verdad del server) en vez de un estado local sembrado en `true`; `useSetAiActive(cardId)` hace update optimista del cache del detalle (mismo patrón que `useMoveCard`) + rollback + invalidación. (2) `crm-board.tsx`: cada tab de pipeline muestra un contador de cards; el tab "Gestión Humana" se resalta (acento fucsia) cuando tiene leads. Nuevo `docs/SPEC_handoff_visibility.md`.
 - Por qué: tras un handoff el lead "desaparecía" para el staff — la card se mueve al pipeline "Gestión Humana" (2º tab, sin señal) y el switch mostraba "on" pese a `is_ai_active=false`, así que el staff creía que la IA seguía atendiendo y no cambiaba de tab. No era bug de API/datos (el board devuelve todo correcto): eran dos defectos de front que se potenciaban.

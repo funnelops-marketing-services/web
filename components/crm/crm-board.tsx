@@ -111,12 +111,15 @@ export function CrmBoard() {
         )}
       </div>
 
-      <div className="hidden w-[30%] flex-col border-l border-white/5 bg-zinc-950/40 lg:flex">
-        <ConversationPanel
-          key={selectedCardId ?? 'empty'}
-          cardId={selectedCardId}
-        />
-      </div>
+      {selectedCardId && (
+        <div className="hidden w-[30%] flex-col border-l border-white/5 bg-zinc-950/40 lg:flex">
+          <ConversationPanel
+            key={selectedCardId}
+            cardId={selectedCardId}
+            onClose={() => setSelectedCardId(null)}
+          />
+        </div>
+      )}
     </div>
   )
 }

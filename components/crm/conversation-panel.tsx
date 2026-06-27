@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Bot, MessageSquare, QrCode, Send } from 'lucide-react'
+import { Bot, MessageSquare, QrCode, Send, X } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -32,7 +32,13 @@ function EmptyState({ text }: { text: string }) {
 }
 
 /** Panel derecho: hilo espejo + toggle IA + input humano (takeover). */
-export function ConversationPanel({ cardId }: { cardId: string | null }) {
+export function ConversationPanel({
+  cardId,
+  onClose,
+}: {
+  cardId: string | null
+  onClose: () => void
+}) {
   const { data: card, isLoading, isError } = useCard(cardId)
   const { data: boards } = useBoard()
   const { canOperateCrm } = usePermissions()
@@ -57,10 +63,20 @@ export function ConversationPanel({ cardId }: { cardId: string | null }) {
     <>
       <div className="border-b border-white/5 p-4">
         <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-sm font-bold text-white">
+          <div className="flex size-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-sm font-bold text-white">
             {card.title.charAt(0).toUpperCase()}
           </div>
-          <p className="truncate text-sm font-bold text-white">{card.title}</p>
+          <p className="min-w-0 flex-1 truncate text-sm font-bold text-white">{card.title}</p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            aria-label="Cerrar conversación"
+            className="size-8 flex-shrink-0 rounded-lg text-zinc-500 hover:bg-white/5 hover:text-white"
+          >
+            <X className="size-4" />
+          </Button>
         </div>
       </div>
 
