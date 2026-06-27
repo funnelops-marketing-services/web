@@ -26,7 +26,7 @@
 - Por qué: el staff no podía colapsar el hilo una vez abierto; el panel quedaba fijo ocupando espacio del kanban. El botón de cerrar devuelve el control y el espacio.
 - Spec/decisión que respeta: UX del inbox del CRM (CLAUDE.md — "Inbox + takeover"). No toca el toggle `is_ai_active`, ni el routing `/crm`, ni contratos con el backend. Sin cambio de paradigma.
 - Prueba local: `pnpm lint` ✓ (0 errores; 4 warnings preexistentes en hooks/use-mobile.ts), `pnpm tsc --noEmit` ✓, `pnpm build` ✓ (con `PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false` por el bug conocido de pnpm v11). `pnpm-workspace.yaml` quedó modificado con placeholders inválidos de pnpm v11 (`allowBuilds: set this to true or false`) — NO se commitea acá; se resuelve aparte definiendo los true/false reales.
-- Commit:
+- Commit: 3dd711a
 
 ### 2026-06-20 · Natalia · crm — visibilidad del lead derivado (handoff)
 - Qué cambió: (1) el Switch "Agente IA" del panel de conversación ahora lee directo de `card.is_ai_active` (verdad del server) en vez de un estado local sembrado en `true`; `useSetAiActive(cardId)` hace update optimista del cache del detalle (mismo patrón que `useMoveCard`) + rollback + invalidación. (2) `crm-board.tsx`: cada tab de pipeline muestra un contador de cards; el tab "Gestión Humana" se resalta (acento fucsia) cuando tiene leads. Nuevo `docs/SPEC_handoff_visibility.md`.
