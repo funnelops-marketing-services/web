@@ -1,0 +1,12 @@
+// Single source of validation messages. UI copy in Spanish (Bolivian client).
+
+export const validationMessages = {
+  required: 'Campo requerido',
+  email: 'Email inválido',
+  phone: 'Teléfono inválido',
+  slug: 'Identificador inválido (a-z, 0-9, guiones)',
+  currency: 'Moneda inválida',
+  priceRequired: 'Precio requerido',
+  priceAmount: 'El precio debe ser mayor a 0',
+  maxLength: (max: number) => `Máximo ${max} caracteres`,
+} as const
