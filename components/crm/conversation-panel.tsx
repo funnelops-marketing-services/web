@@ -69,11 +69,12 @@ export function ConversationPanel({
           <p className="min-w-0 flex-1 truncate text-sm font-bold text-white">{card.title}</p>
           {onClose && (
             <Button
+              type="button"
               variant="ghost"
               size="icon"
               aria-label="Cerrar conversación"
               onClick={onClose}
-              className="size-8 flex-shrink-0 rounded-full text-zinc-500 hover:bg-white/5 hover:text-white"
+              className="size-8 flex-shrink-0 rounded-lg text-zinc-500 hover:bg-white/5 hover:text-white"
             >
               <X className="size-4" />
             </Button>
