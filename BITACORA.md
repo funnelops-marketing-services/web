@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-27 · Natalia · config — aprobar build scripts en pnpm-workspace.yaml (allowBuilds)
+- Qué cambió: se completó el bloque `allowBuilds` en `pnpm-workspace.yaml` con valores reales `true` para `@sentry/cli`, `sharp` y `unrs-resolver` (antes tenía el placeholder inválido de pnpm v11 `set this to true or false`, solo para `@sentry/cli`). pnpm v10+ bloquea por seguridad los scripts de build/postinstall de dependencias hasta aprobarlos explícitamente; estos tres compilan binarios nativos (`sharp` es la lib de imágenes que usa Next).
+- Por qué: con el placeholder, todo comando `pnpm` fallaba con `ERR_PNPM_IGNORED_BUILDS` y obligaba al workaround `PNPM_CONFIG_VERIFY_DEPS_BEFORE_RUN=false`. Al aprobar los builds, `pnpm lint/tsc/build/dev` corren sin el workaround. Visto bueno de Natalia.
+- Spec/decisión que respeta: CLAUDE.md (pnpm como package manager; pnpm v11 lee config desde pnpm-workspace.yaml). Cambio de config/housekeeping; no toca CRM/takeover/pipeline/config del agente/realtime ni contratos del backend.
+- Prueba local: `pnpm lint` ✓ (0 errores, sin el env var de workaround; el `ERR_PNPM_IGNORED_BUILDS` ya no aparece; 4 warnings preexistentes en hooks/use-mobile.ts).
+- Commit: d4552cf
+
 ### 2026-06-26 · Natalia · crm — pantalla Catálogo (Fase 1, operador)
 - Qué cambió: nueva pantalla **Catálogo** en el CRM (`/crm/catalogo`), solo `platform_operator`. (1) `lib/api/catalogo.ts`: schemas Zod + llamadas tipadas (list/create/update/delete offers, upload PDF multipart, publish) espejo del contrato server Fase 1. (2) `lib/api/errors.ts`: `apiErrorMessage` extraído para reuso. (3) `hooks/use-catalogo.ts`: hooks React Query (useOffers, useCreate/Update/DeleteOffer, useUploadAsset, usePublishCatalog) con toasts. (4) `components/crm/catalog/`: `catalog-screen` (header + publicar + nueva oferta), `catalog-table` (lista agrupada por categoría, drag para reordenar dentro de la categoría, toggle activa, editar/desactivar), `offer-editor` (Sheet lateral con form rhf + subir/reemplazar PDF + vista previa en vivo), `offer-preview` (cómo lo ve el lead), `labels`. (5) `app/crm/catalogo/page.tsx`: gate por `canManageConfig` + carga del agente. (6) `Sidebar.tsx`: ítem "Catálogo" (requiresConfig).
 - Por qué: la data del catálogo del bot la maneja negocio desde una UI (no JSON ni deploy), con versionado al publicar. Es el front de la Fase 1 (SPEC_admin_catalogo_kb §6); el backend (offer/asset + CRUD + upload + publish) se mergeó en server PR #63.
