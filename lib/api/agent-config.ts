@@ -27,6 +27,21 @@ export const agentReadSchema = z.object({
   current_version: agentVersionReadSchema.nullable(),
 })
 
+export const modelPricingReadSchema = z.object({
+  input: z.number(),
+  cached_input: z.number(),
+  output: z.number(),
+})
+
+export const modelReadSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  provider: z.string(),
+  reasoning: z.boolean(),
+  reasoning_effort: z.string().nullable(),
+  pricing: modelPricingReadSchema.nullable(),
+})
+
 export const userWithRoleSchema = z.object({
   id: z.string(),
   email: z.string(),
@@ -40,10 +55,12 @@ export const userWithRoleSchema = z.object({
 
 export type AgentVersionRead = z.infer<typeof agentVersionReadSchema>
 export type AgentRead = z.infer<typeof agentReadSchema>
+export type ModelRead = z.infer<typeof modelReadSchema>
 export type UserWithRole = z.infer<typeof userWithRoleSchema>
 
 /** Cambios a aplicar; `config` reemplaza el JSON completo (no merge parcial). */
 export interface AgentUpdate {
+  display_name?: string
   system_prompt?: string
   model?: string
   config?: Record<string, unknown>
@@ -60,6 +77,12 @@ export async function listAgents(): Promise<AgentRead[]> {
 export async function getAgent(id: string): Promise<AgentRead> {
   const { data } = await apiClient.get(`/agents/${id}`)
   return agentReadSchema.parse(data)
+}
+
+/** Catálogo de modelos permitidos (pobla el dropdown de modelo, #103/#60). */
+export async function listModels(): Promise<ModelRead[]> {
+  const { data } = await apiClient.get('/agents/models')
+  return z.array(modelReadSchema).parse(data)
 }
 
 export async function updateAgent(

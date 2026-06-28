@@ -1,98 +1,93 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Slider } from '@/components/ui/slider'
+import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
-import { useUpdateAgentConfig } from '@/hooks/use-agent-config'
+import { useAgentModels, useUpdateAgentConfig } from '@/hooks/use-agent-config'
 import type { AgentRead, AgentUpdate } from '@/lib/api/agent-config'
 
 interface FormValues {
+  display_name: string
   system_prompt: string
   model: string
-  temperature: string
-  services: string
-  faq: string
-  change_summary: string
+  temperature: number
+  emojis: boolean
 }
 
-/** JSON legible para el textarea; clave ausente → vacío (no la reintroducimos). */
-function toText(value: unknown): string {
-  return value === undefined ? '' : JSON.stringify(value, null, 2)
-}
-
-/** Editor del agente. `config` se reemplaza completo en el server: lo reconstruimos
- *  desde el `config` cargado y solo pisamos los campos editados (preserva emojis, etc.). */
+/** Editor del agente. Modelo = dropdown del catálogo (#60); temperatura = slider 0–1;
+ *  emojis = switch on/off (#61). Servicios/FAQ/Resumen salen del Catálogo (#62), no del form.
+ *  `config` se reemplaza completo en el server: lo reconstruimos desde el `config` cargado
+ *  para preservar las keys que el form no maneja (p. ej. `services`, server-owned). */
 export function AgentConfigForm({ agent }: { agent: AgentRead }) {
   const mutation = useUpdateAgentConfig(agent.id)
-  const { register, handleSubmit, formState } = useForm<FormValues>({
+  const { data: models } = useAgentModels()
+  const { register, control, handleSubmit, formState } = useForm<FormValues>({
     defaultValues: {
+      display_name: agent.display_name,
       system_prompt: agent.system_prompt,
       model: agent.model,
-      temperature: agent.config.temperature === undefined ? '' : String(agent.config.temperature),
-      services: toText(agent.config.services),
-      faq: toText(agent.config.faq),
-      change_summary: '',
+      temperature: typeof agent.config.temperature === 'number' ? agent.config.temperature : 0.7,
+      emojis: agent.config.emojis === true,
     },
   })
   const { dirtyFields, isDirty } = formState
 
+  // El modelo guardado podría no estar en el catálogo (valor viejo): lo agregamos
+  // para que el dropdown lo muestre en vez de quedar vacío.
+  const options = models ?? []
+  const modelOptions = options.some((m) => m.id === agent.model)
+    ? options
+    : [{ id: agent.model, label: agent.model }, ...options]
+
   const onSubmit = (values: FormValues) => {
     const body: AgentUpdate = {}
+    if (dirtyFields.display_name) body.display_name = values.display_name.trim()
     if (dirtyFields.system_prompt) body.system_prompt = values.system_prompt
     if (dirtyFields.model) body.model = values.model
 
-    if (dirtyFields.temperature || dirtyFields.services || dirtyFields.faq) {
-      // Spread preserves config keys the form doesn't expose (e.g. emojis): the
-      // server replaces config wholesale, so we only override the edited keys.
+    if (dirtyFields.temperature || dirtyFields.emojis) {
+      // Spread preserves keys the form doesn't expose (e.g. services, server-owned);
+      // los nodos manuales viejos se quitan del payload (el server igual los descarta).
       const config: Record<string, unknown> = { ...agent.config }
-      if (dirtyFields.temperature) {
-        const raw = values.temperature.trim()
-        if (raw === '') {
-          delete config.temperature
-        } else {
-          const num = Number(raw)
-          if (!Number.isFinite(num)) return toast.error('La temperatura debe ser un número.')
-          config.temperature = num
-        }
-      }
-      // Cleared field → drop the key (runtime reads via .get(); absent == null).
-      for (const field of ['services', 'faq'] as const) {
-        if (!dirtyFields[field]) continue
-        const raw = values[field].trim()
-        if (raw === '') {
-          delete config[field]
-          continue
-        }
-        try {
-          config[field] = JSON.parse(raw)
-        } catch {
-          return toast.error(`JSON inválido en ${field === 'services' ? 'Servicios' : 'FAQ'}.`)
-        }
-      }
+      delete config.ofertas
+      delete config.faq
+      delete config.resumen
+      if (dirtyFields.temperature) config.temperature = values.temperature
+      if (dirtyFields.emojis) config.emojis = values.emojis
       body.config = config
     }
-
-    const summary = values.change_summary.trim()
-    if (summary) body.change_summary = summary
 
     if (Object.keys(body).length === 0) return toast.info('No hay cambios para guardar.')
     mutation.mutate(body)
   }
 
-  const versionLabel = agent.current_version
-    ? `Versión actual: v${agent.current_version.version_number}`
-    : 'Sin versiones guardadas'
+  const version = agent.current_version?.version_number ?? null
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Agente</h1>
-          <p className="text-sm text-zinc-500">{versionLabel}</p>
+        <div className="space-y-1.5">
+          <h1 className="text-2xl font-bold text-white">{agent.display_name}</h1>
+          {version !== null ? (
+            <span className="inline-flex items-center rounded-full bg-violet-500/15 px-2.5 py-0.5 text-xs font-medium text-violet-300 ring-1 ring-violet-500/30">
+              Versión {version}
+            </span>
+          ) : (
+            <p className="text-sm text-zinc-500">Sin versiones guardadas</p>
+          )}
         </div>
         <Button
           type="submit"
@@ -102,6 +97,14 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
           {mutation.isPending ? 'Guardando…' : 'Guardar'}
         </Button>
       </div>
+
+      <Field label="Nombre del agente" htmlFor="display_name">
+        <Input
+          id="display_name"
+          {...register('display_name')}
+          className="border-white/10 bg-white/[0.03] text-sm text-white"
+        />
+      </Field>
 
       <Field label="System prompt" htmlFor="system_prompt">
         <Textarea
@@ -114,52 +117,62 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Modelo" htmlFor="model">
-          <Input
-            id="model"
-            {...register('model')}
-            className="border-white/10 bg-white/[0.03] text-sm text-white"
+          <Controller
+            control={control}
+            name="model"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger
+                  id="model"
+                  className="w-full border-white/10 bg-white/[0.03] text-sm text-white"
+                >
+                  <SelectValue placeholder="Elegí un modelo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {modelOptions.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
         </Field>
-        <Field label="Temperatura (0–1)" htmlFor="temperature">
-          <Input
-            id="temperature"
-            type="number"
-            step="0.01"
-            min="0"
-            max="1"
-            {...register('temperature')}
-            className="border-white/10 bg-white/[0.03] text-sm text-white"
-          />
-        </Field>
+        <Controller
+          control={control}
+          name="temperature"
+          render={({ field }) => (
+            <Field label={`Temperatura: ${field.value.toFixed(2)}`} htmlFor="temperature">
+              <Slider
+                id="temperature"
+                min={0}
+                max={1}
+                step={0.01}
+                value={[field.value]}
+                onValueChange={(v) => field.onChange(v[0])}
+                className="py-3"
+              />
+            </Field>
+          )}
+        />
       </div>
 
-      <Field label="Servicios (JSON)" htmlFor="services">
-        <Textarea
-          id="services"
-          rows={6}
-          {...register('services')}
-          className="border-white/10 bg-white/[0.03] font-mono text-sm text-white"
+      <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+        <div className="space-y-1">
+          <Label htmlFor="emojis" className="text-sm font-medium text-white">
+            Emojis
+          </Label>
+          <p className="text-xs text-zinc-500">El agente usa emojis en sus respuestas.</p>
+        </div>
+        <Controller
+          control={control}
+          name="emojis"
+          render={({ field }) => (
+            <Switch id="emojis" checked={field.value} onCheckedChange={field.onChange} />
+          )}
         />
-      </Field>
-
-      <Field label="FAQ (JSON)" htmlFor="faq">
-        <Textarea
-          id="faq"
-          rows={6}
-          {...register('faq')}
-          className="border-white/10 bg-white/[0.03] font-mono text-sm text-white"
-        />
-      </Field>
-
-      <Field label="Resumen del cambio" htmlFor="change_summary">
-        <Input
-          id="change_summary"
-          maxLength={500}
-          placeholder="Qué cambiaste y por qué (opcional)"
-          {...register('change_summary')}
-          className="border-white/10 bg-white/[0.03] text-sm text-white placeholder:text-zinc-600"
-        />
-      </Field>
+      </div>
     </form>
   )
 }
