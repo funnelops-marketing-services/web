@@ -1,17 +1,19 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Search } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { digitsOnly } from '@/lib/validation/fields'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useBoard } from '@/hooks/use-board'
 import { useMoveCard } from '@/hooks/use-card-mutations'
 import { PipelineBoard } from '@/components/crm/pipeline-board'
 import { CardDetailDialog } from '@/components/crm/card-detail-dialog'
+import { OpportunityCreateSheet } from '@/components/crm/opportunity-create'
 import type { Card, Pipeline } from '@/lib/api/crm'
 
 function BoardSkeleton() {
@@ -60,6 +62,7 @@ export function CrmBoard() {
   const moveCard = useMoveCard()
   const [activePipelineId, setActivePipelineId] = useState<string | null>(null)
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
+  const [createOpen, setCreateOpen] = useState(false)
   const [query, setQuery] = useState('')
 
   const q = query.trim().toLowerCase()
@@ -83,14 +86,23 @@ export function CrmBoard() {
               Arrastrá las tarjetas entre columnas para actualizar el estado.
             </p>
           </div>
-          <div className="relative w-64 flex-shrink-0">
-            <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-600" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar por nombre o número…"
-              className="h-10 rounded-full border-white/10 bg-white/[0.03] pl-9 text-sm font-normal text-white placeholder:text-zinc-600"
-            />
+          <div className="flex flex-shrink-0 items-center gap-2">
+            <div className="relative w-64">
+              <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-600" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar por nombre o número…"
+                className="h-10 rounded-full border-white/10 bg-white/[0.03] pl-9 text-sm font-normal text-white placeholder:text-zinc-600"
+              />
+            </div>
+            <Button
+              onClick={() => setCreateOpen(true)}
+              className="h-10 flex-shrink-0 gap-1.5 rounded-full bg-gradient-to-b from-violet-500 to-violet-700 px-4 text-sm font-medium text-white hover:from-violet-400 hover:to-violet-600"
+            >
+              <Plus className="size-4" />
+              Nueva oportunidad
+            </Button>
           </div>
         </div>
 
@@ -159,6 +171,7 @@ export function CrmBoard() {
         cardId={selectedCardId}
         onClose={() => setSelectedCardId(null)}
       />
+      <OpportunityCreateSheet open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }

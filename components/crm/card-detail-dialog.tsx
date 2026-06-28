@@ -56,7 +56,7 @@ export function CardDetailDialog({ cardId, onClose }: CardDetailDialogProps) {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="detalles" className="min-h-0">
-              <OpportunityDetails cardId={renderId} />
+              <OpportunityDetails cardId={renderId} onDeleted={onClose} />
             </TabsContent>
             <TabsContent value="chat" className="flex min-h-0 flex-col">
               <ConversationPanel cardId={renderId} />
@@ -65,7 +65,7 @@ export function CardDetailDialog({ cardId, onClose }: CardDetailDialogProps) {
         ) : (
           <div className="grid min-h-0 flex-1 grid-cols-2">
             <div className="min-h-0 border-r border-white/5">
-              <OpportunityDetails cardId={renderId} />
+              <OpportunityDetails cardId={renderId} onDeleted={onClose} />
             </div>
             <div className="flex min-h-0 flex-col">
               <ConversationPanel cardId={renderId} />
