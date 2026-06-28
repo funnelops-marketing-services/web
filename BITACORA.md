@@ -26,7 +26,7 @@
 - Por qué: #82 — el operador asigna/quita servicios a la oportunidad desde el detalle y los ve. Diferenciación visual asignado vs capturado. Contraparte BE: #132 (`PUT /crm/cards/{id}/services`, `services[]` en `CardDetailOut`).
 - Spec/decisión que respeta: FRONTEND_SPEC (detalle de oportunidad). El PUT setea el set **asignado**; los capturados del bot quedan intactos (los maneja #133). Sin `any`, componente <200 líneas, dark/violeta, copy ES.
 - Prueba local: `pnpm lint` ✓ (0 errores; 7 warnings preexistentes ajenos) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
-- Commit:
+- Commit: f7d5201
 
 ### 2026-06-28 · Nova · crm/catálogo — quitar botón "Publicar" (catálogo en vivo) (#66)
 - Qué cambió: se elimina el botón **"Publicar"** y el warning ámbar de [catalog-screen.tsx](components/crm/catalog/catalog-screen.tsx). Ahora el catálogo es **en vivo** (auto-publish del BE #109): los servicios **activos** se ofrecen al agente apenas se guardan. En su lugar hay un indicador pasivo **"● En línea"** (verde) + el header muestra *"X de N servicios activos"*, y una nota aclara que el switch **Activo** de cada fila controla qué está en línea (no hace falta publicar). Se borran `usePublishCatalog` ([hooks/use-catalogo.ts](hooks/use-catalogo.ts)) y `publishCatalog`/`catalogPublishResultSchema`/`CatalogPublishResult` ([lib/api/catalogo.ts](lib/api/catalogo.ts)).
