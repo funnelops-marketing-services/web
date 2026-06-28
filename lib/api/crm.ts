@@ -39,6 +39,8 @@ export const cardMoveSchema = z.object({
 
 export const cardDetailSchema = cardSchema.extend({
   is_ai_active: z.boolean(),
+  full_name: z.string().nullable(), // nombre del lead (prefill de edición)
+  notes: z.string().nullable(), // notas libres de la oportunidad
   thread: z.array(threadMessageSchema),
   moves: z.array(cardMoveSchema), // historial cronológico (asc por moved_at)
 })
@@ -103,6 +105,34 @@ export async function moveCard(cardId: string, stageId: string): Promise<Card> {
     stage_id: stageId,
   })
   return cardSchema.parse(data)
+}
+
+export interface CardCreateInput {
+  phone: string
+  full_name?: string | null
+  notes?: string | null
+}
+
+export interface CardUpdateInput {
+  full_name?: string | null
+  notes?: string | null
+}
+
+/** Alta manual de oportunidad (#54): crea conversación + card en el primer stage. */
+export async function createCard(input: CardCreateInput): Promise<Card> {
+  const { data } = await apiClient.post('/crm/cards', input)
+  return cardSchema.parse(data)
+}
+
+/** Edita nombre y/o notas de la oportunidad. */
+export async function updateCard(cardId: string, input: CardUpdateInput): Promise<Card> {
+  const { data } = await apiClient.patch(`/crm/cards/${cardId}`, input)
+  return cardSchema.parse(data)
+}
+
+/** Baja de oportunidad (borrado duro en el backend). */
+export async function deleteCard(cardId: string): Promise<void> {
+  await apiClient.delete(`/crm/cards/${cardId}`)
 }
 
 export async function generateEntry(cardId: string): Promise<QrEntryOut> {

@@ -5,14 +5,19 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import {
+  createCard,
+  deleteCard,
   generateEntry,
   moveCard,
   sendHumanReply,
   setAiActive,
+  updateCard,
   type AiActive,
   type Boards,
   type Card,
+  type CardCreateInput,
   type CardDetail,
+  type CardUpdateInput,
   type QrEntryOut,
   type ThreadMessage,
 } from '@/lib/api/crm'
@@ -158,6 +163,55 @@ export function useSetAiActive(cardId: string) {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
       queryClient.invalidateQueries({ queryKey: boardKeys.all })
+    },
+  })
+}
+
+/** Alta manual de oportunidad (#54). Invalida el board al éxito. */
+export function useCreateCard() {
+  const queryClient = useQueryClient()
+
+  return useMutation<Card, Error, CardCreateInput>({
+    mutationFn: (input) => createCard(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: boardKeys.all })
+      toast.success('Oportunidad creada.')
+    },
+    onError: () => {
+      toast.error('No se pudo crear la oportunidad. Revisá los datos.')
+    },
+  })
+}
+
+/** Edita nombre/notas de la oportunidad. Invalida board + detalle al éxito. */
+export function useUpdateCard(cardId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation<Card, Error, CardUpdateInput>({
+    mutationFn: (input) => updateCard(cardId, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: boardKeys.all })
+      queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
+      toast.success('Cambios guardados.')
+    },
+    onError: () => {
+      toast.error('No se pudieron guardar los cambios.')
+    },
+  })
+}
+
+/** Baja de oportunidad (borrado duro). Invalida el board al éxito. */
+export function useDeleteCard() {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, Error, string>({
+    mutationFn: (cardId) => deleteCard(cardId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: boardKeys.all })
+      toast.success('Oportunidad eliminada.')
+    },
+    onError: () => {
+      toast.error('No se pudo eliminar la oportunidad.')
     },
   })
 }

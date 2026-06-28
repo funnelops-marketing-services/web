@@ -1,11 +1,15 @@
 'use client'
 
-import { Phone } from 'lucide-react'
+import { useState } from 'react'
+import { Pencil, Phone } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
 import { useCard } from '@/hooks/use-card'
 import { useBoard } from '@/hooks/use-board'
 import type { Boards } from '@/lib/api/crm'
 import { OpportunityHistory } from '@/components/crm/opportunity-history'
+import { OpportunityEditForm } from '@/components/crm/opportunity-edit-form'
+import { OpportunityDeleteDialog } from '@/components/crm/opportunity-delete-dialog'
 
 function StateMessage({ text }: { text: string }) {
   return (
@@ -32,10 +36,26 @@ function Badge({ children }: { children: string }) {
   )
 }
 
-/** Columna izquierda del popup: datos de la oportunidad + historial de movimientos. */
-export function OpportunityDetails({ cardId }: { cardId: string | null }) {
+function SectionTitle({ children }: { children: string }) {
+  return (
+    <h3 className="mb-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
+      {children}
+    </h3>
+  )
+}
+
+/** Columna izquierda del popup: datos + notas + historial, con edición (nombre/notas)
+ *  y baja (doble confirmación) de la oportunidad (#54). */
+export function OpportunityDetails({
+  cardId,
+  onDeleted,
+}: {
+  cardId: string | null
+  onDeleted: () => void
+}) {
   const { data: card, isLoading, isError } = useCard(cardId)
   const { data: boards } = useBoard()
+  const [editing, setEditing] = useState(false)
 
   if (!cardId) return null
   if (isLoading) return <StateMessage text="Cargando oportunidad…" />
@@ -45,11 +65,11 @@ export function OpportunityDetails({ cardId }: { cardId: string | null }) {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto p-5">
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3">
         <div className="flex size-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-base font-bold text-white">
           {card.title.charAt(0).toUpperCase()}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="truncate text-base font-bold text-white">{card.title}</p>
           {card.phone && (
             <p className="mt-0.5 flex items-center gap-1.5 text-xs font-normal text-zinc-500">
@@ -58,6 +78,17 @@ export function OpportunityDetails({ cardId }: { cardId: string | null }) {
             </p>
           )}
         </div>
+        {!editing && (
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Editar oportunidad"
+            onClick={() => setEditing(true)}
+            className="size-8 flex-shrink-0 rounded-lg text-zinc-500 hover:bg-white/5 hover:text-white"
+          >
+            <Pencil className="size-4" />
+          </Button>
+        )}
       </div>
 
       {location && (
@@ -67,12 +98,40 @@ export function OpportunityDetails({ cardId }: { cardId: string | null }) {
         </div>
       )}
 
-      <div className="mt-6 mb-3 border-t border-white/5 pt-5">
-        <h3 className="mb-4 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
-          Historial de movimientos
-        </h3>
-        <OpportunityHistory moves={card.moves} />
-      </div>
+      {editing ? (
+        <div className="mt-5 border-t border-white/5 pt-5">
+          <OpportunityEditForm
+            cardId={card.id}
+            initialName={card.full_name ?? ''}
+            initialNotes={card.notes ?? ''}
+            onDone={() => setEditing(false)}
+          />
+        </div>
+      ) : (
+        <>
+          <div className="mt-5 border-t border-white/5 pt-5">
+            <SectionTitle>Notas</SectionTitle>
+            {card.notes ? (
+              <p className="text-sm font-normal whitespace-pre-wrap text-zinc-300">{card.notes}</p>
+            ) : (
+              <p className="text-sm font-normal text-zinc-600">Sin notas todavía.</p>
+            )}
+          </div>
+
+          <div className="mt-5 border-t border-white/5 pt-5">
+            <SectionTitle>Historial de movimientos</SectionTitle>
+            <OpportunityHistory moves={card.moves} />
+          </div>
+
+          <div className="mt-auto border-t border-white/5 pt-4">
+            <OpportunityDeleteDialog
+              cardId={card.id}
+              cardTitle={card.title}
+              onDeleted={onDeleted}
+            />
+          </div>
+        </>
+      )}
     </div>
   )
 }
