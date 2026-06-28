@@ -21,6 +21,14 @@
 
 ## Entradas
 
+### 2026-06-27 · Nova · crm — detalle de oportunidad como popup 50/50 con historial de movimientos (#75 Parte B / #55)
+- Qué cambió: `crm-board.tsx` reemplaza el panel lateral fijo del 30% (que mostraba solo el chat) por `CardDetailDialog`. Nuevos componentes: `card-detail-dialog.tsx` (popup 50/50 con `Dialog`; en desktop grid 2 columnas, en mobile tabs Detalles/Chat vía `useIsMobile`; cierra con X/overlay/Esc; conserva el último `cardId` durante el cierre para no parpadear), `opportunity-details.tsx` (columna izquierda: nombre, teléfono, badges pipeline/stage + historial), `opportunity-history.tsx` (timeline de `card_move`: de → a, quién, cuándo, con color de stage; estado vacío). `lib/api/crm.ts`: nuevo `cardMoveSchema` + tipo `CardMove`, y `cardDetailSchema` parsea `moves[]`. El board pasa a ancho completo. La derecha reusa `ConversationPanel` sin cambios.
+- Por qué: #75 — replicar el detalle de oportunidad de Firefly adaptado a popup 50/50, mostrando datos del lead + historial de movimientos (traceability, #55) junto al chat existente.
+- Spec/decisión que respeta: FRONTEND_SPEC §tablero CRM / detalle; CLAUDE.md (CRM en `/crm`, takeover `is_ai_active` intacto, TS estricto, <200 líneas, UI español, dark violeta/fucsia). Contrato: nuevo `CardDetailOut.moves[]` (server, Parte A de #75) — el front ahora **requiere** `moves` en `GET /crm/cards/{id}`.
+- Prueba local: `pnpm lint` ✓ (0 errores; 6 warnings preexistentes en `use-mobile`) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓. Depende de la Parte A backend (expone `moves[]`): mergear/desplegar el PR de `server` antes que este, o el parse de `cardDetailSchema` fallará.
+- Commit: c34569b
+- Mejora de flujo: el popup es la superficie de detalle donde luego viven editar/eliminar oportunidad (#54) y la calificación/resumen IA (#53), evitando rehacer el panel lateral.
+
 ### 2026-06-27 · Nova · crm — buscador por número de teléfono en el tablero de pipelines (#57)
 - Qué cambió: `crm-board.tsx` suma un input de búsqueda en el header de "Oportunidades activas" que filtra las cards de los pipelines por **nombre (title) o teléfono (dígitos, coincidencia parcial)** — helpers `cardMatches`/`filterPipeline`/`cardCount` + estado "Sin resultados para tu búsqueda.". `board-card.tsx`: muestra el teléfono en la tarjeta (sin duplicar cuando `title == phone`). `lib/api/crm.ts`: `cardSchema` suma `phone` (lo hereda `cardDetailSchema`), espejo del nuevo `CardOut.phone` del backend.
 - Por qué: #57 — el operador necesita encontrar oportunidades por número. El teléfono no llegaba al cliente (`CardOut` no exponía `external_id`); la contraparte server lo agrega como `phone`. La búsqueda es client-side sobre el board ya cargado (no se usa el endpoint server-side que planteaba #100 BE).

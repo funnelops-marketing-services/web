@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useBoard } from '@/hooks/use-board'
 import { useMoveCard } from '@/hooks/use-card-mutations'
 import { PipelineBoard } from '@/components/crm/pipeline-board'
-import { ConversationPanel } from '@/components/crm/conversation-panel'
+import { CardDetailDialog } from '@/components/crm/card-detail-dialog'
 import type { Card, Pipeline } from '@/lib/api/crm'
 
 function BoardSkeleton() {
@@ -74,8 +74,8 @@ export function CrmBoard() {
     moveCard.mutate({ cardId, stageId })
 
   return (
-    <div className="flex h-[calc(100vh-4rem)]">
-      <div className="flex w-full flex-col overflow-hidden p-6 lg:w-[70%]">
+    <div className="h-[calc(100vh-4rem)]">
+      <div className="flex h-full w-full flex-col overflow-hidden p-6">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-white">Oportunidades activas</h2>
@@ -155,15 +155,10 @@ export function CrmBoard() {
         )}
       </div>
 
-      {selectedCardId && (
-        <div className="hidden w-[30%] flex-col border-l border-white/5 bg-zinc-950/40 lg:flex">
-          <ConversationPanel
-            key={selectedCardId}
-            cardId={selectedCardId}
-            onClose={() => setSelectedCardId(null)}
-          />
-        </div>
-      )}
+      <CardDetailDialog
+        cardId={selectedCardId}
+        onClose={() => setSelectedCardId(null)}
+      />
     </div>
   )
 }
