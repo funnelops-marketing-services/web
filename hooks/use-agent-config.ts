@@ -6,14 +6,17 @@ import { toast } from 'sonner'
 
 import {
   listAgents,
+  listModels,
   updateAgent,
   type AgentRead,
   type AgentUpdate,
   type AgentVersionRead,
+  type ModelRead,
 } from '@/lib/api/agent-config'
 
 export const agentConfigKeys = {
   current: ['agent-config', 'current'] as const,
+  models: ['agent-config', 'models'] as const,
 }
 
 /** Config del agente del tenant. MVP: un agente por tenant → tomamos el primero. */
@@ -21,6 +24,15 @@ export function useAgentConfig() {
   return useQuery<AgentRead | null>({
     queryKey: agentConfigKeys.current,
     queryFn: async () => (await listAgents())[0] ?? null,
+  })
+}
+
+/** Catálogo de modelos para el dropdown. Estático → no refetchear. */
+export function useAgentModels() {
+  return useQuery<ModelRead[]>({
+    queryKey: agentConfigKeys.models,
+    queryFn: listModels,
+    staleTime: Infinity,
   })
 }
 

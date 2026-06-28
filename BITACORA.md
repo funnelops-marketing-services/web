@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-28 · Nova · crm/config — form de Agentes: dropdown modelo + slider temp + switch emojis + nombre, sin nodos manuales (#60/#61/#62)
+- Qué cambió: rewrite de `agent-config-form.tsx` (misma sección, un PR): **Modelo** = `Select` poblado por `GET /agents/models` (#60, dropdown no editable; si el modelo guardado no está en el catálogo se inyecta como opción para no quedar vacío); **Temperatura** = `Slider` 0–1 step 0.01 con valor en el label (#60); **Emojis** = `Switch` on/off → `config.emojis` bool (#61); **Nombre del agente** = `Input` → `display_name` (server lo acepta ahora); se **quitaron** las textareas de Servicios/FAQ (#62) — vienen del Catálogo y `services` es server-owned. El `config` se reconstruye con spread del `config` cargado (preserva `services` y demás keys) y se quitan del payload `ofertas`/`faq`/`resumen`. `lib/api/agent-config.ts`: `modelReadSchema` + `listModels()` + `AgentUpdate.display_name`. `hooks/use-agent-config.ts`: `useAgentModels()` (staleTime ∞).
+- Por qué: el form mostraba modelo como texto libre, temperatura como input numérico, sin switch de emojis, y editaba a mano Servicios/FAQ (que ahora son del Catálogo). El agente además necesitaba un nombre editable.
+- Spec/decisión que respeta: issues #60/#61/#62 + decisión del owner (nombre editable; FAQ quirúrgico — no se borra el flujo, solo el nodo manual). Contratos server: `GET /agents/models`, `config.emojis` bool, `AgentUpdate.display_name`.
+- Prueba local: `pnpm tsc --noEmit` ✓ · `pnpm lint` ✓ (0 errores; 7 warnings preexistentes) · `pnpm build` ✓. Probado e2e contra backend local (login operador → dropdown poblado, slider, switch, nombre persisten). **Depende de los PRs server** #144 (`/agents/models`), #143 (emojis bool), #145 (descarte nodos + preservar services) y display_name editable: mergear/desplegar antes o el form falla al faltar el endpoint/aceptar display_name.
+- Commit:
+
 ### 2026-06-28 · Nova · crm — calificación del lead (badge hot/medium/cold) + resumen IA en el detalle (#53)
 - Qué cambió: `lib/api/crm.ts` — `cardSchema` suma `rating` (lo hereda el board y el detalle); `cardDetailSchema` suma `ai_summary`. Nuevo `rating-badge.tsx` (badge reusable: 🔥 Caliente / 🌡 Tibio / 🧊 Frío, `showLabel` opcional, default a frío ante valores desconocidos). `board-card.tsx` muestra el **badge de calificación** (solo ícono) en la cara de la card. `opportunity-details.tsx` (detalle lateral) muestra el badge con label en la fila de badges + nueva sección **"Resumen IA"** (texto de `card.ai_summary` o estado vacío "Sin resumen todavía…").
 - Por qué: #53 — el operador ve de un vistazo la temperatura del lead en el tablero (badge) y el resumen del caso por IA al abrir el detalle, sin tener que leer todo el hilo.
