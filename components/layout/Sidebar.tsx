@@ -9,6 +9,7 @@ import {
   Funnel,
   Menu,
   Settings,
+  ShieldCheck,
   Users,
   type LucideIcon,
 } from 'lucide-react'
@@ -36,7 +37,8 @@ const navItems: readonly NavItem[] = [
   { label: 'Contactos', href: '/crm/contacts', icon: Users },
   { label: 'Agentes', href: '/crm/agents', icon: Bot, requiresConfig: true },
   { label: 'Catálogo', href: '/crm/catalogo', icon: BookOpen, requiresConfig: true },
-  // Ajustes contiene "Mi cuenta" (todos) + config de plataforma (solo operador, gateada en la página).
+  { label: 'Usuarios', href: '/crm/users', icon: ShieldCheck, requiresConfig: true },
+  // Ajustes = "Mi cuenta" (todos los usuarios logueados).
   { label: 'Ajustes', href: '/crm/settings', icon: Settings },
 ]
 
