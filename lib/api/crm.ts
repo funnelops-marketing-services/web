@@ -23,6 +23,7 @@ export const cardSchema = z.object({
   title: z.string(),
   conversation_id: z.string(),
   stage_id: z.string(),
+  phone: z.string(), // external_id (wa_id) de la conversación; habilita búsqueda por número
 })
 
 export const cardDetailSchema = cardSchema.extend({

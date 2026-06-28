@@ -21,6 +21,14 @@
 
 ## Entradas
 
+### 2026-06-27 · Nova · crm — buscador por número de teléfono en el tablero de pipelines (#57)
+- Qué cambió: `crm-board.tsx` suma un input de búsqueda en el header de "Oportunidades activas" que filtra las cards de los pipelines por **nombre (title) o teléfono (dígitos, coincidencia parcial)** — helpers `cardMatches`/`filterPipeline`/`cardCount` + estado "Sin resultados para tu búsqueda.". `board-card.tsx`: muestra el teléfono en la tarjeta (sin duplicar cuando `title == phone`). `lib/api/crm.ts`: `cardSchema` suma `phone` (lo hereda `cardDetailSchema`), espejo del nuevo `CardOut.phone` del backend.
+- Por qué: #57 — el operador necesita encontrar oportunidades por número. El teléfono no llegaba al cliente (`CardOut` no exponía `external_id`); la contraparte server lo agrega como `phone`. La búsqueda es client-side sobre el board ya cargado (no se usa el endpoint server-side que planteaba #100 BE).
+- Spec/decisión que respeta: FRONTEND_SPEC §pipeline "Gestión Humana"/tablero CRM (operación de `client_admin` + `staff`); CLAUDE.md (CRM en `/crm`, TS estricto, <200 líneas, UI español, dark violeta/fucsia). Contrato: nuevo `CardOut.phone` (server, re-scope de #100).
+- Prueba local: `pnpm lint` ✓ (0 errores; 5 warnings preexistentes en `use-mobile.ts`) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
+- Commit: f91d9c3
+- Mejora de flujo: el `phone` queda como dato propio (independiente del `title`), de modo que cuando se capture el nombre real del contacto (#119 BE) la búsqueda por número sigue funcionando y la card mostrará nombre + teléfono.
+
 ### 2026-06-27 · Natalia · topbar + login — quitar badge de tenant/punto verde (#50) y bordes redondeados en login (#51)
 - Qué cambió: `Topbar.tsx` — se elimina el badge de tenant (texto "Mirko" + punto verde animado `bg-emerald-400`) que iba a la izquierda del menú de usuario; se borra también la variable huérfana `tenantName`. `login-page.tsx` — los inputs de email y contraseña pasan del estilo subrayado (`border-0 border-b … rounded-none px-0`) a borde completo redondeado (`border border-zinc-800 rounded-lg px-3`), manteniendo alto, foco violeta y demás estilos.
 - Por qué: #50 pide quitar el badge "Mirko" + punto verde de la barra superior derecha; #51 pide inputs con borde redondeado en el login.
