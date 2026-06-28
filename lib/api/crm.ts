@@ -45,6 +45,17 @@ export const cardContactSchema = z.object({
   full_name: z.string().nullable(),
 })
 
+// Servicio del catálogo asignado a la oportunidad (server #132). `source`:
+// 'assigned' = el operador lo asignó a mano; 'captured' = lo eligió el bot (#133).
+export const cardServiceSchema = z.object({
+  id: z.string(), // id del card_service (para quitarlo)
+  service_id: z.string(),
+  nombre: z.string(),
+  precio: z.string(),
+  moneda: z.string(),
+  source: z.string(),
+})
+
 export const cardDetailSchema = cardSchema.extend({
   is_ai_active: z.boolean(),
   full_name: z.string().nullable(), // nombre del lead (prefill de edición)
@@ -53,6 +64,7 @@ export const cardDetailSchema = cardSchema.extend({
   thread: z.array(threadMessageSchema),
   moves: z.array(cardMoveSchema), // historial cronológico (asc por moved_at)
   contact: cardContactSchema.nullable(), // contacto vinculado (FK) o null
+  services: z.array(cardServiceSchema), // servicios asignados/capturados (#132)
 })
 
 export const qrEntrySchema = z.object({
@@ -92,6 +104,7 @@ export type ThreadMessage = z.infer<typeof threadMessageSchema>
 export type Card = z.infer<typeof cardSchema>
 export type CardContact = z.infer<typeof cardContactSchema>
 export type CardMove = z.infer<typeof cardMoveSchema>
+export type CardService = z.infer<typeof cardServiceSchema>
 export type CardDetail = z.infer<typeof cardDetailSchema>
 export type Stage = z.infer<typeof stageSchema>
 export type Pipeline = z.infer<typeof pipelineSchema>
@@ -109,6 +122,18 @@ export async function getBoards(): Promise<Boards> {
 export async function getCard(cardId: string): Promise<CardDetail> {
   const { data } = await apiClient.get(`/crm/cards/${cardId}`)
   return cardDetailSchema.parse(data)
+}
+
+// Asigna manualmente el set de servicios a la oportunidad (#132). Devuelve la lista
+// resultante (incluye los capturados por el bot).
+export async function updateCardServices(
+  cardId: string,
+  serviceIds: string[],
+): Promise<CardService[]> {
+  const { data } = await apiClient.put(`/crm/cards/${cardId}/services`, {
+    service_ids: serviceIds,
+  })
+  return z.array(cardServiceSchema).parse(data)
 }
 
 export async function moveCard(cardId: string, stageId: string): Promise<Card> {
