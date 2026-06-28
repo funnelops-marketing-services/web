@@ -25,7 +25,6 @@ interface FormValues {
   model: string
   temperature: number
   emojis: boolean
-  change_summary: string
 }
 
 /** Editor del agente. Modelo = dropdown del catálogo (#60); temperatura = slider 0–1;
@@ -42,7 +41,6 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
       model: agent.model,
       temperature: typeof agent.config.temperature === 'number' ? agent.config.temperature : 0.7,
       emojis: agent.config.emojis === true,
-      change_summary: '',
     },
   })
   const { dirtyFields, isDirty } = formState
@@ -71,9 +69,6 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
       if (dirtyFields.emojis) config.emojis = values.emojis
       body.config = config
     }
-
-    const summary = values.change_summary.trim()
-    if (summary) body.change_summary = summary
 
     if (Object.keys(body).length === 0) return toast.info('No hay cambios para guardar.')
     mutation.mutate(body)
@@ -174,16 +169,6 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
           )}
         />
       </div>
-
-      <Field label="Resumen del cambio" htmlFor="change_summary">
-        <Input
-          id="change_summary"
-          maxLength={500}
-          placeholder="Qué cambiaste y por qué (opcional)"
-          {...register('change_summary')}
-          className="border-white/10 bg-white/[0.03] text-sm text-white placeholder:text-zinc-600"
-        />
-      </Field>
     </form>
   )
 }
