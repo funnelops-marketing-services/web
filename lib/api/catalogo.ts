@@ -4,15 +4,13 @@ import { apiClient } from '@/lib/api/client'
 
 // ---------- Enums de negocio (espejo de catalog_schemas.py) ----------
 
-export const serviceCategories = ['formacion', 'produccion', 'edicion', 'general'] as const
 export const serviceCurrencies = ['BOB', 'USD'] as const
 export const serviceClosings = ['pago_qr', 'handoff_consultivo'] as const
 
-export const categorySchema = z.enum(serviceCategories)
 export const currencySchema = z.enum(serviceCurrencies)
 export const closingSchema = z.enum(serviceClosings)
 
-// ---------- Schemas (espejo del contrato server Fase 1) ----------
+// ---------- Schemas (espejo del contrato server) ----------
 
 export const assetReadSchema = z.object({
   id: z.string(),
@@ -23,13 +21,23 @@ export const assetReadSchema = z.object({
   created_at: z.string(),
 })
 
+export const serviceCategoryReadSchema = z.object({
+  id: z.string(),
+  organization_id: z.string(),
+  nombre: z.string(),
+  orden: z.number(),
+  created_at: z.string(),
+  updated_at: z.string(),
+})
+
 export const serviceReadSchema = z.object({
   id: z.string(),
   organization_id: z.string(),
   agent_id: z.string(),
   slug: z.string(),
   nombre: z.string(),
-  categoria: z.string(),
+  category_id: z.string().nullable(),
+  category: serviceCategoryReadSchema.nullable(),
   resumen: z.string(),
   detalle: z.string().nullable(),
   precio: z.string(),
@@ -52,16 +60,16 @@ export const catalogPublishResultSchema = z.object({
 // ---------- Tipos derivados ----------
 
 export type AssetRead = z.infer<typeof assetReadSchema>
+export type ServiceCategoryRead = z.infer<typeof serviceCategoryReadSchema>
 export type ServiceRead = z.infer<typeof serviceReadSchema>
 export type CatalogPublishResult = z.infer<typeof catalogPublishResultSchema>
-export type ServiceCategory = (typeof serviceCategories)[number]
 export type ServiceCurrency = (typeof serviceCurrencies)[number]
 export type ServiceClosing = (typeof serviceClosings)[number]
 
 export interface ServiceCreate {
   slug: string
   nombre: string
-  categoria: ServiceCategory
+  category_id?: string | null
   resumen: string
   detalle?: string | null
   precio: string
@@ -73,7 +81,7 @@ export interface ServiceCreate {
 
 export interface ServiceUpdate {
   nombre?: string
-  categoria?: ServiceCategory
+  category_id?: string | null
   resumen?: string
   detalle?: string | null
   precio?: string
@@ -84,7 +92,17 @@ export interface ServiceUpdate {
   is_active?: boolean
 }
 
-// ---------- Llamadas tipadas ----------
+export interface ServiceCategoryCreate {
+  nombre: string
+  orden?: number
+}
+
+export interface ServiceCategoryUpdate {
+  nombre?: string
+  orden?: number
+}
+
+// ---------- Llamadas tipadas: servicios ----------
 
 export async function listServices(agentId: string): Promise<ServiceRead[]> {
   const { data } = await apiClient.get(`/agents/${agentId}/services`)
@@ -117,4 +135,30 @@ export async function uploadAsset(file: File): Promise<AssetRead> {
 export async function publishCatalog(agentId: string): Promise<CatalogPublishResult> {
   const { data } = await apiClient.post(`/agents/${agentId}/catalog/publish`)
   return catalogPublishResultSchema.parse(data)
+}
+
+// ---------- Llamadas tipadas: categorías (#106, org-scoped) ----------
+
+export async function listServiceCategories(): Promise<ServiceCategoryRead[]> {
+  const { data } = await apiClient.get('/service-categories')
+  return z.array(serviceCategoryReadSchema).parse(data)
+}
+
+export async function createServiceCategory(
+  body: ServiceCategoryCreate,
+): Promise<ServiceCategoryRead> {
+  const { data } = await apiClient.post('/service-categories', body)
+  return serviceCategoryReadSchema.parse(data)
+}
+
+export async function updateServiceCategory(
+  categoryId: string,
+  body: ServiceCategoryUpdate,
+): Promise<ServiceCategoryRead> {
+  const { data } = await apiClient.put(`/service-categories/${categoryId}`, body)
+  return serviceCategoryReadSchema.parse(data)
+}
+
+export async function deleteServiceCategory(categoryId: string): Promise<void> {
+  await apiClient.delete(`/service-categories/${categoryId}`)
 }

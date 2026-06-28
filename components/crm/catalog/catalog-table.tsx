@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { FileText, FileWarning, GripVertical, Pencil, Trash2 } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -15,9 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { CATEGORY_LABELS, CATEGORY_ORDER } from '@/components/crm/catalog/labels'
 import { useDeleteService, useUpdateService } from '@/hooks/use-catalogo'
-import type { ServiceCategory, ServiceRead } from '@/lib/api/catalogo'
+import type { ServiceRead } from '@/lib/api/catalogo'
 
 interface CatalogTableProps {
   agentId: string
@@ -25,10 +24,36 @@ interface CatalogTableProps {
   onEdit: (service: ServiceRead) => void
 }
 
+const NO_CATEGORY = '__none__'
+
 export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
   const update = useUpdateService(agentId)
   const remove = useDeleteService(agentId)
   const [dragId, setDragId] = useState<string | null>(null)
+
+  // Agrupa por categoría dinámica (#106); los sin categoría van al final.
+  const groups = useMemo(() => {
+    const map = new Map<string, { label: string; orden: number; items: ServiceRead[] }>()
+    for (const service of services) {
+      const key = service.category_id ?? NO_CATEGORY
+      const existing = map.get(key)
+      if (existing) {
+        existing.items.push(service)
+      } else {
+        map.set(key, {
+          label: service.category?.nombre ?? 'Sin categoría',
+          orden: service.category?.orden ?? Number.MAX_SAFE_INTEGER,
+          items: [service],
+        })
+      }
+    }
+    for (const group of map.values()) {
+      group.items.sort((a, b) => a.orden - b.orden || a.nombre.localeCompare(b.nombre))
+    }
+    return [...map.entries()]
+      .map(([key, value]) => ({ key, ...value }))
+      .sort((a, b) => a.orden - b.orden || a.label.localeCompare(b.label))
+  }, [services])
 
   function reorder(group: ServiceRead[], fromId: string, toId: string) {
     if (fromId === toId) return
@@ -48,99 +73,91 @@ export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
 
   return (
     <div className="space-y-8">
-      {CATEGORY_ORDER.map((category) => {
-        const group = services
-          .filter((o) => o.categoria === category)
-          .sort((a, b) => a.orden - b.orden || a.nombre.localeCompare(b.nombre))
-        if (group.length === 0) return null
-        return (
-          <section key={category} className="space-y-2">
-            <h2 className="text-sm font-semibold text-zinc-300">
-              {CATEGORY_LABELS[category as ServiceCategory] ?? category}
-            </h2>
-            <div className="rounded-xl border border-white/5 bg-white/[0.02]">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-white/5 hover:bg-transparent">
-                    <TableHead className="w-8" />
-                    <TableHead className="text-zinc-400">Servicio</TableHead>
-                    <TableHead className="text-zinc-400">Precio</TableHead>
-                    <TableHead className="text-zinc-400">PDF</TableHead>
-                    <TableHead className="text-zinc-400">Activo</TableHead>
-                    <TableHead className="text-right text-zinc-400">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {group.map((service) => (
-                    <TableRow
-                      key={service.id}
-                      draggable
-                      onDragStart={() => setDragId(service.id)}
-                      onDragEnd={() => setDragId(null)}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={() => dragId && reorder(group, dragId, service.id)}
-                      className={cn(
-                        'border-white/5 hover:bg-white/[0.02]',
-                        dragId === service.id && 'opacity-50',
-                        !service.is_active && 'opacity-50',
+      {groups.map((group) => (
+        <section key={group.key} className="space-y-2">
+          <h2 className="text-sm font-semibold text-zinc-300">{group.label}</h2>
+          <div className="rounded-xl border border-white/5 bg-white/[0.02]">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-white/5 hover:bg-transparent">
+                  <TableHead className="w-8" />
+                  <TableHead className="text-zinc-400">Servicio</TableHead>
+                  <TableHead className="text-zinc-400">Precio</TableHead>
+                  <TableHead className="text-zinc-400">PDF</TableHead>
+                  <TableHead className="text-zinc-400">Activo</TableHead>
+                  <TableHead className="text-right text-zinc-400">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {group.items.map((service) => (
+                  <TableRow
+                    key={service.id}
+                    draggable
+                    onDragStart={() => setDragId(service.id)}
+                    onDragEnd={() => setDragId(null)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => dragId && reorder(group.items, dragId, service.id)}
+                    className={cn(
+                      'border-white/5 hover:bg-white/[0.02]',
+                      dragId === service.id && 'opacity-50',
+                      !service.is_active && 'opacity-50',
+                    )}
+                  >
+                    <TableCell className="cursor-grab text-zinc-600">
+                      <GripVertical className="size-4" />
+                    </TableCell>
+                    <TableCell>
+                      <p className="text-sm font-medium text-white">{service.nombre}</p>
+                      <p className="line-clamp-1 text-xs text-zinc-500">{service.resumen}</p>
+                    </TableCell>
+                    <TableCell className="text-sm text-zinc-300">{service.precio}</TableCell>
+                    <TableCell>
+                      {service.asset ? (
+                        <span className="flex items-center gap-1 text-xs text-zinc-400">
+                          <FileText className="size-3.5 text-emerald-400/70" /> PDF
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-xs text-zinc-600">
+                          <FileWarning className="size-3.5" /> falta
+                        </span>
                       )}
-                    >
-                      <TableCell className="cursor-grab text-zinc-600">
-                        <GripVertical className="size-4" />
-                      </TableCell>
-                      <TableCell>
-                        <p className="text-sm font-medium text-white">{service.nombre}</p>
-                        <p className="line-clamp-1 text-xs text-zinc-500">{service.resumen}</p>
-                      </TableCell>
-                      <TableCell className="text-sm text-zinc-300">{service.precio}</TableCell>
-                      <TableCell>
-                        {service.asset ? (
-                          <span className="flex items-center gap-1 text-xs text-zinc-400">
-                            <FileText className="size-3.5 text-emerald-400/70" /> PDF
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-1 text-xs text-zinc-600">
-                            <FileWarning className="size-3.5" /> falta
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Switch
-                          checked={service.is_active}
-                          onCheckedChange={(checked) =>
-                            update.mutate({ serviceId: service.id, body: { is_active: checked } })
-                          }
-                        />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label="Editar"
-                          onClick={() => onEdit(service)}
-                          className="text-zinc-400 hover:text-white"
-                        >
-                          <Pencil className="size-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label="Eliminar"
-                          disabled={!service.is_active}
-                          onClick={() => remove.mutate(service.id)}
-                          className="text-zinc-400 hover:text-red-400"
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </section>
-        )
-      })}
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={service.is_active}
+                        onCheckedChange={(checked) =>
+                          update.mutate({ serviceId: service.id, body: { is_active: checked } })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Editar"
+                        onClick={() => onEdit(service)}
+                        className="text-zinc-400 hover:text-white"
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Eliminar"
+                        disabled={!service.is_active}
+                        onClick={() => remove.mutate(service.id)}
+                        className="text-zinc-400 hover:text-red-400"
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </section>
+      ))}
       <Badge className="border-amber-500/30 bg-amber-500/10 text-amber-300">
         Arrastrá ⠿ para reordenar dentro de cada categoría
       </Badge>

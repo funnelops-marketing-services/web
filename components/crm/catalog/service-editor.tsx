@@ -24,14 +24,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { CATEGORY_LABELS, CLOSING_LABELS, CURRENCY_LABELS } from '@/components/crm/catalog/labels'
+import { CategorySelect } from '@/components/crm/catalog/category-select'
+import { CLOSING_LABELS, CURRENCY_LABELS } from '@/components/crm/catalog/labels'
 import { ServicePreview } from '@/components/crm/catalog/service-preview'
 import { useCreateService, useUpdateService, useUploadAsset } from '@/hooks/use-catalogo'
 import {
-  serviceCategories,
   serviceClosings,
   serviceCurrencies,
-  type ServiceCategory,
   type ServiceClosing,
   type ServiceCurrency,
   type ServiceRead,
@@ -40,7 +39,7 @@ import {
 interface FormValues {
   slug: string
   nombre: string
-  categoria: ServiceCategory
+  category_id: string
   resumen: string
   detalle: string
   precio: string
@@ -61,7 +60,7 @@ function defaults(service: ServiceRead | null): FormValues {
   return {
     slug: service?.slug ?? '',
     nombre: service?.nombre ?? '',
-    categoria: (service?.categoria as ServiceCategory) ?? 'formacion',
+    category_id: service?.category_id ?? '',
     resumen: service?.resumen ?? '',
     detalle: service?.detalle ?? '',
     precio: service?.precio ?? '',
@@ -91,10 +90,15 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
   }
 
   const onSubmit = handleSubmit(async (form) => {
-    const payload = { ...form, detalle: form.detalle.trim() || null, asset_id: assetId }
+    const payload = {
+      ...form,
+      category_id: form.category_id || null,
+      detalle: form.detalle.trim() || null,
+      asset_id: assetId,
+    }
     if (isEdit) {
       await update.mutateAsync({ serviceId: service.id, body: payload })
-      toast.success('Servicio actualizada')
+      toast.success('Servicio actualizado')
     } else {
       await create.mutateAsync({ ...payload, orden: defaultOrden })
     }
@@ -113,14 +117,18 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
 
         <form onSubmit={onSubmit} className="space-y-4 px-4 pb-8">
           <Field label="Slug (identificador, no se edita)" htmlFor="slug">
-            <Input id="slug" disabled={isEdit} placeholder="curso-contenido-edicion" {...register('slug')} className="border-white/10 bg-white/[0.03] text-sm text-white disabled:opacity-60" />
+            <Input id="slug" disabled={isEdit} placeholder="curso-edicion" {...register('slug')} className="border-white/10 bg-white/[0.03] text-sm text-white disabled:opacity-60" />
           </Field>
           <Field label="Nombre" htmlFor="nombre">
             <Input id="nombre" {...register('nombre')} className="border-white/10 bg-white/[0.03] text-sm text-white" />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Categoría" htmlFor="categoria">
-              <SelectField name="categoria" control={control} options={serviceCategories} labels={CATEGORY_LABELS} />
+            <Field label="Categoría" htmlFor="category_id">
+              <Controller
+                control={control}
+                name="category_id"
+                render={({ field }) => <CategorySelect value={field.value} onChange={field.onChange} />}
+              />
             </Field>
             <Field label="Moneda" htmlFor="moneda">
               <SelectField name="moneda" control={control} options={serviceCurrencies} labels={CURRENCY_LABELS} />
@@ -203,7 +211,7 @@ function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; 
 }
 
 interface SelectFieldProps<T extends string> {
-  name: 'categoria' | 'moneda' | 'flujo_cierre'
+  name: 'moneda' | 'flujo_cierre'
   control: Control<FormValues>
   options: readonly T[]
   labels: Record<T, string>

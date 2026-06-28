@@ -5,13 +5,20 @@ import { toast } from 'sonner'
 
 import {
   createService,
+  createServiceCategory,
   deleteService,
+  deleteServiceCategory,
+  listServiceCategories,
   listServices,
   publishCatalog,
   updateService,
+  updateServiceCategory,
   uploadAsset,
   type AssetRead,
   type CatalogPublishResult,
+  type ServiceCategoryCreate,
+  type ServiceCategoryRead,
+  type ServiceCategoryUpdate,
   type ServiceCreate,
   type ServiceRead,
   type ServiceUpdate,
@@ -20,6 +27,12 @@ import { apiErrorMessage } from '@/lib/api/errors'
 
 export const catalogKeys = {
   services: (agentId: string) => ['catalog', 'services', agentId] as const,
+  servicesRoot: ['catalog', 'services'] as const,
+  categories: ['catalog', 'categories'] as const,
+}
+
+function fail(error: unknown, fallback: string): void {
+  toast.error(apiErrorMessage(error) ?? fallback)
 }
 
 export function useServices(agentId: string | undefined) {
@@ -28,10 +41,6 @@ export function useServices(agentId: string | undefined) {
     queryFn: () => listServices(agentId as string),
     enabled: Boolean(agentId),
   })
-}
-
-function fail(error: unknown, fallback: string): void {
-  toast.error(apiErrorMessage(error) ?? fallback)
 }
 
 export function useCreateService(agentId: string) {
@@ -87,5 +96,57 @@ export function usePublishCatalog(agentId: string) {
       queryClient.invalidateQueries({ queryKey: catalogKeys.services(agentId) })
     },
     onError: (error) => fail(error, 'No se pudo publicar el catálogo.'),
+  })
+}
+
+// ---------- Categorías (#106) ----------
+
+export function useServiceCategories() {
+  return useQuery<ServiceCategoryRead[]>({
+    queryKey: catalogKeys.categories,
+    queryFn: listServiceCategories,
+  })
+}
+
+export function useCreateServiceCategory() {
+  const queryClient = useQueryClient()
+  return useMutation<ServiceCategoryRead, Error, ServiceCategoryCreate>({
+    mutationFn: (body) => createServiceCategory(body),
+    onSuccess: (category) => {
+      toast.success(`Categoría "${category.nombre}" creada`)
+      queryClient.invalidateQueries({ queryKey: catalogKeys.categories })
+    },
+    onError: (error) => fail(error, 'No se pudo crear la categoría.'),
+  })
+}
+
+export function useUpdateServiceCategory() {
+  const queryClient = useQueryClient()
+  return useMutation<
+    ServiceCategoryRead,
+    Error,
+    { categoryId: string; body: ServiceCategoryUpdate }
+  >({
+    mutationFn: ({ categoryId, body }) => updateServiceCategory(categoryId, body),
+    onSuccess: () => {
+      // El rename impacta la categoría anidada en los servicios → refrescar ambos.
+      queryClient.invalidateQueries({ queryKey: catalogKeys.categories })
+      queryClient.invalidateQueries({ queryKey: catalogKeys.servicesRoot })
+    },
+    onError: (error) => fail(error, 'No se pudo actualizar la categoría.'),
+  })
+}
+
+export function useDeleteServiceCategory() {
+  const queryClient = useQueryClient()
+  return useMutation<void, Error, string>({
+    mutationFn: (categoryId) => deleteServiceCategory(categoryId),
+    onSuccess: () => {
+      // Borrar deja los servicios sin categoría → refrescar ambos.
+      toast.success('Categoría eliminada')
+      queryClient.invalidateQueries({ queryKey: catalogKeys.categories })
+      queryClient.invalidateQueries({ queryKey: catalogKeys.servicesRoot })
+    },
+    onError: (error) => fail(error, 'No se pudo eliminar la categoría.'),
   })
 }
