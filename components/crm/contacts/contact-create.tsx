@@ -17,12 +17,32 @@ import { useCreateContact } from '@/hooks/use-contacts'
 interface ContactCreateSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  /** Teléfono precargado (ej. convertir el número de una oportunidad en contacto, #84). */
+  defaultPhone?: string
+  /** Se invoca tras crear con éxito (ej. refrescar el detalle de la card). */
+  onCreated?: () => void
 }
 
-export function ContactCreateSheet({ open, onOpenChange }: ContactCreateSheetProps) {
+export function ContactCreateSheet({
+  open,
+  onOpenChange,
+  defaultPhone = '',
+  onCreated,
+}: ContactCreateSheetProps) {
   const create = useCreateContact()
   const [phone, setPhone] = useState('')
   const [name, setName] = useState('')
+
+  // Al abrir, precarga el teléfono y limpia el nombre para un alta nueva. Patrón de
+  // ajuste-en-render (sin effect): React reejecuta antes de pintar, sin parpadeo.
+  const [wasOpen, setWasOpen] = useState(false)
+  if (open !== wasOpen) {
+    setWasOpen(open)
+    if (open) {
+      setPhone(defaultPhone)
+      setName('')
+    }
+  }
 
   const canSave = phone.trim().length > 0 && !create.isPending
 
@@ -32,6 +52,7 @@ export function ContactCreateSheet({ open, onOpenChange }: ContactCreateSheetPro
     await create.mutateAsync({ phone: phone.trim(), full_name: name.trim() || null })
     setPhone('')
     setName('')
+    onCreated?.()
     onOpenChange(false)
   }
 
