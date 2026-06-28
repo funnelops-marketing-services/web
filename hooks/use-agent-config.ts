@@ -55,14 +55,15 @@ function apiErrorMessage(error: unknown): string | null {
   return null
 }
 
-/** PUT del agente → crea versión nueva. Toast con el número; 422 muestra el mensaje del backend. */
+/** PUT del agente → crea versión nueva. El número de versión se ve en el badge del
+ *  header; el toast solo confirma (convención: "Cambios guardados."). 422 → mensaje del backend. */
 export function useUpdateAgentConfig(agentId: string) {
   const queryClient = useQueryClient()
 
   return useMutation<AgentVersionRead, Error, AgentUpdate>({
     mutationFn: (body) => updateAgent(agentId, body),
-    onSuccess: (version) => {
-      toast.success(`Versión ${version.version_number} guardada`)
+    onSuccess: () => {
+      toast.success('Cambios guardados.')
       queryClient.invalidateQueries({ queryKey: agentConfigKeys.current })
     },
     onError: (error) => {

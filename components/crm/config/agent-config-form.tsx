@@ -74,16 +74,20 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
     mutation.mutate(body)
   }
 
-  const versionLabel = agent.current_version
-    ? `Versión actual: v${agent.current_version.version_number}`
-    : 'Sin versiones guardadas'
+  const version = agent.current_version?.version_number ?? null
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="space-y-1.5">
           <h1 className="text-2xl font-bold text-white">{agent.display_name}</h1>
-          <p className="text-sm text-zinc-500">{versionLabel}</p>
+          {version !== null ? (
+            <span className="inline-flex items-center rounded-full bg-violet-500/15 px-2.5 py-0.5 text-xs font-medium text-violet-300 ring-1 ring-violet-500/30">
+              Versión {version}
+            </span>
+          ) : (
+            <p className="text-sm text-zinc-500">Sin versiones guardadas</p>
+          )}
         </div>
         <Button
           type="submit"
