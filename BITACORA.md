@@ -16,10 +16,17 @@
 - Por qué:
 - Spec/decisión que respeta:   (FRONTEND_SPEC / server/docs / CLAUDE.md)
 - Prueba local:
-- Commit:
+- Commit: 4562dea
 ```
 
 ## Entradas
+
+### 2026-06-28 · Nova · crm/catálogo — dropzone de materiales (#65)
+- Qué cambió: la carga de material (antes un botón "Subir PDF", un solo archivo) se reemplaza por un **dropzone** ([materials-dropzone.tsx](components/crm/catalog/materials-dropzone.tsx)) con drag-and-drop + clic, que acepta **pdf/jpg/png ≤5 MB, máx. 5 por servicio**, valida en cliente tipo/tamaño/cantidad (toast por archivo rechazado) y muestra el **listado en vivo** con ícono por tipo y botón de quitar. El editor ([service-editor.tsx](components/crm/catalog/service-editor.tsx)) maneja `materials: AssetRead[]` y envía `asset_ids` (espejo del nuevo contrato BE #108). Contrato API ([lib/api/catalogo.ts](lib/api/catalogo.ts)): `ServiceRead.materials[]` reemplaza `asset_id`/`asset`; `ServiceCreate/Update` usan `asset_ids`. Preview muestra "Envía: a, b, c" y la tabla del catálogo muestra el **conteo** de materiales (o "falta").
+- Por qué: #65 — subir varios materiales por servicio. Contraparte BE: #108 (≤5, pdf/jpg/png ≤5MB, `asset.service_id`).
+- Spec/decisión que respeta: FRONTEND_SPEC (catálogo) + SPEC_catalogo_y_materiales. Apila sobre #64 (PR #90): comparte `service-editor.tsx`. Dropzone extraído a su propio componente (159/132 líneas, invariante <200). Dark/violeta y copy en español intactos; sin `any`.
+- Prueba local: `pnpm lint` ✓ (0 errores; 7 warnings preexistentes ajenos) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
+- Commit: 4562dea
 
 ### 2026-06-28 · Nova · crm/config — form de Agentes: dropdown modelo + slider temp + switch emojis + nombre, sin nodos manuales (#60/#61/#62)
 - Qué cambió: rewrite de `agent-config-form.tsx` (misma sección, un PR): **Modelo** = `Select` poblado por `GET /agents/models` (#60, dropdown no editable; si el modelo guardado no está en el catálogo se inyecta como opción para no quedar vacío); **Temperatura** = `Slider` 0–1 step 0.01 con valor en el label (#60); **Emojis** = `Switch` on/off → `config.emojis` bool (#61); **Nombre del agente** = `Input` → `display_name` (server lo acepta ahora); se **quitaron** las textareas de Servicios/FAQ (#62) — vienen del Catálogo y `services` es server-owned. El `config` se reconstruye con spread del `config` cargado (preserva `services` y demás keys) y se quitan del payload `ofertas`/`faq`/`resumen`. `lib/api/agent-config.ts`: `modelReadSchema` + `listModels()` + `AgentUpdate.display_name`. `hooks/use-agent-config.ts`: `useAgentModels()` (staleTime ∞). **Ajustes posteriores (mismo PR, pedido del owner):** (1) se quitó el campo "Resumen del cambio" (`change_summary`) del form — el versionado sigue (cada guardado crea versión, con `change_summary` null); (2) label del modelo GPT-5.4 sin "(producción actual)" (server #144); (3) la versión actual se muestra como **badge** violeta junto al título (antes era subtítulo gris); (4) toast de guardado pasa a la convención **"Cambios guardados."** (antes "Versión N guardada" — el número ya vive en el badge).
@@ -148,14 +155,14 @@
 - Por qué: en la UAT, Inbox y Conversaciones eran stubs de 8 líneas → el tester no encontró su conversación (C1) ni pudo leer el hilo / probar IA on-off (C2-C4, E1-E3), aunque el hilo+toggle ya vivían en el panel del tablero. Esta vista da un "hogar" explícito a las conversaciones.
 - Spec/decisión que respeta: `server/docs/SPEC_UAT_remediation.md` Lote 4 — **versión mínima** (lista que abre el panel), la recomendada para desbloquear; la "completa" (Inbox dedicado con búsqueda server-side + realtime + filtros) queda diferida. Reusa data (`useBoard`) y componentes existentes; sin cambio de contrato ni de paradigma. La lista no trae `is_ai_active`/`thread` (sólo el detalle del board), por eso el estado "derivado" se deduce del pipeline humano.
 - Prueba local: `tsc --noEmit` ✓ (binario directo) · `eslint` ✓ (sin salida) sobre los 3 archivos · pre-commit hook (lint+tsc+build). Repro en vivo no corrido (sin backend dev). Polling de `useBoard` como fuente; el realtime del Inbox dedicado queda para la versión completa.
-- Commit:
+- Commit: 4562dea
 
 ### 2026-06-25 · Natalia · crm — quick wins UAT Lote 3 (Mi cuenta, cerrar panel, refresh toggle)
 - Qué cambió: (1) `components/layout/Topbar.tsx`: el item "Mi cuenta" del menú de usuario era un `DropdownMenuItem` **sin `onSelect`** (muerto) → ahora `router.push('/crm/settings')` (F1-F5). (2) `components/crm/conversation-panel.tsx`: nuevo prop opcional `onClose` + botón **X** en el header del panel; `crm-board.tsx` lo mapea a `setSelectedCardId(null)` para liberar el dashboard (New#2). (3) `hooks/use-realtime-events.ts`: el evento `handoff` ahora también invalida `cardKeys.detail` de la card abierta (vía `findCardIdByConversation`, igual que `ai_active_changed`) → el toggle "Agente IA" refleja `is_ai_active=false` tras un handoff sin reload (New#1a).
 - Por qué: gaps de la UAT 2026-06-20 — F1-F5 ("no puedo entrar a mi cuenta": el item no navegaba; la pantalla ya existía en `/crm/settings`), New#2 (el panel de chat no se cerraba y tapaba el tablero), New#1a (tras handoff el check IA seguía mostrándose "on" hasta recargar).
 - Spec/decisión que respeta: `server/docs/SPEC_UAT_remediation.md` Lote 3 (3.1/3.2/3.3). Sin cambio de contrato ni de paradigma; extiende el patrón de invalidación ya usado en `ai_active_changed`.
 - Prueba local: `tsc --noEmit` ✓ (binario directo), `eslint` ✓ (sin salida) sobre los 4 archivos. Build completo = gate del CI del PR. Repro en vivo (handoff/realtime) no corrido: sin backend dev levantado. (`npx pnpm <tool>` sigue fallando por el bug pnpm v11; se usan binarios directos.)
-- Commit:
+- Commit: 4562dea
 
 ### 2026-06-20 · Natalia · crm — visibilidad del lead derivado (handoff)
 - Qué cambió: (1) el Switch "Agente IA" del panel de conversación ahora lee directo de `card.is_ai_active` (verdad del server) en vez de un estado local sembrado en `true`; `useSetAiActive(cardId)` hace update optimista del cache del detalle (mismo patrón que `useMoveCard`) + rollback + invalidación. (2) `crm-board.tsx`: cada tab de pipeline muestra un contador de cards; el tab "Gestión Humana" se resalta (acento fucsia) cuando tiene leads. Nuevo `docs/SPEC_handoff_visibility.md`.
@@ -240,7 +247,7 @@
 - Por qué: cerrar el gap de tracking — el código shippeó en PR #6 pero el spec nunca se commiteó.
 - Spec/decisión que respeta: documenta el contrato `POST /crm/cards/{id}/generate-entry` (server PR #28) y el gating ya vigente (`is_ai_active` + stage "Pago validado").
 - Prueba local: N/A — cambio solo de documentación (markdown), sin tocar código; no se corre lint/tsc/build.
-- Commit:
+- Commit: 4562dea
 
 ### 2026-06-09 · Natalia · crm — B4 (parte 2): espejo de media en el hilo
 - Qué cambió: `lib/api/crm.ts` (`threadMessageSchema` + `type` con default `'text'` y `media_url` nullable/opcional — espejo del contrato server), `components/crm/conversation-message.tsx` (nuevo `MessageContent`: `type === 'image'` → `<img>` nativo con la URL, `type === 'document'` → `<a target="_blank" rel="noreferrer">`, default/tipo desconocido → texto plano como hoy; sin `media_url` → fallback de texto).
@@ -261,7 +268,7 @@
 - Por qué: el backend mergeó RBAC 3 niveles (#22/#23); el front quedó con enum viejo `owner/admin/member` → parse de `/auth/me` fallaba → sesión no hidrataba → nadie podía entrar. Este CR alinea el contrato y completa el invariante de gating.
 - Spec/decisión que respeta: `docs/SPEC_RBAC_FRONT.md` (aprobada 2026-06-09); `CLAUDE.md` invariante "config solo `platform_operator`"; `server/docs/SPECS_MVP.md` §RBAC.
 - Prueba local: `pnpm lint` 0 errores, 4 warnings preexistentes (shadcn/ui — ajenos al cambio); `pnpm tsc --noEmit` limpio; `pnpm build` ✓ (11 rutas). E2E real pendiente hasta backend corriendo localmente.
-- Commit:
+- Commit: 4562dea
 
 ### 2026-06-09 · Natalia · docs — spec RBAC front alineada con RBAC 3 niveles
 - Qué cambió: agregar `docs/SPEC_RBAC_FRONT.md` — spec para alinear el contrato de auth del front con el RBAC de 3 niveles del backend (PR #22/#23). Cubre: enum `client_admin/staff`, dimensión global `is_platform_operator`, gating de nav/rutas config, corrección de copy en register.

@@ -1,13 +1,11 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { FileText, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -19,6 +17,7 @@ import {
 } from '@/components/ui/sheet'
 import { CategorySelect } from '@/components/crm/catalog/category-select'
 import { CLOSING_LABELS, CURRENCY_LABELS } from '@/components/crm/catalog/labels'
+import { MaterialsDropzone } from '@/components/crm/catalog/materials-dropzone'
 import { ServicePreview } from '@/components/crm/catalog/service-preview'
 import {
   Field,
@@ -28,8 +27,13 @@ import {
   SelectField,
   serviceDefaults,
 } from '@/components/crm/catalog/service-form'
-import { useCreateService, useUpdateService, useUploadAsset } from '@/hooks/use-catalogo'
-import { serviceClosings, serviceCurrencies, type ServiceRead } from '@/lib/api/catalogo'
+import { useCreateService, useUpdateService } from '@/hooks/use-catalogo'
+import {
+  serviceClosings,
+  serviceCurrencies,
+  type AssetRead,
+  type ServiceRead,
+} from '@/lib/api/catalogo'
 
 interface ServiceEditorProps {
   agentId: string
@@ -43,10 +47,7 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
   const isEdit = service !== null
   const create = useCreateService(agentId)
   const update = useUpdateService(agentId)
-  const upload = useUploadAsset()
-  const fileRef = useRef<HTMLInputElement>(null)
-  const [assetId, setAssetId] = useState<string | null>(service?.asset_id ?? null)
-  const [assetName, setAssetName] = useState<string | null>(service?.asset?.filename ?? null)
+  const [materials, setMaterials] = useState<AssetRead[]>(service?.materials ?? [])
   const {
     control,
     register,
@@ -56,20 +57,12 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
   } = useForm({ defaultValues: serviceDefaults(service), mode: 'onChange' })
   const values = watch()
 
-  async function onPickFile(file: File | undefined) {
-    if (!file) return
-    const asset = await upload.mutateAsync(file)
-    setAssetId(asset.id)
-    setAssetName(asset.filename)
-    toast.success('PDF subido')
-  }
-
   const onSubmit = handleSubmit(async (form) => {
     const payload = {
       ...form,
       category_id: form.category_id || null,
       detalle: form.detalle.trim() || null,
-      asset_id: assetId,
+      asset_ids: materials.map((m) => m.id),
     }
     if (isEdit) {
       await update.mutateAsync({ serviceId: service.id, body: payload })
@@ -129,21 +122,7 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
             </Field>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-xs font-medium text-zinc-400">Material (PDF)</Label>
-            <div className="flex items-center gap-2">
-              <Button type="button" variant="outline" size="sm" disabled={upload.isPending} onClick={() => fileRef.current?.click()} className="gap-2 border-white/10 bg-white/[0.03] text-white">
-                <Upload className="size-3.5" />
-                {upload.isPending ? 'Subiendo…' : assetName ? 'Reemplazar PDF' : 'Subir PDF'}
-              </Button>
-              {assetName && (
-                <span className="flex items-center gap-1 truncate text-xs text-zinc-400">
-                  <FileText className="size-3.5" /> {assetName}
-                </span>
-              )}
-            </div>
-            <input ref={fileRef} type="file" accept="application/pdf" hidden onChange={(e) => onPickFile(e.target.files?.[0])} />
-          </div>
+          <MaterialsDropzone materials={materials} onChange={setMaterials} />
 
           {isEdit && (
             <Controller
@@ -166,7 +145,7 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
               precio: values.precio,
               moneda: values.moneda,
               flujo_cierre: values.flujo_cierre,
-              materialName: assetName,
+              materialNames: materials.map((m) => m.filename),
             }}
           />
 

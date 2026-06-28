@@ -43,8 +43,7 @@ export const serviceReadSchema = z.object({
   precio: z.string(),
   moneda: z.string(),
   flujo_cierre: z.string(),
-  asset_id: z.string().nullable(),
-  asset: assetReadSchema.nullable(),
+  materials: z.array(assetReadSchema),
   orden: z.number(),
   is_active: z.boolean(),
   created_at: z.string(),
@@ -75,7 +74,7 @@ export interface ServiceCreate {
   precio: string
   moneda: ServiceCurrency
   flujo_cierre?: ServiceClosing
-  asset_id?: string | null
+  asset_ids?: string[]
   orden?: number
 }
 
@@ -87,7 +86,7 @@ export interface ServiceUpdate {
   precio?: string
   moneda?: ServiceCurrency
   flujo_cierre?: ServiceClosing
-  asset_id?: string | null
+  asset_ids?: string[]
   orden?: number
   is_active?: boolean
 }

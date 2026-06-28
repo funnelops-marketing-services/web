@@ -12,7 +12,7 @@ interface PreviewService {
   precio: string
   moneda: string
   flujo_cierre: string
-  materialName?: string | null
+  materialNames?: string[]
 }
 
 /** Cómo el bot le presenta este servicio al lead: resumen breve + precio + material. */
@@ -41,10 +41,10 @@ export function ServicePreview({ service }: { service: PreviewService }) {
       {service.detalle && (
         <p className="whitespace-pre-line text-xs text-zinc-400">{service.detalle}</p>
       )}
-      {service.materialName && (
-        <p className="flex items-center gap-1.5 text-xs text-zinc-400">
-          <FileText className="size-3.5 text-zinc-500" />
-          Envía: {service.materialName}
+      {service.materialNames && service.materialNames.length > 0 && (
+        <p className="flex items-start gap-1.5 text-xs text-zinc-400">
+          <FileText className="mt-0.5 size-3.5 shrink-0 text-zinc-500" />
+          <span>Envía: {service.materialNames.join(', ')}</span>
         </p>
       )}
       <p className="text-xs text-zinc-500">Cierre: {closing}</p>
