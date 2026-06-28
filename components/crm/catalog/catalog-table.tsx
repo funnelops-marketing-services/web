@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react'
 import { FileText, FileWarning, GripVertical, Pencil, Trash2 } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import {
@@ -77,15 +76,15 @@ export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
         <section key={group.key} className="space-y-2">
           <h2 className="text-sm font-semibold text-zinc-300">{group.label}</h2>
           <div className="rounded-xl border border-white/5 bg-white/[0.02]">
-            <Table>
+            <Table className="table-fixed">
               <TableHeader>
                 <TableRow className="border-white/5 hover:bg-transparent">
-                  <TableHead className="w-8" />
+                  <TableHead className="w-10" />
                   <TableHead className="text-zinc-400">Servicio</TableHead>
-                  <TableHead className="text-zinc-400">Precio</TableHead>
-                  <TableHead className="text-zinc-400">PDF</TableHead>
-                  <TableHead className="text-zinc-400">Activo</TableHead>
-                  <TableHead className="text-right text-zinc-400">Acciones</TableHead>
+                  <TableHead className="w-44 text-zinc-400">Precio</TableHead>
+                  <TableHead className="w-20 text-zinc-400">PDF</TableHead>
+                  <TableHead className="w-20 text-zinc-400">Activo</TableHead>
+                  <TableHead className="w-24 text-right text-zinc-400">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -110,7 +109,9 @@ export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
                       <p className="text-sm font-medium text-white">{service.nombre}</p>
                       <p className="line-clamp-1 text-xs text-zinc-500">{service.resumen}</p>
                     </TableCell>
-                    <TableCell className="text-sm text-zinc-300">{service.precio}</TableCell>
+                    <TableCell className="text-sm text-zinc-300">
+                      {service.precio} · {service.moneda}
+                    </TableCell>
                     <TableCell>
                       {service.asset ? (
                         <span className="flex items-center gap-1 text-xs text-zinc-400">
@@ -158,9 +159,6 @@ export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
           </div>
         </section>
       ))}
-      <Badge className="border-amber-500/30 bg-amber-500/10 text-amber-300">
-        Arrastrá ⠿ para reordenar dentro de cada categoría
-      </Badge>
     </div>
   )
 }

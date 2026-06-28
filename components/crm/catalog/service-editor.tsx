@@ -118,11 +118,12 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
         <form onSubmit={onSubmit} className="space-y-4 px-4 pb-8">
           <Field label="Slug (identificador, no se edita)" htmlFor="slug">
             <Input id="slug" disabled={isEdit} placeholder="curso-edicion" {...register('slug')} className="border-white/10 bg-white/[0.03] text-sm text-white disabled:opacity-60" />
+            <p className="text-[11px] text-zinc-500">Minúsculas, números y guiones (ej. curso-edicion).</p>
           </Field>
           <Field label="Nombre" htmlFor="nombre">
             <Input id="nombre" {...register('nombre')} className="border-white/10 bg-white/[0.03] text-sm text-white" />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Categoría" htmlFor="category_id">
               <Controller
                 control={control}
@@ -130,8 +131,8 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
                 render={({ field }) => <CategorySelect value={field.value} onChange={field.onChange} />}
               />
             </Field>
-            <Field label="Moneda" htmlFor="moneda">
-              <SelectField name="moneda" control={control} options={serviceCurrencies} labels={CURRENCY_LABELS} />
+            <Field label="Cierre" htmlFor="flujo_cierre">
+              <SelectField name="flujo_cierre" control={control} options={serviceClosings} labels={CLOSING_LABELS} />
             </Field>
           </div>
           <Field label="Resumen (1–2 líneas, lo que dice el bot)" htmlFor="resumen">
@@ -140,12 +141,12 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
           <Field label="Detalle (opcional, para despejar dudas)" htmlFor="detalle">
             <Textarea id="detalle" rows={3} {...register('detalle')} className="border-white/10 bg-white/[0.03] text-sm text-white" />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Precio (display)" htmlFor="precio">
-              <Input id="precio" placeholder="650 Bs" {...register('precio')} className="border-white/10 bg-white/[0.03] text-sm text-white" />
+              <Input id="precio" placeholder="650" {...register('precio')} className="border-white/10 bg-white/[0.03] text-sm text-white" />
             </Field>
-            <Field label="Cierre" htmlFor="flujo_cierre">
-              <SelectField name="flujo_cierre" control={control} options={serviceClosings} labels={CLOSING_LABELS} />
+            <Field label="Moneda" htmlFor="moneda">
+              <SelectField name="moneda" control={control} options={serviceCurrencies} labels={CURRENCY_LABELS} />
             </Field>
           </div>
 
