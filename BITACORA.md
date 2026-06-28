@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-28 · Nova · crm/catálogo — quitar botón "Publicar" (catálogo en vivo) (#66)
+- Qué cambió: se elimina el botón **"Publicar"** y el warning ámbar de [catalog-screen.tsx](components/crm/catalog/catalog-screen.tsx). Ahora el catálogo es **en vivo** (auto-publish del BE #109): los servicios **activos** se ofrecen al agente apenas se guardan. En su lugar hay un indicador pasivo **"● En línea"** (verde) + el header muestra *"X de N servicios activos"*, y una nota aclara que el switch **Activo** de cada fila controla qué está en línea (no hace falta publicar). Se borran `usePublishCatalog` ([hooks/use-catalogo.ts](hooks/use-catalogo.ts)) y `publishCatalog`/`catalogPublishResultSchema`/`CatalogPublishResult` ([lib/api/catalogo.ts](lib/api/catalogo.ts)).
+- Por qué: #66 — el botón siempre disponible no dejaba claro si el catálogo estaba en línea o en borrador, y el modelo de "publicar" ya no aplica (BE #109 lo hace automático). `is_active` es ahora el control intuitivo y visible.
+- Spec/decisión que respeta: FRONTEND_SPEC (catálogo). Contraparte BE: #109 (auto-publish, sin endpoint `catalog/publish`). Decisión de arquitectura con el owner (catálogo en vivo, sin fase borrador global). Dark/violeta y copy en español intactos; sin `any`.
+- Prueba local: `pnpm lint` ✓ (0 errores; 7 warnings preexistentes ajenos) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
+- Commit: 01fabdb
+
 ### 2026-06-28 · Natalia · crm — "Usuarios y roles" como ítem propio del sidebar + tabla read-only + label Superadmin
 - Qué cambió: se sacó "Usuarios y roles" de Ajustes y se le dio **su propia ruta** [/crm/users](app/crm/users/page.tsx) con ítem en el [Sidebar](components/layout/Sidebar.tsx) (ícono `ShieldCheck`, `requiresConfig: true` → solo `platform_operator`; redirige a `/crm` si no, y el backend igual 403ea `GET /users`). [Ajustes](app/crm/settings/page.tsx) queda solo con "Mi cuenta". En [users-table.tsx](components/crm/config/users-table.tsx): (1) el badge del superadmin pasa de **"Operador" → "Superadmin"**; (2) se **eliminó la columna "Acción"** (cambio de rol) — la tabla queda read-only (Email · Nombre · Rol). Se quitó el "Solo lectura" que se leía como un permiso incorrecto sobre el superadmin.
 - Por qué: el owner pidió que la gestión de usuarios/roles sea visible aparte y **solo para el superadmin** (no para Admin/Mirko). La columna "Acción" permitía estados incoherentes (degradar visualmente al superadmin); la edición de roles vuelve con un RBAC coherente y anti-self-lockout — abierto en **server#151**.

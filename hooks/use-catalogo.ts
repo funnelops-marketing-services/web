@@ -10,12 +10,10 @@ import {
   deleteServiceCategory,
   listServiceCategories,
   listServices,
-  publishCatalog,
   updateService,
   updateServiceCategory,
   uploadAsset,
   type AssetRead,
-  type CatalogPublishResult,
   type ServiceCategoryCreate,
   type ServiceCategoryRead,
   type ServiceCategoryUpdate,
@@ -82,20 +80,6 @@ export function useUploadAsset() {
   return useMutation<AssetRead, Error, File>({
     mutationFn: (file) => uploadAsset(file),
     onError: (error) => fail(error, 'No se pudo subir el material.'),
-  })
-}
-
-export function usePublishCatalog(agentId: string) {
-  const queryClient = useQueryClient()
-  return useMutation<CatalogPublishResult, Error, void>({
-    mutationFn: () => publishCatalog(agentId),
-    onSuccess: (result) => {
-      toast.success(
-        `Catálogo publicado · versión ${result.version_number} (${result.services_published} servicios)`,
-      )
-      queryClient.invalidateQueries({ queryKey: catalogKeys.services(agentId) })
-    },
-    onError: (error) => fail(error, 'No se pudo publicar el catálogo.'),
   })
 }
 
