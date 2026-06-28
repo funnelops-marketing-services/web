@@ -14,7 +14,7 @@ interface FormValues {
   system_prompt: string
   model: string
   temperature: string
-  ofertas: string
+  services: string
   faq: string
   change_summary: string
 }
@@ -33,7 +33,7 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
       system_prompt: agent.system_prompt,
       model: agent.model,
       temperature: agent.config.temperature === undefined ? '' : String(agent.config.temperature),
-      ofertas: toText(agent.config.ofertas),
+      services: toText(agent.config.services),
       faq: toText(agent.config.faq),
       change_summary: '',
     },
@@ -45,7 +45,7 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
     if (dirtyFields.system_prompt) body.system_prompt = values.system_prompt
     if (dirtyFields.model) body.model = values.model
 
-    if (dirtyFields.temperature || dirtyFields.ofertas || dirtyFields.faq) {
+    if (dirtyFields.temperature || dirtyFields.services || dirtyFields.faq) {
       // Spread preserves config keys the form doesn't expose (e.g. emojis): the
       // server replaces config wholesale, so we only override the edited keys.
       const config: Record<string, unknown> = { ...agent.config }
@@ -60,7 +60,7 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
         }
       }
       // Cleared field → drop the key (runtime reads via .get(); absent == null).
-      for (const field of ['ofertas', 'faq'] as const) {
+      for (const field of ['services', 'faq'] as const) {
         if (!dirtyFields[field]) continue
         const raw = values[field].trim()
         if (raw === '') {
@@ -70,7 +70,7 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
         try {
           config[field] = JSON.parse(raw)
         } catch {
-          return toast.error(`JSON inválido en ${field === 'ofertas' ? 'Ofertas' : 'FAQ'}.`)
+          return toast.error(`JSON inválido en ${field === 'services' ? 'Servicios' : 'FAQ'}.`)
         }
       }
       body.config = config
@@ -133,11 +133,11 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
         </Field>
       </div>
 
-      <Field label="Ofertas (JSON)" htmlFor="ofertas">
+      <Field label="Servicios (JSON)" htmlFor="services">
         <Textarea
-          id="ofertas"
+          id="services"
           rows={6}
-          {...register('ofertas')}
+          {...register('services')}
           className="border-white/10 bg-white/[0.03] font-mono text-sm text-white"
         />
       </Field>

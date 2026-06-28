@@ -4,7 +4,7 @@ import { apiClient } from '@/lib/api/client'
 import { tenantUserRoleSchema, type TenantUserRole } from '@/lib/api/auth'
 
 // ---------- Schemas (espejo del contrato M-Config server, PR #36 + GET /agents) ----------
-// `config` es un JSON abierto (temperature, ofertas, faq, emojis, …); lo tratamos
+// `config` es un JSON abierto (temperature, services, faq, emojis, …); lo tratamos
 // como record opaco y resolvemos cada clave en la UI.
 
 export const agentVersionReadSchema = z.object({

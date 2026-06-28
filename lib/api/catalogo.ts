@@ -4,13 +4,13 @@ import { apiClient } from '@/lib/api/client'
 
 // ---------- Enums de negocio (espejo de catalog_schemas.py) ----------
 
-export const offerCategories = ['formacion', 'produccion', 'edicion', 'general'] as const
-export const offerCurrencies = ['BOB', 'USD'] as const
-export const offerClosings = ['pago_qr', 'handoff_consultivo'] as const
+export const serviceCategories = ['formacion', 'produccion', 'edicion', 'general'] as const
+export const serviceCurrencies = ['BOB', 'USD'] as const
+export const serviceClosings = ['pago_qr', 'handoff_consultivo'] as const
 
-export const categorySchema = z.enum(offerCategories)
-export const currencySchema = z.enum(offerCurrencies)
-export const closingSchema = z.enum(offerClosings)
+export const categorySchema = z.enum(serviceCategories)
+export const currencySchema = z.enum(serviceCurrencies)
+export const closingSchema = z.enum(serviceClosings)
 
 // ---------- Schemas (espejo del contrato server Fase 1) ----------
 
@@ -23,7 +23,7 @@ export const assetReadSchema = z.object({
   created_at: z.string(),
 })
 
-export const offerReadSchema = z.object({
+export const serviceReadSchema = z.object({
   id: z.string(),
   organization_id: z.string(),
   agent_id: z.string(),
@@ -46,39 +46,39 @@ export const offerReadSchema = z.object({
 export const catalogPublishResultSchema = z.object({
   version_id: z.string(),
   version_number: z.number(),
-  offers_published: z.number(),
+  services_published: z.number(),
 })
 
 // ---------- Tipos derivados ----------
 
 export type AssetRead = z.infer<typeof assetReadSchema>
-export type OfferRead = z.infer<typeof offerReadSchema>
+export type ServiceRead = z.infer<typeof serviceReadSchema>
 export type CatalogPublishResult = z.infer<typeof catalogPublishResultSchema>
-export type OfferCategory = (typeof offerCategories)[number]
-export type OfferCurrency = (typeof offerCurrencies)[number]
-export type OfferClosing = (typeof offerClosings)[number]
+export type ServiceCategory = (typeof serviceCategories)[number]
+export type ServiceCurrency = (typeof serviceCurrencies)[number]
+export type ServiceClosing = (typeof serviceClosings)[number]
 
-export interface OfferCreate {
+export interface ServiceCreate {
   slug: string
   nombre: string
-  categoria: OfferCategory
+  categoria: ServiceCategory
   resumen: string
   detalle?: string | null
   precio: string
-  moneda: OfferCurrency
-  flujo_cierre?: OfferClosing
+  moneda: ServiceCurrency
+  flujo_cierre?: ServiceClosing
   asset_id?: string | null
   orden?: number
 }
 
-export interface OfferUpdate {
+export interface ServiceUpdate {
   nombre?: string
-  categoria?: OfferCategory
+  categoria?: ServiceCategory
   resumen?: string
   detalle?: string | null
   precio?: string
-  moneda?: OfferCurrency
-  flujo_cierre?: OfferClosing
+  moneda?: ServiceCurrency
+  flujo_cierre?: ServiceClosing
   asset_id?: string | null
   orden?: number
   is_active?: boolean
@@ -86,23 +86,23 @@ export interface OfferUpdate {
 
 // ---------- Llamadas tipadas ----------
 
-export async function listOffers(agentId: string): Promise<OfferRead[]> {
-  const { data } = await apiClient.get(`/agents/${agentId}/offers`)
-  return z.array(offerReadSchema).parse(data)
+export async function listServices(agentId: string): Promise<ServiceRead[]> {
+  const { data } = await apiClient.get(`/agents/${agentId}/services`)
+  return z.array(serviceReadSchema).parse(data)
 }
 
-export async function createOffer(agentId: string, body: OfferCreate): Promise<OfferRead> {
-  const { data } = await apiClient.post(`/agents/${agentId}/offers`, body)
-  return offerReadSchema.parse(data)
+export async function createService(agentId: string, body: ServiceCreate): Promise<ServiceRead> {
+  const { data } = await apiClient.post(`/agents/${agentId}/services`, body)
+  return serviceReadSchema.parse(data)
 }
 
-export async function updateOffer(offerId: string, body: OfferUpdate): Promise<OfferRead> {
-  const { data } = await apiClient.put(`/offers/${offerId}`, body)
-  return offerReadSchema.parse(data)
+export async function updateService(serviceId: string, body: ServiceUpdate): Promise<ServiceRead> {
+  const { data } = await apiClient.put(`/services/${serviceId}`, body)
+  return serviceReadSchema.parse(data)
 }
 
-export async function deleteOffer(offerId: string): Promise<void> {
-  await apiClient.delete(`/offers/${offerId}`)
+export async function deleteService(serviceId: string): Promise<void> {
+  await apiClient.delete(`/services/${serviceId}`)
 }
 
 export async function uploadAsset(file: File): Promise<AssetRead> {

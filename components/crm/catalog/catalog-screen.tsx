@@ -5,17 +5,17 @@ import { Plus, UploadCloud } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { CatalogTable } from '@/components/crm/catalog/catalog-table'
-import { OfferEditor } from '@/components/crm/catalog/offer-editor'
-import { useOffers, usePublishCatalog } from '@/hooks/use-catalogo'
-import type { OfferRead } from '@/lib/api/catalogo'
+import { ServiceEditor } from '@/components/crm/catalog/service-editor'
+import { useServices, usePublishCatalog } from '@/hooks/use-catalogo'
+import type { ServiceRead } from '@/lib/api/catalogo'
 
 export function CatalogScreen({ agentId }: { agentId: string }) {
-  const { data: offers, isLoading, isError } = useOffers(agentId)
+  const { data: services, isLoading, isError } = useServices(agentId)
   const publish = usePublishCatalog(agentId)
   const [editorOpen, setEditorOpen] = useState(false)
-  const [editing, setEditing] = useState<OfferRead | null>(null)
+  const [editing, setEditing] = useState<ServiceRead | null>(null)
 
-  const list = offers ?? []
+  const list = services ?? []
   const nextOrden = list.reduce((max, o) => Math.max(max, o.orden), -1) + 1
 
   function openNew() {
@@ -23,8 +23,8 @@ export function CatalogScreen({ agentId }: { agentId: string }) {
     setEditorOpen(true)
   }
 
-  function openEdit(offer: OfferRead) {
-    setEditing(offer)
+  function openEdit(service: ServiceRead) {
+    setEditing(service)
     setEditorOpen(true)
   }
 
@@ -34,7 +34,7 @@ export function CatalogScreen({ agentId }: { agentId: string }) {
         <div>
           <h1 className="text-2xl font-bold text-white">Catálogo</h1>
           <p className="text-sm text-zinc-500">
-            {list.length} ofertas · el bot las resume y manda el PDF al elegir.
+            {list.length} servicios · el bot los resume y manda el PDF al elegir.
           </p>
         </div>
         <div className="flex gap-2">
@@ -43,7 +43,7 @@ export function CatalogScreen({ agentId }: { agentId: string }) {
             onClick={openNew}
             className="gap-2 border-white/10 bg-white/[0.03] text-white"
           >
-            <Plus className="size-4" /> Nueva oferta
+            <Plus className="size-4" /> Nuevo servicio
           </Button>
           <Button
             onClick={() => publish.mutate()}
@@ -64,15 +64,15 @@ export function CatalogScreen({ agentId }: { agentId: string }) {
       {isLoading && <p className="text-sm text-zinc-500">Cargando catálogo…</p>}
       {isError && <p className="text-sm text-zinc-500">No se pudo cargar el catálogo.</p>}
       {!isLoading && !isError && list.length === 0 && (
-        <p className="text-sm text-zinc-500">Todavía no hay ofertas. Creá la primera.</p>
+        <p className="text-sm text-zinc-500">Todavía no hay servicios. Creá la primera.</p>
       )}
-      {list.length > 0 && <CatalogTable agentId={agentId} offers={list} onEdit={openEdit} />}
+      {list.length > 0 && <CatalogTable agentId={agentId} services={list} onEdit={openEdit} />}
 
       {editorOpen && (
-        <OfferEditor
+        <ServiceEditor
           key={editing?.id ?? 'new'}
           agentId={agentId}
-          offer={editing}
+          service={editing}
           defaultOrden={nextOrden}
           open={editorOpen}
           onOpenChange={setEditorOpen}
