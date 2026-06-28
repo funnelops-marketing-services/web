@@ -26,9 +26,21 @@ export const cardSchema = z.object({
   phone: z.string(), // external_id (wa_id) de la conversación; habilita búsqueda por número
 })
 
+// Un paso del historial de movimientos de la card (traceability del detalle #75/#55).
+// stage_from_* es null en el alta de la card (primer move sin origen).
+export const cardMoveSchema = z.object({
+  stage_from_name: z.string().nullable(),
+  stage_from_color: z.string().nullable(),
+  stage_to_name: z.string(),
+  stage_to_color: z.string().nullable(),
+  moved_by: z.string(), // 'agent' | user_id
+  moved_at: z.string(),
+})
+
 export const cardDetailSchema = cardSchema.extend({
   is_ai_active: z.boolean(),
   thread: z.array(threadMessageSchema),
+  moves: z.array(cardMoveSchema), // historial cronológico (asc por moved_at)
 })
 
 export const qrEntrySchema = z.object({
@@ -66,6 +78,7 @@ export const aiActiveSchema = z.object({
 export type ThreadSender = z.infer<typeof threadSenderSchema>
 export type ThreadMessage = z.infer<typeof threadMessageSchema>
 export type Card = z.infer<typeof cardSchema>
+export type CardMove = z.infer<typeof cardMoveSchema>
 export type CardDetail = z.infer<typeof cardDetailSchema>
 export type Stage = z.infer<typeof stageSchema>
 export type Pipeline = z.infer<typeof pipelineSchema>
