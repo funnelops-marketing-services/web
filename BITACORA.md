@@ -26,7 +26,7 @@
 - Por qué: #63 — el operador administra las categorías (flexibilidad: las 4 actuales pueden cambiar) y asigna `category_id` a cada servicio desde el form. Reemplaza el enum hardcodeado por la tabla administrable del BE.
 - Spec/decisión que respeta: issue #63 (depende de server #142, In review — backend-first). Decisión con el cliente (2026-06-28): categorías per-org editables, sin PDF (el material es del servicio), borrar → servicios sin categoría. CLAUDE.md: CRM en `/crm` (config solo `platform_operator` vía la página), TS estricto (sin `any`), copy en español, dark violeta, componentes < 200 líneas.
 - Prueba local: `pnpm tsc --noEmit` (0) · `pnpm lint` (0 errores, 7 warnings preexistentes en `use-mobile.ts`) · `pnpm build` (0, `/crm/catalogo` generada). Verificado end-to-end contra el backend de #142 (rama local + `alembic upgrade head` a `0017`).
-- Commit:
+- Commit: 9daf9b0
 
 ### 2026-06-28 · Natalia · crm — convertir el número de la oportunidad en contacto desde el detalle (#84)
 - Qué cambió: `lib/api/crm.ts` — `cardDetailSchema` suma `contact` (`{ id, full_name } | null`), espejo del nuevo campo de `CardDetailOut` (server #139); nuevo `cardContactSchema` + tipo `CardContact`. `opportunity-details.tsx` — junto a `card.phone` muestra acción **"Convertir en contacto"** (cualquier stage) que abre el `ContactCreateSheet` reusado con el teléfono precargado; si `card.contact != null` muestra el estado **"Ya es contacto"** (con el nombre) en vez de la acción; tras crear invalida `cardKeys.detail` para refrescar el vínculo. `contact-create.tsx` — `ContactCreateSheet` suma props opcionales `defaultPhone` (precarga al abrir, patrón ajuste-en-render) y `onCreated` (callback post-alta).
