@@ -26,7 +26,7 @@
 - Por qué: simplificar la navegación del CRM. El tablero (kanban de pipelines / "Gestión Humana") pasa a ser el ítem principal "Embudo de ventas". El hilo de conversación + toggle IA (takeover) ya vivían en `conversation-panel.tsx` dentro del tablero, así que quitar las vistas standalone de Inbox/Conversaciones no pierde funcionalidad.
 - Spec/decisión que respeta: CLAUDE.md — CRM bajo `/crm` (sin subdominio), "Inbox + takeover" (toggle `is_ai_active` intacto en `conversation-panel.tsx`), pipeline "Gestión Humana" sin cambios, realtime sin cambios. No toca contratos con el backend (el endpoint `/crm/conversations/{id}/ai-active` en `lib/api/crm.ts` se mantiene).
 - Prueba local: `pnpm lint` ✓ (0 errores; 5 warnings preexistentes en `use-mobile.ts`) · `pnpm build` ✓ (rutas: `/crm`, `/crm/agents`, `/crm/catalogo`, `/crm/contacts`, `/crm/settings`; ya no aparecen `/crm/inbox` ni `/crm/conversations`) · tsc corre dentro del build ✓.
-- Commit:
+- Commit: 0e97814 (PR #72)
 
 ### 2026-06-27 · Nova · crm — colapsar la columna del panel al cerrar la conversación (#31, mejora)
 - Qué cambió: `crm-board.tsx` ahora **renderiza la columna del panel solo cuando hay `selectedCardId`** (envuelto en `{selectedCardId && (…)}`, `key={selectedCardId}`); al cerrar, la columna del 30% desaparece y el tablero recupera el ancho completo. Antes quedaba una columna vacía muerta con EmptyState. `conversation-panel.tsx`: pulido del botón de cierre (`type="button"`, `rounded-lg`). `onClose` sigue opcional (no rompe el reuso en `inbox-view`).
