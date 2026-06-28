@@ -10,6 +10,7 @@ import type { Boards } from '@/lib/api/crm'
 import { OpportunityHistory } from '@/components/crm/opportunity-history'
 import { OpportunityEditForm } from '@/components/crm/opportunity-edit-form'
 import { OpportunityDeleteDialog } from '@/components/crm/opportunity-delete-dialog'
+import { RatingBadge } from '@/components/crm/rating-badge'
 
 function StateMessage({ text }: { text: string }) {
   return (
@@ -91,12 +92,15 @@ export function OpportunityDetails({
         )}
       </div>
 
-      {location && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Badge>{location.pipelineName}</Badge>
-          <Badge>{location.stageName}</Badge>
-        </div>
-      )}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <RatingBadge rating={card.rating} showLabel className="px-2.5 py-0.5 text-xs" />
+        {location && (
+          <>
+            <Badge>{location.pipelineName}</Badge>
+            <Badge>{location.stageName}</Badge>
+          </>
+        )}
+      </div>
 
       {editing ? (
         <div className="mt-5 border-t border-white/5 pt-5">
@@ -109,6 +113,19 @@ export function OpportunityDetails({
         </div>
       ) : (
         <>
+          <div className="mt-5 border-t border-white/5 pt-5">
+            <SectionTitle>Resumen IA</SectionTitle>
+            {card.ai_summary ? (
+              <p className="text-sm font-normal whitespace-pre-wrap text-zinc-300">
+                {card.ai_summary}
+              </p>
+            ) : (
+              <p className="text-sm font-normal text-zinc-600">
+                Sin resumen todavía. Se genera a medida que el lead avanza.
+              </p>
+            )}
+          </div>
+
           <div className="mt-5 border-t border-white/5 pt-5">
             <SectionTitle>Notas</SectionTitle>
             {card.notes ? (
