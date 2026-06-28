@@ -1,15 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { Pencil, Phone } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { Pencil, Phone, UserCheck, UserPlus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { useCard } from '@/hooks/use-card'
+import { useCard, cardKeys } from '@/hooks/use-card'
 import { useBoard } from '@/hooks/use-board'
 import type { Boards } from '@/lib/api/crm'
 import { OpportunityHistory } from '@/components/crm/opportunity-history'
 import { OpportunityEditForm } from '@/components/crm/opportunity-edit-form'
 import { OpportunityDeleteDialog } from '@/components/crm/opportunity-delete-dialog'
+import { ContactCreateSheet } from '@/components/crm/contacts/contact-create'
 import { RatingBadge } from '@/components/crm/rating-badge'
 
 function StateMessage({ text }: { text: string }) {
@@ -56,7 +58,9 @@ export function OpportunityDetails({
 }) {
   const { data: card, isLoading, isError } = useCard(cardId)
   const { data: boards } = useBoard()
+  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
+  const [contactSheetOpen, setContactSheetOpen] = useState(false)
 
   if (!cardId) return null
   if (isLoading) return <StateMessage text="Cargando oportunidad…" />
@@ -78,6 +82,23 @@ export function OpportunityDetails({
               {card.phone}
             </p>
           )}
+          {card.phone &&
+            (card.contact ? (
+              <p className="mt-1 flex items-center gap-1.5 text-xs font-medium text-emerald-400">
+                <UserCheck className="size-3 flex-shrink-0" />
+                Ya es contacto
+                {card.contact.full_name ? ` · ${card.contact.full_name}` : ''}
+              </p>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setContactSheetOpen(true)}
+                className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-violet-400 transition-colors hover:text-violet-300"
+              >
+                <UserPlus className="size-3 flex-shrink-0" />
+                Convertir en contacto
+              </button>
+            ))}
         </div>
         {!editing && (
           <Button
@@ -149,6 +170,15 @@ export function OpportunityDetails({
           </div>
         </>
       )}
+
+      <ContactCreateSheet
+        open={contactSheetOpen}
+        onOpenChange={setContactSheetOpen}
+        defaultPhone={card.phone}
+        onCreated={() =>
+          queryClient.invalidateQueries({ queryKey: cardKeys.detail(card.id) })
+        }
+      />
     </div>
   )
 }

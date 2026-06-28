@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-28 · Natalia · crm — convertir el número de la oportunidad en contacto desde el detalle (#84)
+- Qué cambió: `lib/api/crm.ts` — `cardDetailSchema` suma `contact` (`{ id, full_name } | null`), espejo del nuevo campo de `CardDetailOut` (server #139); nuevo `cardContactSchema` + tipo `CardContact`. `opportunity-details.tsx` — junto a `card.phone` muestra acción **"Convertir en contacto"** (cualquier stage) que abre el `ContactCreateSheet` reusado con el teléfono precargado; si `card.contact != null` muestra el estado **"Ya es contacto"** (con el nombre) en vez de la acción; tras crear invalida `cardKeys.detail` para refrescar el vínculo. `contact-create.tsx` — `ContactCreateSheet` suma props opcionales `defaultPhone` (precarga al abrir, patrón ajuste-en-render) y `onCreated` (callback post-alta).
+- Por qué: el operador veía el número en el detalle pero tenía que ir a Contactos para promoverlo; ahora lo convierte en el lugar, sin duplicar (alta idempotente por phone en el BE).
+- Spec/decisión que respeta: issue #84 (depende de server #139, mergeado PR #141); reutiliza `ContactCreateSheet` (no se crea popup nuevo); vínculo leído del campo `contact` del detalle. CLAUDE.md (CRM en `/crm`, TS estricto, copy en español).
+- Prueba local: `pnpm lint` (0 errores, 7 warnings preexistentes), `pnpm tsc --noEmit` (0), `pnpm build` (0). Sin backend dev levantado: contrato verificado contra el schema de `CardDetailOut` de server `origin/main`.
+- Commit:
+
 ### 2026-06-28 · Nova · crm — calificación del lead (badge hot/medium/cold) + resumen IA en el detalle (#53)
 - Qué cambió: `lib/api/crm.ts` — `cardSchema` suma `rating` (lo hereda el board y el detalle); `cardDetailSchema` suma `ai_summary`. Nuevo `rating-badge.tsx` (badge reusable: 🔥 Caliente / 🌡 Tibio / 🧊 Frío, `showLabel` opcional, default a frío ante valores desconocidos). `board-card.tsx` muestra el **badge de calificación** (solo ícono) en la cara de la card. `opportunity-details.tsx` (detalle lateral) muestra el badge con label en la fila de badges + nueva sección **"Resumen IA"** (texto de `card.ai_summary` o estado vacío "Sin resumen todavía…").
 - Por qué: #53 — el operador ve de un vistazo la temperatura del lead en el tablero (badge) y el resumen del caso por IA al abrir el detalle, sin tener que leer todo el hilo.

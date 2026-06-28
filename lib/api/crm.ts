@@ -38,6 +38,13 @@ export const cardMoveSchema = z.object({
   moved_at: z.string(),
 })
 
+// Contacto vinculado a la card vía la FK `card.contact_id` (server #139); null si el
+// número todavía no es contacto.
+export const cardContactSchema = z.object({
+  id: z.string(),
+  full_name: z.string().nullable(),
+})
+
 export const cardDetailSchema = cardSchema.extend({
   is_ai_active: z.boolean(),
   full_name: z.string().nullable(), // nombre del lead (prefill de edición)
@@ -45,6 +52,7 @@ export const cardDetailSchema = cardSchema.extend({
   ai_summary: z.string().nullable(), // resumen del caso por IA
   thread: z.array(threadMessageSchema),
   moves: z.array(cardMoveSchema), // historial cronológico (asc por moved_at)
+  contact: cardContactSchema.nullable(), // contacto vinculado (FK) o null
 })
 
 export const qrEntrySchema = z.object({
@@ -82,6 +90,7 @@ export const aiActiveSchema = z.object({
 export type ThreadSender = z.infer<typeof threadSenderSchema>
 export type ThreadMessage = z.infer<typeof threadMessageSchema>
 export type Card = z.infer<typeof cardSchema>
+export type CardContact = z.infer<typeof cardContactSchema>
 export type CardMove = z.infer<typeof cardMoveSchema>
 export type CardDetail = z.infer<typeof cardDetailSchema>
 export type Stage = z.infer<typeof stageSchema>
