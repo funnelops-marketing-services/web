@@ -81,7 +81,7 @@ export function useDeleteService(agentId: string) {
 export function useUploadAsset() {
   return useMutation<AssetRead, Error, File>({
     mutationFn: (file) => uploadAsset(file),
-    onError: (error) => fail(error, 'No se pudo subir el PDF.'),
+    onError: (error) => fail(error, 'No se pudo subir el material.'),
   })
 }
 

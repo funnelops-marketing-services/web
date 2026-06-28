@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-28 · Nova · crm/catálogo — dropzone de materiales (#65)
+- Qué cambió: la carga de material (antes un botón "Subir PDF", un solo archivo) se reemplaza por un **dropzone** ([materials-dropzone.tsx](components/crm/catalog/materials-dropzone.tsx)) con drag-and-drop + clic, que acepta **pdf/jpg/png ≤5 MB, máx. 5 por servicio**, valida en cliente tipo/tamaño/cantidad (toast por archivo rechazado) y muestra el **listado en vivo** con ícono por tipo y botón de quitar. El editor ([service-editor.tsx](components/crm/catalog/service-editor.tsx)) maneja `materials: AssetRead[]` y envía `asset_ids` (espejo del nuevo contrato BE #108). Contrato API ([lib/api/catalogo.ts](lib/api/catalogo.ts)): `ServiceRead.materials[]` reemplaza `asset_id`/`asset`; `ServiceCreate/Update` usan `asset_ids`. Preview muestra "Envía: a, b, c" y la tabla del catálogo muestra el **conteo** de materiales (o "falta").
+- Por qué: #65 — subir varios materiales por servicio. Contraparte BE: #108 (≤5, pdf/jpg/png ≤5MB, `asset.service_id`).
+- Spec/decisión que respeta: FRONTEND_SPEC (catálogo) + SPEC_catalogo_y_materiales. Apila sobre #64 (PR #90): comparte `service-editor.tsx`. Dropzone extraído a su propio componente (159/132 líneas, invariante <200). Dark/violeta y copy en español intactos; sin `any`.
+- Prueba local: `pnpm lint` ✓ (0 errores; 7 warnings preexistentes ajenos) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
+- Commit:
+
 ### 2026-06-28 · Nova · crm/catálogo — validación de campos del form de servicios (#64)
 - Qué cambió: el form de alta/edición de servicios ([service-editor.tsx](components/crm/catalog/service-editor.tsx)) ahora valida en cliente con react-hook-form (`mode: 'onChange'`): límites por campo (**nombre 30, slug 20, resumen 200, detalle 300** vía `maxLength` nativo + reglas), `precio` solo números con ≤2 decimales y tope `100000`, mensajes inline por campo (`FieldError`) y **botón de guardar deshabilitado mientras `!isValid`**. Refactor de tamaño: se extrajo la config de validación (`LIMITS`/`RULES`), `serviceDefaults` y los helpers presentacionales (`Field`/`FieldError`/`SelectField`) a [service-form.tsx](components/crm/catalog/service-form.tsx) → el componente baja de 288 a 180 líneas (cumple el invariante <200).
 - Por qué: #64 — impedir datos inválidos antes de guardar. Mismos límites que la validación server-side (#107) para que el front no choque con el 422 del backend.

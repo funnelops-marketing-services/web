@@ -113,9 +113,9 @@ export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
                       {service.precio} · {service.moneda}
                     </TableCell>
                     <TableCell>
-                      {service.asset ? (
+                      {service.materials.length > 0 ? (
                         <span className="flex items-center gap-1 text-xs text-zinc-400">
-                          <FileText className="size-3.5 text-emerald-400/70" /> PDF
+                          <FileText className="size-3.5 text-emerald-400/70" /> {service.materials.length}
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 text-xs text-zinc-600">
