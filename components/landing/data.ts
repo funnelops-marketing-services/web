@@ -1,147 +1,235 @@
-// Contenido del landing de servicios. Extraído del PDF "Paquetes Exclusivos MC".
+// Contenido del landing "Rediseño de portafolio audiovisual" (Mirko Calzadilla).
 
 export const CONTACT = {
-  // Se mantiene el WhatsApp actual del landing (+591 78482245), no el del PDF.
   whatsappNumber: "59178482245",
   whatsappUrl: "https://wa.me/59178482245",
-  instagram: "mirko_calzadilla",
-  instagramUrl: "https://instagram.com/mirko_calzadilla",
-  email: "mirkocalzadilla@gmail.com",
+  instagram: "mirko_calzadilla_",
+  instagramUrl: "https://www.instagram.com/mirko_calzadilla_/",
+  email: "mirkocalzadilla4@gmail.com",
+  location: "Santa Cruz, Bolivia",
 } as const
 
-export type PriceTier = {
-  label: string
-  price: string
+/** Arma el link de WhatsApp con un mensaje prellenado opcional. */
+export function whatsappLink(message?: string): string {
+  return message ? `${CONTACT.whatsappUrl}?text=${encodeURIComponent(message)}` : CONTACT.whatsappUrl
 }
 
-export type ServicePackage = {
+export const NAV_ITEMS = [
+  { href: "#trabajo", label: "Trabajo" },
+  { href: "#servicios", label: "Servicios" },
+  { href: "#curso", label: "Curso" },
+  { href: "#contacto", label: "Contacto" },
+] as const
+
+export const STATS = [
+  { value: 5, prefix: "+", label: "años de experiencia" },
+  { value: 50, prefix: "+", label: "empresas a nivel nacional" },
+] as const
+
+export const MARQUEE_ITEMS = [
+  "Producción cinematográfica",
+  "Fotografía editorial",
+  "Edición con IA",
+  "Marca personal premium",
+  "Contenido para redes",
+] as const
+
+export type WorkItem =
+  | { kind: "video"; title: string; src: string }
+  | { kind: "gallery"; title: string; images: string[] }
+
+export const WORK_ITEMS: WorkItem[] = [
+  { kind: "video", title: "Pieza 01", src: "/landing/post1.mp4" },
+  {
+    kind: "gallery",
+    title: "Sesión de fotos",
+    images: ["/landing/post2/p1.jpg", "/landing/post2/p2.jpg", "/landing/post2/p3.jpg", "/landing/post2/p4.jpg"],
+  },
+  { kind: "video", title: "Pieza 03", src: "/landing/post3.mp4" },
+]
+
+export const PROCESS_STEPS = [
+  { step: "01", title: "Preproducción", description: "Estrategia, concepto y guion para cada pieza." },
+  { step: "02", title: "Rodaje", description: "Equipo de cine, iluminación y dirección en set." },
+  { step: "03", title: "Postproducción", description: "Edición, motion graphics y colorización." },
+  { step: "04", title: "Entrega", description: "Contenido listo para publicar, a tiempo." },
+] as const
+
+export const GEAR = [
+  { label: "CÁMARAS", value: "Sony FX3 · A7 IV · a6400" },
+  { label: "LENTES", value: "G Master 24–70 · 50mm · 11mm" },
+  { label: "ESTABILIZACIÓN", value: "Gimbal DJI RS3 Mini" },
+  { label: "ILUMINACIÓN", value: "Luces RGB profesionales · difusores" },
+  { label: "AÉREO", value: "Drone DJI · video vertical" },
+  { label: "POST", value: "After Effects · Premiere · DaVinci · IA" },
+] as const
+
+export type PriceTier = { label: string; price: string }
+
+export type ProductionPackage = {
   name: string
-  /** Resalta la opción con integración de IA / premium. */
+  /** Sello superior (ESTÁNDAR / PREMIUM · CINE). */
+  badge: string
   featured?: boolean
-  /** Muestra el sello "IA" en la tarjeta. */
   ai?: boolean
-  /** Entregables / lo que incluye. */
+  description: string
   features: string[]
-  /** Precio único, cuando aplica. */
-  price?: string
-  /** Precios por volumen, cuando hay más de una opción. */
-  tiers?: PriceTier[]
-  /** Aclaración de producción o entrega. */
-  note?: string
+  price: string
+  message: string
 }
 
-export type ServiceCategory = {
-  id: string
-  title: string
-  subtitle: string
-  packages: ServicePackage[]
-}
-
-export const SERVICE_CATEGORIES: ServiceCategory[] = [
+export const PRODUCTION_PACKAGES: ProductionPackage[] = [
   {
-    id: "produccion",
-    title: "Producción audiovisual",
-    subtitle: "Sesión completa de video y fotografía",
-    packages: [
-      {
-        name: "Paquete 1",
-        features: ["5 videos", "12 fotografías", "2 días de producción"],
-        price: "Bs. 5.500",
-      },
-      {
-        name: "Paquete 2",
-        featured: true,
-        ai: true,
-        features: [
-          "5 videos",
-          "12 fotografías",
-          "Integración con IA",
-          "2 días de producción",
-        ],
-        price: "Bs. 9.500",
-      },
-    ],
+    name: "Paquete 1",
+    badge: "ESTÁNDAR",
+    description: "Cámara Sony a6400 · trípode · luz principal + relleno RGB · edición en CapCut.",
+    features: ["5 videos", "12 fotografías", "2 días de producción"],
+    price: "Bs 5.500",
+    message: "Hola Mirko, me interesa el Paquete 1 de producción audiovisual.",
   },
   {
-    id: "edicion",
-    title: "Edición de videos",
-    subtitle: "Edición mensual de tu contenido",
-    packages: [
-      {
-        name: "CapCut",
-        features: ["Edición profesional en CapCut"],
-        tiers: [
-          { label: "5 videos / mes", price: "Bs. 1.800" },
-          { label: "10 videos / mes", price: "Bs. 3.000" },
-        ],
-        note: "Primer video entregado en 2 días; luego un nuevo video cada 2 días hasta completar la entrega.",
-      },
-      {
-        name: "After Effects",
-        featured: true,
-        ai: true,
-        features: ["Edición avanzada en After Effects", "Integración con IA: +Bs. 150 / video"],
-        tiers: [
-          { label: "5 videos", price: "Bs. 7.000" },
-          { label: "10 videos", price: "Bs. 12.000" },
-        ],
-      },
-    ],
-  },
-  {
-    id: "individual",
-    title: "Servicios individuales",
-    subtitle: "Piezas sueltas a medida",
-    packages: [
-      {
-        name: "Video individual",
-        features: ["1 video a medida"],
-        price: "desde Bs. 3.800",
-        note: "El precio depende del tipo de contenido.",
-      },
-      {
-        name: "Producción cinematográfica con IA",
-        featured: true,
-        ai: true,
-        features: ["Pieza cinematográfica de 15 a 30 seg", "Producción con IA"],
-        price: "Bs. 2.800",
-      },
-      {
-        name: "Ediciones de IA",
-        features: ["Edición puntual con IA"],
-        price: "Bs. 450",
-      },
-    ],
+    name: "Paquete 2",
+    badge: "PREMIUM · CINE",
+    featured: true,
+    ai: true,
+    description:
+      "Sony FX3 / A7 IV · lentes G Master · gimbal RS3 · luces RGB + difusores + drone · edición AE · Premiere · DaVinci + IA.",
+    features: ["5 videos cinematográficos", "12 fotografías editoriales", "Integración con IA", "2 días de producción"],
+    price: "Bs 9.500",
+    message: "Hola Mirko, me interesa el Paquete 2 premium cinematográfico.",
   },
 ]
 
-export type CourseVideo = {
-  title: string
+export type EditingPlan = {
+  name: string
+  ai?: boolean
   description: string
-  points: string[]
-  /** Ruta del .mp4 web (ver public/portfolio/README.md para generarlo). */
-  src: string
-  poster: string
-  orientation: "horizontal" | "vertical"
+  tiers: PriceTier[]
+  message: string
 }
 
-// Videos promocionales del curso de producción audiovisual.
-// NOTA: copy provisional — falta detalle real del curso (qué incluye, precio, duración).
-export const COURSE_VIDEOS: CourseVideo[] = [
+export const EDITING_PLANS: EditingPlan[] = [
   {
-    title: "Contenido para redes",
-    description: "Reels que enganchan desde el primer segundo.",
-    points: ["Edición dinámica con IA", "Texto y ritmo para retención", "Formato vertical 9:16 para redes"],
-    src: "/portfolio/reel-vertical.mp4",
-    poster: "/portfolio/reel-vertical.jpg",
-    orientation: "vertical",
+    name: "CapCut",
+    description: "Edición profesional accesible, lista para redes.",
+    tiers: [
+      { label: "5 videos / mes", price: "Bs 1.800" },
+      { label: "10 videos / mes", price: "Bs 3.000" },
+    ],
+    message: "Hola Mirko, me interesa el plan de edición en CapCut.",
   },
   {
-    title: "Producción profesional",
-    description: "Graba como un profesional, de la idea a la entrega.",
-    points: ["Cámara, luz y composición", "Dirección y narrativa visual", "Flujo de producción completo"],
-    src: "/portfolio/reel-horizontal.mp4",
-    poster: "/portfolio/reel-horizontal.jpg",
-    orientation: "horizontal",
+    name: "After Effects",
+    ai: true,
+    description: "Premium · Premiere · DaVinci. Integración con IA +Bs 150 / video.",
+    tiers: [
+      { label: "5 videos / mes", price: "Bs 3.700" },
+      { label: "10 videos / mes", price: "Bs 6.000" },
+    ],
+    message: "Hola Mirko, me interesa el plan de edición en After Effects.",
+  },
+]
+
+export const EDITING_NOTE =
+  "Entrega: el primer video en 2 días; luego, uno nuevo cada 2 días hasta completar el plan."
+
+export type IndividualService = {
+  name: string
+  ai?: boolean
+  description: string
+  price: string
+  message: string
+}
+
+export const INDIVIDUAL_SERVICES: IndividualService[] = [
+  {
+    name: "Video individual",
+    description: "Producción a medida según el tipo de contenido.",
+    price: "desde Bs 3.800",
+    message: "Hola Mirko, me interesa un video individual.",
+  },
+  {
+    name: "Cinematográfico con IA",
+    ai: true,
+    description: "Pieza de 15 a 30 segundos, look de cine.",
+    price: "Bs 2.800",
+    message: "Hola Mirko, me interesa una pieza cinematográfica con IA.",
+  },
+  {
+    name: "Ediciones de IA",
+    description: "Retoque y generación puntual con IA.",
+    price: "Bs 450",
+    message: "Hola Mirko, me interesan las ediciones de IA.",
+  },
+]
+
+export type CourseWorkshop = {
+  step: string
+  title: string
+  description: string
+  price: string
+}
+
+export const COURSE_WORKSHOPS: CourseWorkshop[] = [
+  {
+    step: "TALLER 1",
+    title: "Preproducción",
+    description: "Iluminación, composición, hablar a cámara y línea gráfica.",
+    price: "Bs 150",
+  },
+  {
+    step: "TALLER 2",
+    title: "CapCut Pro básico",
+    description: "Manejo de la app, cortes, títulos, textos y música.",
+    price: "Bs 250",
+  },
+  {
+    step: "TALLER 3",
+    title: "CapCut Pro avanzado",
+    description: "Keyframes, animaciones, transiciones y color (pro).",
+    price: "Bs 350",
+  },
+  {
+    step: "TALLER 4",
+    title: "Integración con IA",
+    description: "Higgsfield, foto y video con IA, prompts profesionales.",
+    price: "Bs 250",
+  },
+]
+
+export const COURSE_BUNDLE = {
+  badge: "CURSO COMPLETO · PREVENTA",
+  price: "Bs 650",
+  strikethrough: "Bs 1.000",
+  message: "Hola Mirko, me interesa el curso completo de producción audiovisual + IA.",
+}
+
+export type PremiumProgram = {
+  badge: string
+  title: string
+  description: string
+  tags: string[]
+  message: string
+  glow: "a1" | "a2"
+}
+
+export const PREMIUM_PROGRAMS: PremiumProgram[] = [
+  {
+    badge: "PLAN ESTRELLA",
+    title: "Marca de Alto Impacto",
+    description:
+      "Programa mensual de marca personal premium: estrategia, producción cinematográfica, fotografía editorial, manejo de redes y un equipo de cine de 6 personas dedicado a tu marca, mes a mes.",
+    tags: ["Estrategia", "Producción", "Redes", "Equipo de 6"],
+    message: "Hola Mirko, quiero info del programa Marca de Alto Impacto.",
+    glow: "a1",
+  },
+  {
+    badge: "A TU RUBRO",
+    title: "Capacitación Personalizada",
+    description:
+      "Los 4 talleres del curso, 100% dirigidos a tu sector: inmobiliaria, médico, tienda, marca o empresa. Formación a medida con acceso directo a mí y a mi equipo.",
+    tags: ["A medida", "Práctico", "Acceso directo"],
+    message: "Hola Mirko, quiero info de la Capacitación Personalizada para mi rubro.",
+    glow: "a2",
   },
 ]
