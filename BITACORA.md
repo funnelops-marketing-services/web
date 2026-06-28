@@ -26,7 +26,7 @@
 - Por qué: #64 — impedir datos inválidos antes de guardar. Mismos límites que la validación server-side (#107) para que el front no choque con el 422 del backend.
 - Spec/decisión que respeta: FRONTEND_SPEC (catálogo, ABM de servicios) + SPEC_admin_catalogo_kb §5. Límites espejados con BE #107. Sin tocar contrato de API ni realtime; dark/violeta y copy en español intactos.
 - Prueba local: `pnpm lint` ✓ (0 errores; 7 warnings preexistentes ajenos) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
-- Commit:
+- Commit: ada2da9
 
 ### 2026-06-28 · Nova · crm/catálogo — cosméticos: precio+moneda, columnas, responsive, slug, reordenar (#43 #45 #47 #48 #49)
 - Qué cambió: 5 ajustes de UI del catálogo (sobre `main`, ya con #86 mergeado). **#49** `service-editor.tsx`: precio y moneda en la misma fila (antes en filas separadas); `catalog-table.tsx` y `service-preview.tsx` muestran `precio · moneda` concatenado. **#45** `service-editor.tsx`: las grillas de 2 columnas apilan en mobile (`grid-cols-1 sm:grid-cols-2`). **#43** `service-editor.tsx`: hint de formato del slug (minúsculas/números/guiones) bajo el input (el placeholder ya era válido, `curso-edicion`). **#47** `catalog-table.tsx`: se quitó el badge "Arrastrá ⠿ para reordenar…" (el grip sigue siendo la affordance). **#48** `catalog-table.tsx`: `table-fixed` + anchos fijos por columna → las columnas alinean entre las tablas de cada categoría.
