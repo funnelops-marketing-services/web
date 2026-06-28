@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Montserrat } from 'next/font/google'
+import { Montserrat, Sora, Instrument_Serif, Space_Mono } from 'next/font/google'
 import './globals.css'
 import { QueryProvider } from '@/lib/query/provider'
 import { Toaster } from '@/components/ui/sonner'
@@ -7,6 +7,25 @@ import { Toaster } from '@/components/ui/sonner'
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: '--font-montserrat'
+});
+
+const sora = Sora({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: '--font-sora',
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: '--font-instrument-serif',
+});
+
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: '--font-space-mono',
 });
 
 export const metadata: Metadata = {
@@ -41,7 +60,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="dark bg-black">
-      <body className={`${montserrat.variable} font-sans antialiased bg-black text-white`}>
+      <body className={`${montserrat.variable} ${sora.variable} ${instrumentSerif.variable} ${spaceMono.variable} font-sans antialiased bg-black text-white`}>
         <QueryProvider>
           {children}
           <Toaster richColors position="top-right" />
