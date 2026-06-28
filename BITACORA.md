@@ -26,7 +26,7 @@
 - Por qué: el form mostraba modelo como texto libre, temperatura como input numérico, sin switch de emojis, y editaba a mano Servicios/FAQ (que ahora son del Catálogo). El agente además necesitaba un nombre editable.
 - Spec/decisión que respeta: issues #60/#61/#62 + decisión del owner (nombre editable; FAQ quirúrgico — no se borra el flujo, solo el nodo manual). Contratos server: `GET /agents/models`, `config.emojis` bool, `AgentUpdate.display_name`.
 - Prueba local: `pnpm tsc --noEmit` ✓ · `pnpm lint` ✓ (0 errores; 7 warnings preexistentes) · `pnpm build` ✓. Probado e2e contra backend local (login operador → dropdown poblado, slider, switch, nombre persisten). **Depende de los PRs server** #144 (`/agents/models`), #143 (emojis bool), #145 (descarte nodos + preservar services) y display_name editable: mergear/desplegar antes o el form falla al faltar el endpoint/aceptar display_name.
-- Commit:
+- Commit: b419ea6
 
 ### 2026-06-28 · Nova · crm — calificación del lead (badge hot/medium/cold) + resumen IA en el detalle (#53)
 - Qué cambió: `lib/api/crm.ts` — `cardSchema` suma `rating` (lo hereda el board y el detalle); `cardDetailSchema` suma `ai_summary`. Nuevo `rating-badge.tsx` (badge reusable: 🔥 Caliente / 🌡 Tibio / 🧊 Frío, `showLabel` opcional, default a frío ante valores desconocidos). `board-card.tsx` muestra el **badge de calificación** (solo ícono) en la cara de la card. `opportunity-details.tsx` (detalle lateral) muestra el badge con label en la fila de badges + nueva sección **"Resumen IA"** (texto de `card.ai_summary` o estado vacío "Sin resumen todavía…").
