@@ -4,28 +4,28 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import {
-  createOffer,
-  deleteOffer,
-  listOffers,
+  createService,
+  deleteService,
+  listServices,
   publishCatalog,
-  updateOffer,
+  updateService,
   uploadAsset,
   type AssetRead,
   type CatalogPublishResult,
-  type OfferCreate,
-  type OfferRead,
-  type OfferUpdate,
+  type ServiceCreate,
+  type ServiceRead,
+  type ServiceUpdate,
 } from '@/lib/api/catalogo'
 import { apiErrorMessage } from '@/lib/api/errors'
 
 export const catalogKeys = {
-  offers: (agentId: string) => ['catalog', 'offers', agentId] as const,
+  services: (agentId: string) => ['catalog', 'services', agentId] as const,
 }
 
-export function useOffers(agentId: string | undefined) {
-  return useQuery<OfferRead[]>({
-    queryKey: catalogKeys.offers(agentId ?? 'none'),
-    queryFn: () => listOffers(agentId as string),
+export function useServices(agentId: string | undefined) {
+  return useQuery<ServiceRead[]>({
+    queryKey: catalogKeys.services(agentId ?? 'none'),
+    queryFn: () => listServices(agentId as string),
     enabled: Boolean(agentId),
   })
 }
@@ -34,38 +34,38 @@ function fail(error: unknown, fallback: string): void {
   toast.error(apiErrorMessage(error) ?? fallback)
 }
 
-export function useCreateOffer(agentId: string) {
+export function useCreateService(agentId: string) {
   const queryClient = useQueryClient()
-  return useMutation<OfferRead, Error, OfferCreate>({
-    mutationFn: (body) => createOffer(agentId, body),
-    onSuccess: (offer) => {
-      toast.success(`Oferta "${offer.nombre}" creada`)
-      queryClient.invalidateQueries({ queryKey: catalogKeys.offers(agentId) })
+  return useMutation<ServiceRead, Error, ServiceCreate>({
+    mutationFn: (body) => createService(agentId, body),
+    onSuccess: (service) => {
+      toast.success(`Servicio "${service.nombre}" creado`)
+      queryClient.invalidateQueries({ queryKey: catalogKeys.services(agentId) })
     },
-    onError: (error) => fail(error, 'No se pudo crear la oferta.'),
+    onError: (error) => fail(error, 'No se pudo crear el servicio.'),
   })
 }
 
-export function useUpdateOffer(agentId: string) {
+export function useUpdateService(agentId: string) {
   const queryClient = useQueryClient()
-  return useMutation<OfferRead, Error, { offerId: string; body: OfferUpdate }>({
-    mutationFn: ({ offerId, body }) => updateOffer(offerId, body),
+  return useMutation<ServiceRead, Error, { serviceId: string; body: ServiceUpdate }>({
+    mutationFn: ({ serviceId, body }) => updateService(serviceId, body),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: catalogKeys.offers(agentId) })
+      queryClient.invalidateQueries({ queryKey: catalogKeys.services(agentId) })
     },
-    onError: (error) => fail(error, 'No se pudo actualizar la oferta.'),
+    onError: (error) => fail(error, 'No se pudo actualizar el servicio.'),
   })
 }
 
-export function useDeleteOffer(agentId: string) {
+export function useDeleteService(agentId: string) {
   const queryClient = useQueryClient()
   return useMutation<void, Error, string>({
-    mutationFn: (offerId) => deleteOffer(offerId),
+    mutationFn: (serviceId) => deleteService(serviceId),
     onSuccess: () => {
-      toast.success('Oferta desactivada')
-      queryClient.invalidateQueries({ queryKey: catalogKeys.offers(agentId) })
+      toast.success('Servicio eliminado')
+      queryClient.invalidateQueries({ queryKey: catalogKeys.services(agentId) })
     },
-    onError: (error) => fail(error, 'No se pudo desactivar la oferta.'),
+    onError: (error) => fail(error, 'No se pudo eliminar el servicio.'),
   })
 }
 
@@ -82,9 +82,9 @@ export function usePublishCatalog(agentId: string) {
     mutationFn: () => publishCatalog(agentId),
     onSuccess: (result) => {
       toast.success(
-        `Catálogo publicado · versión ${result.version_number} (${result.offers_published} ofertas)`,
+        `Catálogo publicado · versión ${result.version_number} (${result.services_published} servicios)`,
       )
-      queryClient.invalidateQueries({ queryKey: catalogKeys.offers(agentId) })
+      queryClient.invalidateQueries({ queryKey: catalogKeys.services(agentId) })
     },
     onError: (error) => fail(error, 'No se pudo publicar el catálogo.'),
   })
