@@ -27,7 +27,6 @@ export function Topbar() {
 
   const userName = session?.user.full_name?.trim() || session?.user.email || 'Usuario'
   const userEmail = session?.user.email ?? ''
-  const tenantName = session?.tenant.name ?? '—'
 
   const handleSignOut = () => {
     signOut()
@@ -38,13 +37,6 @@ export function Topbar() {
     <header className="relative z-20 h-16 flex-shrink-0 border-b border-white/5 bg-black/40 backdrop-blur-xl">
       <div className="flex h-full items-center justify-end gap-4 pl-14 pr-4 md:px-6">
         <div className="flex flex-shrink-0 items-center gap-3">
-          <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 sm:flex">
-            <div className="size-1.5 animate-pulse rounded-full bg-emerald-400" />
-            <span className="text-xs font-normal text-zinc-300">
-              {tenantName}
-            </span>
-          </div>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
