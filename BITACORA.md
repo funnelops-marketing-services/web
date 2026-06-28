@@ -26,7 +26,7 @@
 - Por qué: el operador veía el número en el detalle pero tenía que ir a Contactos para promoverlo; ahora lo convierte en el lugar, sin duplicar (alta idempotente por phone en el BE).
 - Spec/decisión que respeta: issue #84 (depende de server #139, mergeado PR #141); reutiliza `ContactCreateSheet` (no se crea popup nuevo); vínculo leído del campo `contact` del detalle. CLAUDE.md (CRM en `/crm`, TS estricto, copy en español).
 - Prueba local: `pnpm lint` (0 errores, 7 warnings preexistentes), `pnpm tsc --noEmit` (0), `pnpm build` (0). Sin backend dev levantado: contrato verificado contra el schema de `CardDetailOut` de server `origin/main`.
-- Commit:
+- Commit: 9089e77 (PR #85)
 
 ### 2026-06-28 · Nova · crm — calificación del lead (badge hot/medium/cold) + resumen IA en el detalle (#53)
 - Qué cambió: `lib/api/crm.ts` — `cardSchema` suma `rating` (lo hereda el board y el detalle); `cardDetailSchema` suma `ai_summary`. Nuevo `rating-badge.tsx` (badge reusable: 🔥 Caliente / 🌡 Tibio / 🧊 Frío, `showLabel` opcional, default a frío ante valores desconocidos). `board-card.tsx` muestra el **badge de calificación** (solo ícono) en la cara de la card. `opportunity-details.tsx` (detalle lateral) muestra el badge con label en la fila de badges + nueva sección **"Resumen IA"** (texto de `card.ai_summary` o estado vacío "Sin resumen todavía…").
