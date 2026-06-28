@@ -76,7 +76,9 @@
 
 @theme inline {
   --font-sans: var(--font-montserrat), 'Montserrat', sans-serif;
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-display: var(--font-sora), system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), serif;
+  --font-mono: var(--font-space-mono), 'Geist Mono', monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -123,3 +125,61 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ── Landing (rediseño de portafolio audiovisual) ───────────────────── */
+@layer utilities {
+  /* Botón con destello al hacer hover. */
+  .shine-btn {
+    position: relative;
+    overflow: hidden;
+  }
+  .shine-btn::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    bottom: -40%;
+    left: -85%;
+    width: 46%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 2;
+  }
+  .shine-btn:hover::before {
+    animation: btnSheen 0.8s cubic-bezier(0.25, 0.6, 0.3, 1);
+  }
+
+  /* Texto con degradado violeta → magenta. */
+  .text-gradient {
+    background: linear-gradient(100deg, var(--a1, #8b3df5), var(--a2, #ef4488));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Reveal al entrar en viewport (scroll-driven). */
+  .reveal-up {
+    animation-name: revealUp;
+    animation-duration: 0.9s;
+    animation-timing-function: cubic-bezier(0.2, 0.75, 0.25, 1);
+    animation-fill-mode: both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 26%;
+  }
+}
+
+@keyframes floatA { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(4vw, 3vh) scale(1.14); } }
+@keyframes floatB { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-5vw, 2vh) scale(1.16); } }
+@keyframes floatC { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(3vw, -3vh) scale(1.1); } }
+@keyframes grain { 0% { background-position: 0 0; } 100% { background-position: 220px 220px; } }
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+@keyframes sweep { 0% { transform: translateX(-130%) skewX(12deg); } 60%, 100% { transform: translateX(240%) skewX(12deg); } }
+@keyframes pulseRing { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.7); opacity: 0; } }
+@keyframes introUp { 0% { transform: translateY(22px); } 100% { transform: translateY(0); } }
+@keyframes revealUp { 0% { opacity: 0; transform: translateY(28px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes scrollDot { 0% { transform: translateY(0); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(20px); opacity: 0; } }
+@keyframes cineShine { 0% { background-position: 185% 50%; } 55% { background-position: -75% 50%; } 100% { background-position: -75% 50%; } }
+@keyframes btnSheen { 0% { left: -85%; opacity: 0; } 12% { opacity: 1; } 100% { left: 145%; opacity: 0; } }

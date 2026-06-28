@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { Controller, useForm, type Control } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { FileText, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -11,43 +11,25 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { CATEGORY_LABELS, CLOSING_LABELS, CURRENCY_LABELS } from '@/components/crm/catalog/labels'
+import { CategorySelect } from '@/components/crm/catalog/category-select'
+import { CLOSING_LABELS, CURRENCY_LABELS } from '@/components/crm/catalog/labels'
 import { ServicePreview } from '@/components/crm/catalog/service-preview'
-import { useCreateService, useUpdateService, useUploadAsset } from '@/hooks/use-catalogo'
 import {
-  serviceCategories,
-  serviceClosings,
-  serviceCurrencies,
-  type ServiceCategory,
-  type ServiceClosing,
-  type ServiceCurrency,
-  type ServiceRead,
-} from '@/lib/api/catalogo'
-
-interface FormValues {
-  slug: string
-  nombre: string
-  categoria: ServiceCategory
-  resumen: string
-  detalle: string
-  precio: string
-  moneda: ServiceCurrency
-  flujo_cierre: ServiceClosing
-  is_active: boolean
-}
+  Field,
+  FieldError,
+  LIMITS,
+  RULES,
+  SelectField,
+  serviceDefaults,
+} from '@/components/crm/catalog/service-form'
+import { useCreateService, useUpdateService, useUploadAsset } from '@/hooks/use-catalogo'
+import { serviceClosings, serviceCurrencies, type ServiceRead } from '@/lib/api/catalogo'
 
 interface ServiceEditorProps {
   agentId: string
@@ -55,20 +37,6 @@ interface ServiceEditorProps {
   defaultOrden: number
   open: boolean
   onOpenChange: (open: boolean) => void
-}
-
-function defaults(service: ServiceRead | null): FormValues {
-  return {
-    slug: service?.slug ?? '',
-    nombre: service?.nombre ?? '',
-    categoria: (service?.categoria as ServiceCategory) ?? 'formacion',
-    resumen: service?.resumen ?? '',
-    detalle: service?.detalle ?? '',
-    precio: service?.precio ?? '',
-    moneda: (service?.moneda as ServiceCurrency) ?? 'BOB',
-    flujo_cierre: (service?.flujo_cierre as ServiceClosing) ?? 'pago_qr',
-    is_active: service?.is_active ?? true,
-  }
 }
 
 export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChange }: ServiceEditorProps) {
@@ -79,7 +47,13 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
   const fileRef = useRef<HTMLInputElement>(null)
   const [assetId, setAssetId] = useState<string | null>(service?.asset_id ?? null)
   const [assetName, setAssetName] = useState<string | null>(service?.asset?.filename ?? null)
-  const { control, register, handleSubmit, watch } = useForm<FormValues>({ defaultValues: defaults(service) })
+  const {
+    control,
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid },
+  } = useForm({ defaultValues: serviceDefaults(service), mode: 'onChange' })
   const values = watch()
 
   async function onPickFile(file: File | undefined) {
@@ -91,10 +65,15 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
   }
 
   const onSubmit = handleSubmit(async (form) => {
-    const payload = { ...form, detalle: form.detalle.trim() || null, asset_id: assetId }
+    const payload = {
+      ...form,
+      category_id: form.category_id || null,
+      detalle: form.detalle.trim() || null,
+      asset_id: assetId,
+    }
     if (isEdit) {
       await update.mutateAsync({ serviceId: service.id, body: payload })
-      toast.success('Servicio actualizada')
+      toast.success('Servicio actualizado')
     } else {
       await create.mutateAsync({ ...payload, orden: defaultOrden })
     }
@@ -113,31 +92,40 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
 
         <form onSubmit={onSubmit} className="space-y-4 px-4 pb-8">
           <Field label="Slug (identificador, no se edita)" htmlFor="slug">
-            <Input id="slug" disabled={isEdit} placeholder="curso-contenido-edicion" {...register('slug')} className="border-white/10 bg-white/[0.03] text-sm text-white disabled:opacity-60" />
+            <Input id="slug" disabled={isEdit} maxLength={LIMITS.slug} placeholder="curso-edicion" {...register('slug', RULES.slug)} className="border-white/10 bg-white/[0.03] text-sm text-white disabled:opacity-60" />
+            {errors.slug ? <FieldError message={errors.slug.message} /> : <p className="text-[11px] text-zinc-500">Minúsculas, números y guiones (ej. curso-edicion).</p>}
           </Field>
           <Field label="Nombre" htmlFor="nombre">
-            <Input id="nombre" {...register('nombre')} className="border-white/10 bg-white/[0.03] text-sm text-white" />
+            <Input id="nombre" maxLength={LIMITS.nombre} {...register('nombre', RULES.nombre)} className="border-white/10 bg-white/[0.03] text-sm text-white" />
+            <FieldError message={errors.nombre?.message} />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Categoría" htmlFor="categoria">
-              <SelectField name="categoria" control={control} options={serviceCategories} labels={CATEGORY_LABELS} />
-            </Field>
-            <Field label="Moneda" htmlFor="moneda">
-              <SelectField name="moneda" control={control} options={serviceCurrencies} labels={CURRENCY_LABELS} />
-            </Field>
-          </div>
-          <Field label="Resumen (1–2 líneas, lo que dice el bot)" htmlFor="resumen">
-            <Textarea id="resumen" rows={3} {...register('resumen')} className="border-white/10 bg-white/[0.03] text-sm text-white" />
-          </Field>
-          <Field label="Detalle (opcional, para despejar dudas)" htmlFor="detalle">
-            <Textarea id="detalle" rows={3} {...register('detalle')} className="border-white/10 bg-white/[0.03] text-sm text-white" />
-          </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Precio (display)" htmlFor="precio">
-              <Input id="precio" placeholder="650 Bs" {...register('precio')} className="border-white/10 bg-white/[0.03] text-sm text-white" />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Field label="Categoría" htmlFor="category_id">
+              <Controller
+                control={control}
+                name="category_id"
+                render={({ field }) => <CategorySelect value={field.value} onChange={field.onChange} />}
+              />
             </Field>
             <Field label="Cierre" htmlFor="flujo_cierre">
               <SelectField name="flujo_cierre" control={control} options={serviceClosings} labels={CLOSING_LABELS} />
+            </Field>
+          </div>
+          <Field label="Resumen (1–2 líneas, lo que dice el bot)" htmlFor="resumen">
+            <Textarea id="resumen" rows={3} maxLength={LIMITS.resumen} {...register('resumen', RULES.resumen)} className="border-white/10 bg-white/[0.03] text-sm text-white" />
+            <FieldError message={errors.resumen?.message} />
+          </Field>
+          <Field label="Detalle (opcional, para despejar dudas)" htmlFor="detalle">
+            <Textarea id="detalle" rows={3} maxLength={LIMITS.detalle} {...register('detalle', RULES.detalle)} className="border-white/10 bg-white/[0.03] text-sm text-white" />
+            <FieldError message={errors.detalle?.message} />
+          </Field>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Field label="Precio (display)" htmlFor="precio">
+              <Input id="precio" inputMode="decimal" placeholder="650" {...register('precio', RULES.precio)} className="border-white/10 bg-white/[0.03] text-sm text-white" />
+              <FieldError message={errors.precio?.message} />
+            </Field>
+            <Field label="Moneda" htmlFor="moneda">
+              <SelectField name="moneda" control={control} options={serviceCurrencies} labels={CURRENCY_LABELS} />
             </Field>
           </div>
 
@@ -182,52 +170,11 @@ export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChan
             }}
           />
 
-          <Button type="submit" disabled={saving} className="w-full bg-gradient-to-b from-violet-500 to-violet-700 text-white">
+          <Button type="submit" disabled={saving || !isValid} className="w-full bg-gradient-to-b from-violet-500 to-violet-700 text-white">
             {saving ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Crear servicio'}
           </Button>
         </form>
       </SheetContent>
     </Sheet>
-  )
-}
-
-function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <Label htmlFor={htmlFor} className="text-xs font-medium text-zinc-400">
-        {label}
-      </Label>
-      {children}
-    </div>
-  )
-}
-
-interface SelectFieldProps<T extends string> {
-  name: 'categoria' | 'moneda' | 'flujo_cierre'
-  control: Control<FormValues>
-  options: readonly T[]
-  labels: Record<T, string>
-}
-
-function SelectField<T extends string>({ name, control, options, labels }: SelectFieldProps<T>) {
-  return (
-    <Controller
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <Select value={field.value} onValueChange={field.onChange}>
-          <SelectTrigger className="border-white/10 bg-white/[0.03] text-sm text-white">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {options.map((opt) => (
-              <SelectItem key={opt} value={opt}>
-                {labels[opt]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-    />
   )
 }

@@ -5,6 +5,7 @@ import { Plus, UploadCloud } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { CatalogTable } from '@/components/crm/catalog/catalog-table'
+import { CategoryManager } from '@/components/crm/catalog/category-manager'
 import { ServiceEditor } from '@/components/crm/catalog/service-editor'
 import { useServices, usePublishCatalog } from '@/hooks/use-catalogo'
 import type { ServiceRead } from '@/lib/api/catalogo'
@@ -38,6 +39,7 @@ export function CatalogScreen({ agentId }: { agentId: string }) {
           </p>
         </div>
         <div className="flex gap-2">
+          <CategoryManager />
           <Button
             variant="outline"
             onClick={openNew}

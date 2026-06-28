@@ -1,19 +1,4 @@
-import type { ServiceCategory, ServiceClosing, ServiceCurrency } from '@/lib/api/catalogo'
-
-export const CATEGORY_LABELS: Record<ServiceCategory, string> = {
-  formacion: 'Formación',
-  produccion: 'Producción audiovisual',
-  edicion: 'Edición de videos',
-  general: 'Programa general',
-}
-
-/** Orden de presentación de las categorías en la pantalla y el preview. */
-export const CATEGORY_ORDER: readonly ServiceCategory[] = [
-  'formacion',
-  'produccion',
-  'edicion',
-  'general',
-]
+import type { ServiceClosing, ServiceCurrency } from '@/lib/api/catalogo'
 
 export const CURRENCY_LABELS: Record<ServiceCurrency, string> = {
   BOB: 'Bs (BOB)',
