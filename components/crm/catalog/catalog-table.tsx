@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { FileText, FileWarning, GripVertical, Pencil, Trash2 } from 'lucide-react'
+import { FileText, FileWarning, GripVertical, Pencil } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useDeleteService, useUpdateService } from '@/hooks/use-catalogo'
+import { ServiceDeleteDialog } from '@/components/crm/catalog/service-delete-dialog'
+import { useUpdateService } from '@/hooks/use-catalogo'
 import type { ServiceRead } from '@/lib/api/catalogo'
 
 interface CatalogTableProps {
@@ -27,7 +28,6 @@ const NO_CATEGORY = '__none__'
 
 export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
   const update = useUpdateService(agentId)
-  const remove = useDeleteService(agentId)
   const [dragId, setDragId] = useState<string | null>(null)
 
   // Agrupa por categoría dinámica (#106); los sin categoría van al final.
@@ -141,16 +141,12 @@ export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
                       >
                         <Pencil className="size-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Eliminar"
+                      <ServiceDeleteDialog
+                        agentId={agentId}
+                        serviceId={service.id}
+                        serviceName={service.nombre}
                         disabled={!service.is_active}
-                        onClick={() => remove.mutate(service.id)}
-                        className="text-zinc-400 hover:text-red-400"
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
