@@ -12,15 +12,18 @@ import {
   sendHumanReply,
   setAiActive,
   updateCard,
+  updateCardServices,
   type AiActive,
   type Boards,
   type Card,
   type CardCreateInput,
   type CardDetail,
+  type CardService,
   type CardUpdateInput,
   type QrEntryOut,
   type ThreadMessage,
 } from '@/lib/api/crm'
+import { apiErrorMessage } from '@/lib/api/errors'
 import { boardKeys } from '@/hooks/use-board'
 import { cardKeys } from '@/hooks/use-card'
 
@@ -196,6 +199,21 @@ export function useUpdateCard(cardId: string) {
     },
     onError: () => {
       toast.error('No se pudieron guardar los cambios.')
+    },
+  })
+}
+
+/** Asigna manualmente el set de servicios a la oportunidad (#132). Refresca el detalle. */
+export function useUpdateCardServices(cardId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation<CardService[], Error, string[]>({
+    mutationFn: (serviceIds) => updateCardServices(cardId, serviceIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error) ?? 'No se pudieron guardar los servicios.')
     },
   })
 }

@@ -13,6 +13,7 @@ import { OpportunityEditForm } from '@/components/crm/opportunity-edit-form'
 import { OpportunityDeleteDialog } from '@/components/crm/opportunity-delete-dialog'
 import { ContactCreateSheet } from '@/components/crm/contacts/contact-create'
 import { RatingBadge } from '@/components/crm/rating-badge'
+import { ServicesSelector } from '@/components/crm/services-selector'
 
 function StateMessage({ text }: { text: string }) {
   return (
@@ -154,6 +155,11 @@ export function OpportunityDetails({
             ) : (
               <p className="text-sm font-normal text-zinc-600">Sin notas todavía.</p>
             )}
+          </div>
+
+          <div className="mt-5 border-t border-white/5 pt-5">
+            <SectionTitle>Servicios</SectionTitle>
+            <ServicesSelector cardId={card.id} services={card.services} />
           </div>
 
           <div className="mt-5 border-t border-white/5 pt-5">

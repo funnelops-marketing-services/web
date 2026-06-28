@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-28 · Nova · crm/oportunidad — selector de servicios en el detalle de la card (#82)
+- Qué cambió: nueva sección **"Servicios"** en el detalle de la oportunidad ([opportunity-details.tsx](components/crm/opportunity-details.tsx)) con el componente [services-selector.tsx](components/crm/services-selector.tsx): lista los servicios de la card (nombre · precio moneda) diferenciando **asignados** (operador, con botón de quitar) de **capturados** por el bot (badge verde "✦ bot", read-only, #133); un Popover con checkboxes del **catálogo activo** (multi-selección) para asignar/quitar. Contrato API ([lib/api/crm.ts](lib/api/crm.ts)): `cardServiceSchema` + `CardDetail.services[]`, `updateCardServices(cardId, serviceIds)` → `PUT /crm/cards/{id}/services`. Hook `useUpdateCardServices` ([use-card-mutations.ts](hooks/use-card-mutations.ts)) que invalida el detalle. El catálogo se obtiene con `useAgentConfig()` (1 agente por tenant) → `useServices(agent.id)`.
+- Por qué: #82 — el operador asigna/quita servicios a la oportunidad desde el detalle y los ve. Diferenciación visual asignado vs capturado. Contraparte BE: #132 (`PUT /crm/cards/{id}/services`, `services[]` en `CardDetailOut`).
+- Spec/decisión que respeta: FRONTEND_SPEC (detalle de oportunidad). El PUT setea el set **asignado**; los capturados del bot quedan intactos (los maneja #133). Sin `any`, componente <200 líneas, dark/violeta, copy ES.
+- Prueba local: `pnpm lint` ✓ (0 errores; 7 warnings preexistentes ajenos) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
+- Commit: f7d5201
+
 ### 2026-06-28 · Nova · crm/catálogo — quitar botón "Publicar" (catálogo en vivo) (#66)
 - Qué cambió: se elimina el botón **"Publicar"** y el warning ámbar de [catalog-screen.tsx](components/crm/catalog/catalog-screen.tsx). Ahora el catálogo es **en vivo** (auto-publish del BE #109): los servicios **activos** se ofrecen al agente apenas se guardan. En su lugar hay un indicador pasivo **"● En línea"** (verde) + el header muestra *"X de N servicios activos"*, y una nota aclara que el switch **Activo** de cada fila controla qué está en línea (no hace falta publicar). Se borran `usePublishCatalog` ([hooks/use-catalogo.ts](hooks/use-catalogo.ts)) y `publishCatalog`/`catalogPublishResultSchema`/`CatalogPublishResult` ([lib/api/catalogo.ts](lib/api/catalogo.ts)).
 - Por qué: #66 — el botón siempre disponible no dejaba claro si el catálogo estaba en línea o en borrador, y el modelo de "publicar" ya no aplica (BE #109 lo hace automático). `is_active` es ahora el control intuitivo y visible.
