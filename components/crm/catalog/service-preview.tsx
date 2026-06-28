@@ -31,6 +31,7 @@ export function ServicePreview({ service }: { service: PreviewService }) {
       </p>
       <p className="text-sm text-violet-300">
         {service.precio || '—'}
+        {service.precio && <span className="ml-1 text-xs text-zinc-400">{service.moneda}</span>}
         {isUsd && (
           <span className="ml-1 text-xs text-zinc-500">
             (referencia; el equipo confirma el monto en Bs)
