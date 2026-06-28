@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-27 · Natalia · crm — reestructura del sidebar + quitar breadcrumbs (#38, #39, #40, #41)
+- Qué cambió: `Sidebar.tsx` — se quitan los ítems **"Inbox"** (#39) y **"Conversaciones"** (#38) y se agrega **"Embudo de ventas" → `/crm`** como primer ítem del menú, ícono `Funnel` (#41); `isActive` ahora marca `/crm` solo en coincidencia exacta (no en cada `/crm/*`). Se borran las rutas huérfanas `app/crm/conversations/page.tsx` (redirect) y `app/crm/inbox/page.tsx`, más el componente `components/crm/inbox-view.tsx` (sin uso). `Topbar.tsx` — se elimina la barra de breadcrumbs y todo su código muerto (`buildBreadcrumb`, `segmentLabels`, `Crumb`, `usePathname`/`useMemo`/`Link`/`ChevronRight`); queda el badge de tenant + menú de usuario.
+- Por qué: simplificar la navegación del CRM. El tablero (kanban de pipelines / "Gestión Humana") pasa a ser el ítem principal "Embudo de ventas". El hilo de conversación + toggle IA (takeover) ya vivían en `conversation-panel.tsx` dentro del tablero, así que quitar las vistas standalone de Inbox/Conversaciones no pierde funcionalidad.
+- Spec/decisión que respeta: CLAUDE.md — CRM bajo `/crm` (sin subdominio), "Inbox + takeover" (toggle `is_ai_active` intacto en `conversation-panel.tsx`), pipeline "Gestión Humana" sin cambios, realtime sin cambios. No toca contratos con el backend (el endpoint `/crm/conversations/{id}/ai-active` en `lib/api/crm.ts` se mantiene).
+- Prueba local: `pnpm lint` ✓ (0 errores; 5 warnings preexistentes en `use-mobile.ts`) · `pnpm build` ✓ (rutas: `/crm`, `/crm/agents`, `/crm/catalogo`, `/crm/contacts`, `/crm/settings`; ya no aparecen `/crm/inbox` ni `/crm/conversations`) · tsc corre dentro del build ✓.
+- Commit: 0e97814 (PR #72)
+
 ### 2026-06-27 · Nova · crm — colapsar la columna del panel al cerrar la conversación (#31, mejora)
 - Qué cambió: `crm-board.tsx` ahora **renderiza la columna del panel solo cuando hay `selectedCardId`** (envuelto en `{selectedCardId && (…)}`, `key={selectedCardId}`); al cerrar, la columna del 30% desaparece y el tablero recupera el ancho completo. Antes quedaba una columna vacía muerta con EmptyState. `conversation-panel.tsx`: pulido del botón de cierre (`type="button"`, `rounded-lg`). `onClose` sigue opcional (no rompe el reuso en `inbox-view`).
 - Por qué: la implementación previa del cierre (PR #21, *quick wins UAT Lote 3*, autora Natalia) dejaba el panel siempre montado: al cerrar, la card se deseleccionaba pero la columna vacía seguía ocupando espacio del kanban. Esta versión colapsa la columna (era el cambio del PR #67, cerrado por basarse en un main viejo; se rehace sobre main actual). Decisión: prevalece esta versión por mejor UX.

@@ -6,9 +6,8 @@ import { usePathname } from 'next/navigation'
 import {
   BookOpen,
   Bot,
-  Inbox,
+  Funnel,
   Menu,
-  MessagesSquare,
   Settings,
   Users,
   type LucideIcon,
@@ -33,8 +32,7 @@ interface NavItem {
 }
 
 const navItems: readonly NavItem[] = [
-  { label: 'Inbox', href: '/crm/inbox', icon: Inbox },
-  { label: 'Conversaciones', href: '/crm/conversations', icon: MessagesSquare },
+  { label: 'Embudo de ventas', href: '/crm', icon: Funnel },
   { label: 'Contactos', href: '/crm/contacts', icon: Users },
   { label: 'Agentes', href: '/crm/agents', icon: Bot, requiresConfig: true },
   { label: 'Catálogo', href: '/crm/catalogo', icon: BookOpen, requiresConfig: true },
@@ -43,6 +41,9 @@ const navItems: readonly NavItem[] = [
 ]
 
 function isActive(pathname: string, href: string): boolean {
+  // The board lives at the /crm root: mark active only on exact match, not on
+  // every /crm/* path (otherwise it would stay highlighted everywhere).
+  if (href === '/crm') return pathname === '/crm'
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
