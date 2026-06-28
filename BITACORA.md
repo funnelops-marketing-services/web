@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-28 · Nova · crm/catálogo — validación de campos del form de servicios (#64)
+- Qué cambió: el form de alta/edición de servicios ([service-editor.tsx](components/crm/catalog/service-editor.tsx)) ahora valida en cliente con react-hook-form (`mode: 'onChange'`): límites por campo (**nombre 30, slug 20, resumen 200, detalle 300** vía `maxLength` nativo + reglas), `precio` solo números con ≤2 decimales y tope `100000`, mensajes inline por campo (`FieldError`) y **botón de guardar deshabilitado mientras `!isValid`**. Refactor de tamaño: se extrajo la config de validación (`LIMITS`/`RULES`), `serviceDefaults` y los helpers presentacionales (`Field`/`FieldError`/`SelectField`) a [service-form.tsx](components/crm/catalog/service-form.tsx) → el componente baja de 288 a 180 líneas (cumple el invariante <200).
+- Por qué: #64 — impedir datos inválidos antes de guardar. Mismos límites que la validación server-side (#107) para que el front no choque con el 422 del backend.
+- Spec/decisión que respeta: FRONTEND_SPEC (catálogo, ABM de servicios) + SPEC_admin_catalogo_kb §5. Límites espejados con BE #107. Sin tocar contrato de API ni realtime; dark/violeta y copy en español intactos.
+- Prueba local: `pnpm lint` ✓ (0 errores; 7 warnings preexistentes ajenos) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
+- Commit:
+
 ### 2026-06-28 · Nova · crm/catálogo — cosméticos: precio+moneda, columnas, responsive, slug, reordenar (#43 #45 #47 #48 #49)
 - Qué cambió: 5 ajustes de UI del catálogo (sobre `main`, ya con #86 mergeado). **#49** `service-editor.tsx`: precio y moneda en la misma fila (antes en filas separadas); `catalog-table.tsx` y `service-preview.tsx` muestran `precio · moneda` concatenado. **#45** `service-editor.tsx`: las grillas de 2 columnas apilan en mobile (`grid-cols-1 sm:grid-cols-2`). **#43** `service-editor.tsx`: hint de formato del slug (minúsculas/números/guiones) bajo el input (el placeholder ya era válido, `curso-edicion`). **#47** `catalog-table.tsx`: se quitó el badge "Arrastrá ⠿ para reordenar…" (el grip sigue siendo la affordance). **#48** `catalog-table.tsx`: `table-fixed` + anchos fijos por columna → las columnas alinean entre las tablas de cada categoría.
 - Por qué: pulido de UX del catálogo (legibilidad, mobile, consistencia visual) pedido por el cliente.
