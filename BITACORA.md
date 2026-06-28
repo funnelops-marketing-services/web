@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-28 · Natalia · crm — "Usuarios y roles" como ítem propio del sidebar + tabla read-only + label Superadmin
+- Qué cambió: se sacó "Usuarios y roles" de Ajustes y se le dio **su propia ruta** [/crm/users](app/crm/users/page.tsx) con ítem en el [Sidebar](components/layout/Sidebar.tsx) (ícono `ShieldCheck`, `requiresConfig: true` → solo `platform_operator`; redirige a `/crm` si no, y el backend igual 403ea `GET /users`). [Ajustes](app/crm/settings/page.tsx) queda solo con "Mi cuenta". En [users-table.tsx](components/crm/config/users-table.tsx): (1) el badge del superadmin pasa de **"Operador" → "Superadmin"**; (2) se **eliminó la columna "Acción"** (cambio de rol) — la tabla queda read-only (Email · Nombre · Rol). Se quitó el "Solo lectura" que se leía como un permiso incorrecto sobre el superadmin.
+- Por qué: el owner pidió que la gestión de usuarios/roles sea visible aparte y **solo para el superadmin** (no para Admin/Mirko). La columna "Acción" permitía estados incoherentes (degradar visualmente al superadmin); la edición de roles vuelve con un RBAC coherente y anti-self-lockout — abierto en **server#151**.
+- Spec/decisión que respeta: CLAUDE.md/FRONTEND_SPEC §RBAC ("crear users/roles: solo `platform_operator`; `client_admin`=Mirko y `staff` NO lo ven"). Sin `any`, componentes <200 líneas, dark/violeta, copy ES.
+- Prueba local: `pnpm tsc --noEmit` ✓ · `pnpm lint` ✓ (0 errores; 7 warnings preexistentes ajenos) · `pnpm build` ✓ (ruta `/crm/users` en el output). Verificado e2e en local con superadmin (ve Usuarios) y admin/Mirko (no lo ve → redirige).
+- Commit: (este)
+
 ### 2026-06-28 · Nova · crm/catálogo — dropzone de materiales (#65)
 - Qué cambió: la carga de material (antes un botón "Subir PDF", un solo archivo) se reemplaza por un **dropzone** ([materials-dropzone.tsx](components/crm/catalog/materials-dropzone.tsx)) con drag-and-drop + clic, que acepta **pdf/jpg/png ≤5 MB, máx. 5 por servicio**, valida en cliente tipo/tamaño/cantidad (toast por archivo rechazado) y muestra el **listado en vivo** con ícono por tipo y botón de quitar. El editor ([service-editor.tsx](components/crm/catalog/service-editor.tsx)) maneja `materials: AssetRead[]` y envía `asset_ids` (espejo del nuevo contrato BE #108). Contrato API ([lib/api/catalogo.ts](lib/api/catalogo.ts)): `ServiceRead.materials[]` reemplaza `asset_id`/`asset`; `ServiceCreate/Update` usan `asset_ids`. Preview muestra "Envía: a, b, c" y la tabla del catálogo muestra el **conteo** de materiales (o "falta").
 - Por qué: #65 — subir varios materiales por servicio. Contraparte BE: #108 (≤5, pdf/jpg/png ≤5MB, `asset.service_id`).
