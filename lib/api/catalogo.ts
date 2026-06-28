@@ -50,18 +50,11 @@ export const serviceReadSchema = z.object({
   updated_at: z.string(),
 })
 
-export const catalogPublishResultSchema = z.object({
-  version_id: z.string(),
-  version_number: z.number(),
-  services_published: z.number(),
-})
-
 // ---------- Tipos derivados ----------
 
 export type AssetRead = z.infer<typeof assetReadSchema>
 export type ServiceCategoryRead = z.infer<typeof serviceCategoryReadSchema>
 export type ServiceRead = z.infer<typeof serviceReadSchema>
-export type CatalogPublishResult = z.infer<typeof catalogPublishResultSchema>
 export type ServiceCurrency = (typeof serviceCurrencies)[number]
 export type ServiceClosing = (typeof serviceClosings)[number]
 
@@ -129,11 +122,6 @@ export async function uploadAsset(file: File): Promise<AssetRead> {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
   return assetReadSchema.parse(data)
-}
-
-export async function publishCatalog(agentId: string): Promise<CatalogPublishResult> {
-  const { data } = await apiClient.post(`/agents/${agentId}/catalog/publish`)
-  return catalogPublishResultSchema.parse(data)
 }
 
 // ---------- Llamadas tipadas: categorías (#106, org-scoped) ----------

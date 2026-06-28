@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-28 · Nova · crm/catálogo — quitar botón "Publicar" (catálogo en vivo) (#66)
+- Qué cambió: se elimina el botón **"Publicar"** y el warning ámbar de [catalog-screen.tsx](components/crm/catalog/catalog-screen.tsx). Ahora el catálogo es **en vivo** (auto-publish del BE #109): los servicios **activos** se ofrecen al agente apenas se guardan. En su lugar hay un indicador pasivo **"● En línea"** (verde) + el header muestra *"X de N servicios activos"*, y una nota aclara que el switch **Activo** de cada fila controla qué está en línea (no hace falta publicar). Se borran `usePublishCatalog` ([hooks/use-catalogo.ts](hooks/use-catalogo.ts)) y `publishCatalog`/`catalogPublishResultSchema`/`CatalogPublishResult` ([lib/api/catalogo.ts](lib/api/catalogo.ts)).
+- Por qué: #66 — el botón siempre disponible no dejaba claro si el catálogo estaba en línea o en borrador, y el modelo de "publicar" ya no aplica (BE #109 lo hace automático). `is_active` es ahora el control intuitivo y visible.
+- Spec/decisión que respeta: FRONTEND_SPEC (catálogo). Contraparte BE: #109 (auto-publish, sin endpoint `catalog/publish`). Decisión de arquitectura con el owner (catálogo en vivo, sin fase borrador global). Dark/violeta y copy en español intactos; sin `any`.
+- Prueba local: `pnpm lint` ✓ (0 errores; 7 warnings preexistentes ajenos) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
+- Commit:
+
 ### 2026-06-28 · Nova · crm/catálogo — dropzone de materiales (#65)
 - Qué cambió: la carga de material (antes un botón "Subir PDF", un solo archivo) se reemplaza por un **dropzone** ([materials-dropzone.tsx](components/crm/catalog/materials-dropzone.tsx)) con drag-and-drop + clic, que acepta **pdf/jpg/png ≤5 MB, máx. 5 por servicio**, valida en cliente tipo/tamaño/cantidad (toast por archivo rechazado) y muestra el **listado en vivo** con ícono por tipo y botón de quitar. El editor ([service-editor.tsx](components/crm/catalog/service-editor.tsx)) maneja `materials: AssetRead[]` y envía `asset_ids` (espejo del nuevo contrato BE #108). Contrato API ([lib/api/catalogo.ts](lib/api/catalogo.ts)): `ServiceRead.materials[]` reemplaza `asset_id`/`asset`; `ServiceCreate/Update` usan `asset_ids`. Preview muestra "Envía: a, b, c" y la tabla del catálogo muestra el **conteo** de materiales (o "falta").
 - Por qué: #65 — subir varios materiales por servicio. Contraparte BE: #108 (≤5, pdf/jpg/png ≤5MB, `asset.service_id`).
