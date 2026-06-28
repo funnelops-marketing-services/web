@@ -43,6 +43,9 @@ export function BoardCard({
           <p className="mb-1.5 truncate text-sm font-bold text-white">
             {card.title}
           </p>
+          {card.phone && card.phone !== card.title && (
+            <p className="mb-1.5 truncate text-xs font-normal text-zinc-500">{card.phone}</p>
+          )}
           <div className="flex items-center gap-1.5 text-[10px] text-zinc-600">
             <MessageSquare className="size-2.5" />
             <span className="font-normal">Ver conversación</span>
