@@ -26,7 +26,7 @@
 - Por qué: #57 — el operador necesita encontrar oportunidades por número. El teléfono no llegaba al cliente (`CardOut` no exponía `external_id`); la contraparte server lo agrega como `phone`. La búsqueda es client-side sobre el board ya cargado (no se usa el endpoint server-side que planteaba #100 BE).
 - Spec/decisión que respeta: FRONTEND_SPEC §pipeline "Gestión Humana"/tablero CRM (operación de `client_admin` + `staff`); CLAUDE.md (CRM en `/crm`, TS estricto, <200 líneas, UI español, dark violeta/fucsia). Contrato: nuevo `CardOut.phone` (server, re-scope de #100).
 - Prueba local: `pnpm lint` ✓ (0 errores; 5 warnings preexistentes en `use-mobile.ts`) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
-- Commit:
+- Commit: f91d9c3
 - Mejora de flujo: el `phone` queda como dato propio (independiente del `title`), de modo que cuando se capture el nombre real del contacto (#119 BE) la búsqueda por número sigue funcionando y la card mostrará nombre + teléfono.
 
 ### 2026-06-27 · Nova · crm — colapsar la columna del panel al cerrar la conversación (#31, mejora)
