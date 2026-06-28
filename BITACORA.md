@@ -26,7 +26,7 @@
 - Por qué: #66 — el botón siempre disponible no dejaba claro si el catálogo estaba en línea o en borrador, y el modelo de "publicar" ya no aplica (BE #109 lo hace automático). `is_active` es ahora el control intuitivo y visible.
 - Spec/decisión que respeta: FRONTEND_SPEC (catálogo). Contraparte BE: #109 (auto-publish, sin endpoint `catalog/publish`). Decisión de arquitectura con el owner (catálogo en vivo, sin fase borrador global). Dark/violeta y copy en español intactos; sin `any`.
 - Prueba local: `pnpm lint` ✓ (0 errores; 7 warnings preexistentes ajenos) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
-- Commit:
+- Commit: 01fabdb
 
 ### 2026-06-28 · Natalia · crm — "Usuarios y roles" como ítem propio del sidebar + tabla read-only + label Superadmin
 - Qué cambió: se sacó "Usuarios y roles" de Ajustes y se le dio **su propia ruta** [/crm/users](app/crm/users/page.tsx) con ítem en el [Sidebar](components/layout/Sidebar.tsx) (ícono `ShieldCheck`, `requiresConfig: true` → solo `platform_operator`; redirige a `/crm` si no, y el backend igual 403ea `GET /users`). [Ajustes](app/crm/settings/page.tsx) queda solo con "Mi cuenta". En [users-table.tsx](components/crm/config/users-table.tsx): (1) el badge del superadmin pasa de **"Operador" → "Superadmin"**; (2) se **eliminó la columna "Acción"** (cambio de rol) — la tabla queda read-only (Email · Nombre · Rol). Se quitó el "Solo lectura" que se leía como un permiso incorrecto sobre el superadmin.
