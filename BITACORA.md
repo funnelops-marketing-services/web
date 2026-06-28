@@ -26,7 +26,7 @@
 - Por qué: evitar borrados accidentales — el servicio se eliminaba sin pedir confirmación. Misma UX de seguridad que ya existía para oportunidades.
 - Spec/decisión que respeta: FRONTEND_SPEC (catálogo). Reusa `alert-dialog` + `useDeleteService`; sin `any`, dark/violeta, copy ES.
 - Prueba local: `pnpm lint` ✓ (0 errores; 7 warnings preexistentes ajenos) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓.
-- Commit:
+- Commit: b9aa62d
 
 ### 2026-06-28 · Nova · crm/oportunidad — selector de servicios en el detalle de la card (#82)
 - Qué cambió: nueva sección **"Servicios"** en el detalle de la oportunidad ([opportunity-details.tsx](components/crm/opportunity-details.tsx)) con el componente [services-selector.tsx](components/crm/services-selector.tsx): lista los servicios de la card (nombre · precio moneda) diferenciando **asignados** (operador, con botón de quitar) de **capturados** por el bot (badge verde "✦ bot", read-only, #133); un Popover con checkboxes del **catálogo activo** (multi-selección) para asignar/quitar. Contrato API ([lib/api/crm.ts](lib/api/crm.ts)): `cardServiceSchema` + `CardDetail.services[]`, `updateCardServices(cardId, serviceIds)` → `PUT /crm/cards/{id}/services`. Hook `useUpdateCardServices` ([use-card-mutations.ts](hooks/use-card-mutations.ts)) que invalida el detalle. El catálogo se obtiene con `useAgentConfig()` (1 agente por tenant) → `useServices(agent.id)`.
