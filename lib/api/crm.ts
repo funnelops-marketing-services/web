@@ -24,6 +24,7 @@ export const cardSchema = z.object({
   conversation_id: z.string(),
   stage_id: z.string(),
   phone: z.string(), // external_id (wa_id) de la conversación; habilita búsqueda por número
+  rating: z.string(), // 'hot' | 'medium' | 'cold' — calificación del lead (badge)
 })
 
 // Un paso del historial de movimientos de la card (traceability del detalle #75/#55).
@@ -41,6 +42,7 @@ export const cardDetailSchema = cardSchema.extend({
   is_ai_active: z.boolean(),
   full_name: z.string().nullable(), // nombre del lead (prefill de edición)
   notes: z.string().nullable(), // notas libres de la oportunidad
+  ai_summary: z.string().nullable(), // resumen del caso por IA
   thread: z.array(threadMessageSchema),
   moves: z.array(cardMoveSchema), // historial cronológico (asc por moved_at)
 })

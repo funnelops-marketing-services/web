@@ -4,6 +4,7 @@ import { GripVertical, MessageSquare } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import type { Card } from '@/lib/api/crm'
+import { RatingBadge } from '@/components/crm/rating-badge'
 
 interface BoardCardProps {
   card: Card
@@ -40,9 +41,10 @@ export function BoardCard({
       <div className="flex items-start gap-2">
         <GripVertical className="mt-0.5 size-3.5 cursor-grab text-zinc-700 opacity-0 transition-opacity group-hover:opacity-100" />
         <div className="min-w-0 flex-1">
-          <p className="mb-1.5 truncate text-sm font-bold text-white">
-            {card.title}
-          </p>
+          <div className="mb-1.5 flex items-start justify-between gap-2">
+            <p className="truncate text-sm font-bold text-white">{card.title}</p>
+            <RatingBadge rating={card.rating} className="flex-shrink-0" />
+          </div>
           {card.phone && card.phone !== card.title && (
             <p className="mb-1.5 truncate text-xs font-normal text-zinc-500">{card.phone}</p>
           )}
