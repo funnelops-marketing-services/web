@@ -26,7 +26,7 @@
 - Por qué: #75 — replicar el detalle de oportunidad de Firefly adaptado a popup 50/50, mostrando datos del lead + historial de movimientos (traceability, #55) junto al chat existente.
 - Spec/decisión que respeta: FRONTEND_SPEC §tablero CRM / detalle; CLAUDE.md (CRM en `/crm`, takeover `is_ai_active` intacto, TS estricto, <200 líneas, UI español, dark violeta/fucsia). Contrato: nuevo `CardDetailOut.moves[]` (server, Parte A de #75) — el front ahora **requiere** `moves` en `GET /crm/cards/{id}`.
 - Prueba local: `pnpm lint` ✓ (0 errores; 6 warnings preexistentes en `use-mobile`) · `pnpm tsc --noEmit` ✓ · `pnpm build` ✓. Depende de la Parte A backend (expone `moves[]`): mergear/desplegar el PR de `server` antes que este, o el parse de `cardDetailSchema` fallará.
-- Commit: (pendiente)
+- Commit: c34569b
 - Mejora de flujo: el popup es la superficie de detalle donde luego viven editar/eliminar oportunidad (#54) y la calificación/resumen IA (#53), evitando rehacer el panel lateral.
 
 ### 2026-06-27 · Nova · crm — buscador por número de teléfono en el tablero de pipelines (#57)
