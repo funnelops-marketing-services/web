@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-27 · Natalia · topbar + login — quitar badge de tenant/punto verde (#50) y bordes redondeados en login (#51)
+- Qué cambió: `Topbar.tsx` — se elimina el badge de tenant (texto "Mirko" + punto verde animado `bg-emerald-400`) que iba a la izquierda del menú de usuario; se borra también la variable huérfana `tenantName`. `login-page.tsx` — los inputs de email y contraseña pasan del estilo subrayado (`border-0 border-b … rounded-none px-0`) a borde completo redondeado (`border border-zinc-800 rounded-lg px-3`), manteniendo alto, foco violeta y demás estilos.
+- Por qué: #50 pide quitar el badge "Mirko" + punto verde de la barra superior derecha; #51 pide inputs con borde redondeado en el login.
+- Spec/decisión que respeta: CLAUDE.md — solo cambio visual del CRM bajo `/crm` y del login; no toca paradigma, RBAC, contratos con el backend ni realtime.
+- Prueba local: `pnpm tsc --noEmit` ✓ · `pnpm lint` ✓ (0 errores; 5 warnings preexistentes en `use-mobile.ts`) · `pnpm build` ✓.
+- Commit: (pendiente)
+
 ### 2026-06-27 · Natalia · crm — reestructura del sidebar + quitar breadcrumbs (#38, #39, #40, #41)
 - Qué cambió: `Sidebar.tsx` — se quitan los ítems **"Inbox"** (#39) y **"Conversaciones"** (#38) y se agrega **"Embudo de ventas" → `/crm`** como primer ítem del menú, ícono `Funnel` (#41); `isActive` ahora marca `/crm` solo en coincidencia exacta (no en cada `/crm/*`). Se borran las rutas huérfanas `app/crm/conversations/page.tsx` (redirect) y `app/crm/inbox/page.tsx`, más el componente `components/crm/inbox-view.tsx` (sin uso). `Topbar.tsx` — se elimina la barra de breadcrumbs y todo su código muerto (`buildBreadcrumb`, `segmentLabels`, `Crumb`, `usePathname`/`useMemo`/`Link`/`ChevronRight`); queda el badge de tenant + menú de usuario.
 - Por qué: simplificar la navegación del CRM. El tablero (kanban de pipelines / "Gestión Humana") pasa a ser el ítem principal "Embudo de ventas". El hilo de conversación + toggle IA (takeover) ya vivían en `conversation-panel.tsx` dentro del tablero, así que quitar las vistas standalone de Inbox/Conversaciones no pierde funcionalidad.

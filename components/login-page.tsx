@@ -132,7 +132,7 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-transparent border-0 border-b border-zinc-800 rounded-none px-0 h-11 text-white placeholder:text-zinc-700 focus:border-violet-500 focus-visible:ring-0 focus-visible:ring-offset-0 font-normal"
+                className="bg-transparent border border-zinc-800 rounded-lg px-3 h-11 text-white placeholder:text-zinc-700 focus:border-violet-500 focus-visible:ring-0 focus-visible:ring-offset-0 font-normal"
                 placeholder="tu@email.com"
                 autoComplete="email"
               />
@@ -147,7 +147,7 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-transparent border-0 border-b border-zinc-800 rounded-none px-0 h-11 text-white placeholder:text-zinc-700 focus:border-violet-500 focus-visible:ring-0 focus-visible:ring-offset-0 font-normal"
+                className="bg-transparent border border-zinc-800 rounded-lg px-3 h-11 text-white placeholder:text-zinc-700 focus:border-violet-500 focus-visible:ring-0 focus-visible:ring-offset-0 font-normal"
                 placeholder="••••••••"
                 autoComplete="current-password"
               />
