@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-28 · Nova · catálogo — límites de longitud (nombre/slug)
+- Qué cambió: subí `LIMITS` en `components/crm/catalog/service-form.tsx` — `nombre` 30→50 y `slug` 20→40 (las `RULES` de validación del form de alta/edición de servicios derivan de ahí).
+- Por qué: el cliente necesita nombres y slugs de servicio más largos en el catálogo.
+- Spec/decisión que respeta: validación #107 (alineada con server `catalog_schemas.py`, que sube los mismos límites en su PR par); columnas en DB son `Text` (sin límite) → no requiere migración. FRONTEND_SPEC no documenta los límites, sin desviación del diseño.
+- Prueba local: `pnpm lint` (0 errores), `pnpm tsc --noEmit` (OK), `pnpm build` (OK).
+- Commit:
+
 ### 2026-06-28 · Nova · landing — refresco de UI y responsive
 - Qué cambió:
   - Nav/footer: logo de marca ([logo-mirko.svg](public/landing/logo-mirko.svg)) en vez de la "M"; se quitó el botón WhatsApp de la barra superior (queda solo en el menú móvil).

@@ -24,7 +24,7 @@ export interface FormValues {
 }
 
 // Límites alineados con la validación server-side (#107).
-export const LIMITS = { nombre: 30, slug: 20, resumen: 200, detalle: 300 } as const
+export const LIMITS = { nombre: 50, slug: 40, resumen: 200, detalle: 300 } as const
 const PRECIO_MAX = 100000
 
 export const RULES = {
