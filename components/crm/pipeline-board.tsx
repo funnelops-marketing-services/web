@@ -38,9 +38,12 @@ export function PipelineBoard({
   }
 
   return (
-    <div className="flex h-full gap-4 overflow-x-auto pb-2">
+    <div className="flex h-full snap-x snap-mandatory gap-4 overflow-x-auto pb-2 lg:snap-none">
       {stages.map((stage) => (
-        <div key={stage.id} className="flex w-72 flex-shrink-0 flex-col">
+        <div
+          key={stage.id}
+          className="flex w-[80vw] max-w-xs flex-shrink-0 snap-start flex-col sm:w-72 lg:w-auto lg:min-w-68 lg:flex-1"
+        >
           <BoardColumn
             stage={stage}
             selectedCardId={selectedCardId}
