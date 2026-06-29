@@ -9,7 +9,7 @@ export function Work() {
         <div className="reveal-up flex flex-wrap items-end justify-between gap-6">
           <div>
             <Eyebrow>Trabajo</Eyebrow>
-            <h2 className="mt-[18px] font-display text-[clamp(30px,4.4vw,56px)] font-bold leading-[1.03] tracking-[-0.03em]">
+            <h2 className="mt-[18px] font-display text-[clamp(26px,4.4vw,56px)] font-bold leading-[1.05] tracking-[-0.03em]">
               Selección de piezas
             </h2>
           </div>

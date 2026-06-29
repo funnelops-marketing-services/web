@@ -150,6 +150,11 @@
     animation: btnSheen 0.8s cubic-bezier(0.25, 0.6, 0.3, 1);
   }
 
+  /* Fondo de botón: violeta → rojo vino (sin rosado intermedio). */
+  .btn-grad {
+    background-image: linear-gradient(100deg, var(--a1, #8b3df5), var(--a3, #7a1330));
+  }
+
   /* Texto con degradado violeta → magenta. */
   .text-gradient {
     background: linear-gradient(100deg, var(--a1, #8b3df5), var(--a2, #ef4488));

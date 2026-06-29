@@ -1,7 +1,8 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
-import { CONTACT, NAV_ITEMS, whatsappLink } from "./data"
+import { NAV_ITEMS, whatsappLink } from "./data"
 
 export function SiteNav() {
   const [open, setOpen] = useState(false)
@@ -12,10 +13,15 @@ export function SiteNav() {
         data-nav
         className="fixed inset-x-0 top-0 z-[120] flex items-center justify-between gap-6 border-b border-transparent px-[clamp(18px,4vw,52px)] py-[15px] transition-[background,border-color,backdrop-filter] duration-300"
       >
-        <a href="#top" className="flex items-center gap-3 font-mono text-[11.5px] font-bold tracking-[0.32em] text-[#f3f0fa]">
-          <span className="grid h-[30px] w-[30px] place-items-center rounded-[7px] bg-[linear-gradient(100deg,var(--a1),var(--a2))] text-[15px] font-extrabold text-white">
-            M
-          </span>
+        <a href="#top" className="flex items-center gap-2.5 font-mono text-[10.5px] font-bold tracking-[0.28em] text-[#f3f0fa] sm:text-[11.5px] sm:tracking-[0.32em]">
+          <Image
+            src="/landing/logo-mirko.svg"
+            alt="Mirko Calzadilla"
+            width={20}
+            height={32}
+            className="h-6.5 w-auto sm:h-7.5"
+            priority
+          />
           MIRKO&nbsp;CALZADILLA
         </a>
 
@@ -29,14 +35,6 @@ export function SiteNav() {
               {item.label}
             </a>
           ))}
-          <a
-            className="shine-btn rounded-full bg-[linear-gradient(100deg,var(--a1),var(--a2))] px-5 py-[11px] text-sm font-semibold text-white shadow-[0_8px_28px_rgba(239,68,136,.32)] transition-transform hover:-translate-y-0.5"
-            href={whatsappLink()}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            WhatsApp
-          </a>
         </div>
 
         <button
@@ -72,7 +70,7 @@ export function SiteNav() {
             </a>
           ))}
           <a
-            className="shine-btn mt-3.5 rounded-full bg-[linear-gradient(100deg,var(--a1),var(--a2))] px-7 py-[15px] font-semibold text-white"
+            className="shine-btn btn-grad mt-3.5 rounded-full px-7 py-[15px] font-semibold text-white"
             href={whatsappLink()}
             target="_blank"
             rel="noopener noreferrer"

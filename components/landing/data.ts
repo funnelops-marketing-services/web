@@ -1,8 +1,8 @@
 // Contenido del landing "Rediseño de portafolio audiovisual" (Mirko Calzadilla).
 
 export const CONTACT = {
-  whatsappNumber: "59178482245",
-  whatsappUrl: "https://wa.me/59178482245",
+  whatsappNumber: "59178023135",
+  whatsappUrl: "https://wa.me/59178023135",
   instagram: "mirko_calzadilla_",
   instagramUrl: "https://www.instagram.com/mirko_calzadilla_/",
   email: "mirkocalzadilla4@gmail.com",

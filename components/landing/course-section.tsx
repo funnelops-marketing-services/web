@@ -7,7 +7,7 @@ export function CourseSection() {
       <div className="mx-auto w-[min(1240px,90vw)]">
         <div className="reveal-up">
           <Eyebrow>Formación</Eyebrow>
-          <h2 className="mt-[18px] max-w-[18ch] font-display text-[clamp(30px,4.6vw,58px)] font-bold leading-[1.02] tracking-[-0.03em]">
+          <h2 className="mt-[18px] max-w-[18ch] font-display text-[clamp(26px,4.6vw,58px)] font-bold leading-[1.04] tracking-[-0.03em]">
             Curso de Producción Audiovisual <em className="font-serif font-normal text-gradient">+ IA</em>
           </h2>
           <p className="mt-[18px] max-w-[54ch] text-[clamp(15px,1.2vw,18px)] leading-[1.6] text-[#a99fc8]">
@@ -41,7 +41,7 @@ export function CourseSection() {
             </div>
           </div>
           <a
-            className="shine-btn inline-flex items-center gap-2.5 rounded-full bg-[linear-gradient(100deg,var(--a1),var(--a2))] px-[26px] py-[15px] text-[15px] font-semibold text-white shadow-[0_12px_38px_rgba(239,68,136,.32)] transition-transform hover:-translate-y-0.5"
+            className="shine-btn btn-grad inline-flex items-center gap-2.5 rounded-full px-[26px] py-[15px] text-[15px] font-semibold text-white shadow-[0_12px_38px_rgba(239,68,136,.32)] transition-transform hover:-translate-y-0.5"
             href={whatsappLink(COURSE_BUNDLE.message)}
             target="_blank"
             rel="noopener noreferrer"

@@ -21,6 +21,21 @@
 
 ## Entradas
 
+### 2026-06-28 · Nova · landing — refresco de UI y responsive
+- Qué cambió:
+  - Nav/footer: logo de marca ([logo-mirko.svg](public/landing/logo-mirko.svg)) en vez de la "M"; se quitó el botón WhatsApp de la barra superior (queda solo en el menú móvil).
+  - Botones: nueva utilidad `.btn-grad` ([globals.css](app/globals.css)) con gradiente violeta → rojo vino (`--a3: #7a1330`), sin el rosado intermedio; aplicada a todos los CTAs (hero, contacto, curso, reserve-link, menú móvil).
+  - Número de WhatsApp corregido a `59178023135` en [data.ts](components/landing/data.ts) → afecta todos los botones.
+  - Hero: se quitó el label "DESLIZÁ". "Quién soy": el slogan *"La luz no es para ver…"* se movió a debajo de las stats +5/+50.
+  - Contacto: se quitaron @instagram y email. Footer: "Política de privacidad" reubicada junto a "Todos los derechos reservados".
+  - Responsive: se bajaron los pisos (`min` del `clamp`) de los títulos en hero, about, contacto, servicios, curso, trabajo, proceso, equipo y premium; tamaño en escritorio sin cambios.
+  - Favicons: nuevo set provisto por la clienta (favicon.ico, 16/32, apple-touch-icon, android-chrome 192/512) reemplaza el viejo (icon.svg, apple-icon, icon-*-32x32); [layout.tsx](app/layout.tsx) recableado a los archivos nuevos.
+- Por qué: pedidos de la clienta para alinear la marca (logo, número correcto, favicons) y mejorar la lectura en móvil.
+- Spec/decisión que respeta: cambios solo sobre la landing pública (`mirkocalzadilla.com`); no toca CRM (`/crm`), inbox, pipeline, realtime ni contratos del backend (CLAUDE.md · FRONTEND_SPEC).
+- Mejora de flujo: el acento de los botones pasa de fucsia a rojo vino (cambio de diseño pedido explícitamente por la clienta) — se mantiene `--a1/--a2` violeta/fucsia para textos y glows, solo cambia el extremo del CTA.
+- Prueba local: `pnpm lint` (0 errores, 7 warnings preexistentes en CRM/UI) · `pnpm tsc --noEmit` OK · `pnpm build` OK (12 páginas estáticas, incl. `/`).
+- Commit:
+
 ### 2026-06-28 · Nova · crm/catálogo — doble confirmación al eliminar un servicio
 - Qué cambió: borrar un servicio del catálogo dejaba de dispararse directo (sin aviso). Nuevo [service-delete-dialog.tsx](components/crm/catalog/service-delete-dialog.tsx) con **doble confirmación** (abrir AlertDialog + tildar "Entiendo que se eliminará del catálogo" para habilitar el botón destructivo), calcado del patrón de baja de oportunidad ([opportunity-delete-dialog.tsx](components/crm/opportunity-delete-dialog.tsx), #54). [catalog-table.tsx](components/crm/catalog/catalog-table.tsx) usa el diálogo en vez del `onClick={() => remove.mutate(...)}` inmediato.
 - Por qué: evitar borrados accidentales — el servicio se eliminaba sin pedir confirmación. Misma UX de seguridad que ya existía para oportunidades.

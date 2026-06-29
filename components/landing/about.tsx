@@ -7,7 +7,7 @@ export function About() {
       <div className="reveal-up mx-auto grid w-[min(1240px,90vw)] grid-cols-1 items-center gap-[clamp(40px,6vw,84px)] md:grid-cols-[1.15fr_0.85fr]">
         <div>
           <Eyebrow>Quién soy</Eyebrow>
-          <h2 className="mt-5 font-display text-[clamp(34px,5vw,62px)] font-bold leading-[1.02] tracking-[-0.03em]">
+          <h2 className="mt-5 font-display text-[clamp(29px,5vw,62px)] font-bold leading-[1.04] tracking-[-0.03em]">
             Hago ver <em className="font-serif font-normal text-gradient">premium</em> a tu marca.
           </h2>
           <p className="mt-[26px] max-w-[52ch] text-pretty text-[clamp(15px,1.2vw,18px)] leading-[1.7] text-[#bcb3d6]">
@@ -23,7 +23,7 @@ export function About() {
                   <div
                     data-count={stat.value}
                     data-prefix={stat.prefix}
-                    className="font-display text-[clamp(38px,4vw,54px)] font-bold leading-none tracking-[-0.03em]"
+                    className="font-display text-[clamp(32px,4vw,54px)] font-bold leading-none tracking-[-0.03em]"
                   >
                     {stat.prefix}
                     {stat.value}
@@ -33,6 +33,9 @@ export function About() {
               </div>
             ))}
           </div>
+          <p className="mt-10 max-w-[24ch] text-balance font-serif text-[clamp(22px,2.6vw,34px)] italic leading-[1.2] tracking-[-0.01em] text-[#e9e4f5]">
+            “La luz no es para ver. Es para hacer <span className="text-gradient">sentir</span>”
+          </p>
         </div>
         <ImageSlot
           placeholder="Arrastrá tu retrato"
@@ -40,12 +43,6 @@ export function About() {
           src="/landing/mirko.png"
           alt="Mirko Calzadilla con cámara y gimbal"
         />
-      </div>
-
-      <div className="reveal-up mx-auto mt-[clamp(70px,9vw,120px)] w-[min(1100px,90vw)] text-center">
-        <p className="text-balance font-serif text-[clamp(28px,4.6vw,58px)] italic leading-[1.18] tracking-[-0.01em] text-[#e9e4f5]">
-          “La luz no es para ver. Es para hacer <span className="text-gradient">sentir</span>”
-        </p>
       </div>
     </section>
   )

@@ -6,7 +6,7 @@ export function Process() {
     <section className="relative z-[2] py-[clamp(70px,9vw,120px)]">
       <div className="reveal-up mx-auto w-[min(1240px,90vw)]">
         <Eyebrow>El proceso</Eyebrow>
-        <h2 className="mt-[18px] font-display text-[clamp(30px,4.4vw,56px)] font-bold leading-[1.03] tracking-[-0.03em]">
+        <h2 className="mt-[18px] font-display text-[clamp(26px,4.4vw,56px)] font-bold leading-[1.05] tracking-[-0.03em]">
           Cómo trabajo
         </h2>
         <div className="mt-12 grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
