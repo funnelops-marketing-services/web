@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-29 · Nova · crm — embudo full-width/responsive + sidebar colapsable (#106, #107)
+- Qué cambió: (1) Embudo ([components/crm/pipeline-board.tsx](components/crm/pipeline-board.tsx)): las columnas (stages) pasan de ancho fijo `w-72` a llenar el ancho en desktop (`lg:w-auto lg:min-w-68 lg:flex-1`) y a un carrusel con scroll-snap en mobile (`w-[80vw] max-w-xs … snap-start`; contenedor `snap-x snap-mandatory lg:snap-none`). (2) Sidebar ([components/layout/Sidebar.tsx](components/layout/Sidebar.tsx)): el aside de desktop colapsa a solo-iconos (`w-64 ↔ w-16`) con botón toggle al pie; `NavList` recibe `collapsed` (oculta labels, agrega `title`/`aria-label`); `Logo` suma prop `compact`. Estado de colapso persistente en nuevo [store/ui-store.ts](store/ui-store.ts) (Zustand + persist, espejo de `auth-store`), con guard `hasHydrated` para evitar mismatch SSR. El drawer mobile (Sheet) no cambia.
+- Por qué: quick wins de UX pedidos por el cliente — aprovechar el ancho de pantalla en el tablero, hacerlo usable en mobile, y ganar espacio horizontal colapsando el menú.
+- Spec/decisión que respeta: solo capa visual/layout; no toca routing `/crm`, takeover `is_ai_active`, naming "Gestión Humana", RBAC ni realtime (FRONTEND_SPEC §Pantallas/RBAC/Realtime intactos). Dark mode violeta/fucsia y `cn()` mantenidos; componentes <200 líneas (Sidebar 172).
+- Prueba local: `pnpm lint` (0 errores, 7 warnings preexistentes en `use-mobile`), `pnpm tsc --noEmit` (OK), `pnpm build` (OK). Verificación visual interactiva (toggle, mobile snap) pendiente en dev con sesión.
+- Commit: c5a49a4
+
 ### 2026-06-28 · Natalia · crm — badge de alerta "solicitud desconocida" en la card (#94)
 - Qué cambió: nuevo `AlertBadge` ([components/crm/alert-badge.tsx](components/crm/alert-badge.tsx)) que mapea `card.alert==='unknown_service'` → badge ámbar "⚠ Solicitud desconocida" (null para cualquier otro valor). `cardSchema` ([lib/api/crm.ts](lib/api/crm.ts)) suma `alert: string|null|opcional`. Se muestra en la cara de la card del kanban (solo ícono, [board-card.tsx](components/crm/board-card.tsx)) y en el detalle de la oportunidad (con label, [opportunity-details.tsx](components/crm/opportunity-details.tsx)).
 - Por qué: cuando el agente deriva una oportunidad por un servicio fuera del catálogo (server #94), el operador necesita verla marcada para atenderla en "Por atender".

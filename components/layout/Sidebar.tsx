@@ -8,6 +8,8 @@ import {
   Bot,
   Funnel,
   Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
   Settings,
   ShieldCheck,
   Users,
@@ -23,6 +25,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { usePermissions } from '@/hooks/use-permissions'
+import { useUiStore } from '@/store/ui-store'
 import { Logo } from './Logo'
 
 interface NavItem {
@@ -51,10 +54,11 @@ function isActive(pathname: string, href: string): boolean {
 
 interface NavListProps {
   pathname: string
+  collapsed?: boolean
   onSelect?: () => void
 }
 
-function NavList({ pathname, onSelect }: NavListProps) {
+function NavList({ pathname, collapsed = false, onSelect }: NavListProps) {
   const { canManageConfig } = usePermissions()
   const visibleItems = navItems.filter((item) => !item.requiresConfig || canManageConfig)
 
@@ -69,8 +73,11 @@ function NavList({ pathname, onSelect }: NavListProps) {
             href={item.href}
             onClick={onSelect}
             aria-current={active ? 'page' : undefined}
+            aria-label={collapsed ? item.label : undefined}
+            title={collapsed ? item.label : undefined}
             className={cn(
-              'group flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm font-normal transition-all',
+              'group flex items-center rounded-xl border py-2.5 text-sm font-normal transition-all',
+              collapsed ? 'justify-center px-0' : 'gap-3 px-3',
               active
                 ? 'border-violet-500/30 bg-violet-500/15 text-white shadow-[0_0_25px_-12px_rgba(167,139,250,0.7)]'
                 : 'border-transparent text-zinc-400 hover:bg-white/[0.04] hover:text-white',
@@ -84,7 +91,7 @@ function NavList({ pathname, onSelect }: NavListProps) {
                   : 'text-zinc-500 group-hover:text-zinc-300',
               )}
             />
-            <span className="truncate">{item.label}</span>
+            {!collapsed && <span className="truncate">{item.label}</span>}
           </Link>
         )
       })}
@@ -95,6 +102,11 @@ function NavList({ pathname, onSelect }: NavListProps) {
 export function Sidebar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const sidebarCollapsed = useUiStore((s) => s.sidebarCollapsed)
+  const hasHydrated = useUiStore((s) => s.hasHydrated)
+  const toggleSidebar = useUiStore((s) => s.toggleSidebar)
+  // Render expanded until the persisted value hydrates (avoids SSR mismatch).
+  const collapsed = hasHydrated && sidebarCollapsed
 
   return (
     <>
@@ -122,12 +134,38 @@ export function Sidebar() {
         </SheetContent>
       </Sheet>
 
-      {/* Sidebar desktop */}
-      <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-white/5 bg-black/40 backdrop-blur-xl md:flex">
-        <div className="flex h-16 items-center border-b border-white/5 px-5">
-          <Logo />
+      {/* Desktop sidebar (collapsible) */}
+      <aside
+        className={cn(
+          'hidden flex-shrink-0 flex-col border-r border-white/5 bg-black/40 backdrop-blur-xl transition-[width] duration-200 ease-out md:flex',
+          collapsed ? 'w-16' : 'w-64',
+        )}
+      >
+        <div
+          className={cn(
+            'flex h-16 items-center border-b border-white/5',
+            collapsed ? 'justify-center px-0' : 'px-5',
+          )}
+        >
+          <Logo compact={collapsed} />
         </div>
-        <NavList pathname={pathname} />
+        <NavList pathname={pathname} collapsed={collapsed} />
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          aria-label={collapsed ? 'Expandir menú' : 'Colapsar menú'}
+          className={cn(
+            'mt-auto flex h-12 items-center border-t border-white/5 text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-white',
+            collapsed ? 'justify-center px-0' : 'gap-3 px-5',
+          )}
+        >
+          {collapsed ? (
+            <PanelLeftOpen className="size-4 flex-shrink-0" />
+          ) : (
+            <PanelLeftClose className="size-4 flex-shrink-0" />
+          )}
+          {!collapsed && <span className="text-sm">Colapsar</span>}
+        </button>
       </aside>
     </>
   )
