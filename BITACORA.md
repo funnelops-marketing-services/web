@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-28 · Natalia · crm — badge de alerta "solicitud desconocida" en la card (#94)
+- Qué cambió: nuevo `AlertBadge` ([components/crm/alert-badge.tsx](components/crm/alert-badge.tsx)) que mapea `card.alert==='unknown_service'` → badge ámbar "⚠ Solicitud desconocida" (null para cualquier otro valor). `cardSchema` ([lib/api/crm.ts](lib/api/crm.ts)) suma `alert: string|null|opcional`. Se muestra en la cara de la card del kanban (solo ícono, [board-card.tsx](components/crm/board-card.tsx)) y en el detalle de la oportunidad (con label, [opportunity-details.tsx](components/crm/opportunity-details.tsx)).
+- Por qué: cuando el agente deriva una oportunidad por un servicio fuera del catálogo (server #94), el operador necesita verla marcada para atenderla en "Por atender".
+- Spec/decisión que respeta: contrato server #94 (`CardOut.alert`/`CardDetailOut.alert` derivado del último `handoff_event.reason`, sin campo nuevo ni migración). Mismo patrón de badge que `RatingBadge`. PR par del server (#161).
+- Prueba local: `pnpm tsc --noEmit` (OK), `pnpm lint` (0 errores), `pnpm build` (OK).
+- Commit: (este)
+
 ### 2026-06-28 · Nova · catálogo — límites de longitud (nombre/slug)
 - Qué cambió: subí `LIMITS` en `components/crm/catalog/service-form.tsx` — `nombre` 30→50 y `slug` 20→40 (las `RULES` de validación del form de alta/edición de servicios derivan de ahí).
 - Por qué: el cliente necesita nombres y slugs de servicio más largos en el catálogo.
