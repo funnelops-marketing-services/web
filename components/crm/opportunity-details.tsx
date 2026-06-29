@@ -13,6 +13,7 @@ import { OpportunityEditForm } from '@/components/crm/opportunity-edit-form'
 import { OpportunityDeleteDialog } from '@/components/crm/opportunity-delete-dialog'
 import { ContactCreateSheet } from '@/components/crm/contacts/contact-create'
 import { RatingBadge } from '@/components/crm/rating-badge'
+import { AlertBadge } from '@/components/crm/alert-badge'
 import { ServicesSelector } from '@/components/crm/services-selector'
 
 function StateMessage({ text }: { text: string }) {
@@ -116,6 +117,7 @@ export function OpportunityDetails({
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <RatingBadge rating={card.rating} showLabel className="px-2.5 py-0.5 text-xs" />
+        <AlertBadge alert={card.alert} showLabel className="px-2.5 py-0.5 text-xs" />
         {location && (
           <>
             <Badge>{location.pipelineName}</Badge>

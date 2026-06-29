@@ -25,6 +25,9 @@ export const cardSchema = z.object({
   stage_id: z.string(),
   phone: z.string(), // external_id (wa_id) de la conversación; habilita búsqueda por número
   rating: z.string(), // 'hot' | 'medium' | 'cold' — calificación del lead (badge)
+  // Etiqueta de alerta derivada del motivo de handoff (#94): 'unknown_service' cuando
+  // el lead pidió un servicio fuera del catálogo; null/ausente si no hay alerta.
+  alert: z.string().nullable().optional(),
 })
 
 // Un paso del historial de movimientos de la card (traceability del detalle #75/#55).
