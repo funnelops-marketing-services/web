@@ -26,7 +26,7 @@
 - Por qué: el cliente necesita nombres y slugs de servicio más largos en el catálogo.
 - Spec/decisión que respeta: validación #107 (alineada con server `catalog_schemas.py`, que sube los mismos límites en su PR par); columnas en DB son `Text` (sin límite) → no requiere migración. FRONTEND_SPEC no documenta los límites, sin desviación del diseño.
 - Prueba local: `pnpm lint` (0 errores), `pnpm tsc --noEmit` (OK), `pnpm build` (OK).
-- Commit:
+- Commit: 1891e8b
 
 ### 2026-06-28 · Nova · landing — refresco de UI y responsive
 - Qué cambió:
