@@ -17,10 +17,17 @@ import { OpportunityCreateSheet } from '@/components/crm/opportunity-create'
 import type { Card, Pipeline } from '@/lib/api/crm'
 
 function BoardSkeleton() {
+  // Mirror the responsive column layout of PipelineBoard so the loading state
+  // matches the real board (full-width on desktop, snap carousel on mobile).
   return (
-    <div className="grid flex-1 grid-cols-3 gap-4 p-6">
-      {[0, 1, 2].map((i) => (
-        <Skeleton key={i} className="h-full w-full rounded-2xl bg-white/[0.03]" />
+    <div className="flex flex-1 gap-4 overflow-x-auto pb-2">
+      {[0, 1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="flex w-[80vw] max-w-xs flex-shrink-0 flex-col sm:w-72 lg:w-auto lg:min-w-68 lg:flex-1"
+        >
+          <Skeleton className="h-full w-full rounded-2xl bg-white/[0.03]" />
+        </div>
       ))}
     </div>
   )

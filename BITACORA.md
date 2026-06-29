@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-06-29 · Nova · crm — tablas responsive en mobile + BoardSkeleton consistente (#109)
+- Qué cambió: (1) Tablas del CRM ([contacts-table.tsx](components/crm/contacts/contacts-table.tsx), [users-table.tsx](components/crm/config/users-table.tsx), [catalog-table.tsx](components/crm/catalog/catalog-table.tsx)): se les da `min-w` (`min-w-120`/`min-w-170`) para que el contenedor `overflow-x-auto` del primitivo `Table` de shadcn dispare **scroll horizontal en mobile** en vez de comprimir/romper las columnas. (2) `BoardSkeleton` ([crm-board.tsx](components/crm/crm-board.tsx)): reescrito para reflejar el layout responsive de `PipelineBoard` (flex + `w-[80vw]/sm:w-72/lg:flex-1`) y se quitó el `p-6` duplicado.
+- Por qué: continuación de #106 — el board ya era responsive pero las tablas se rompían en pantallas chicas y el skeleton de carga no coincidía con el board real.
+- Spec/decisión que respeta: solo capa visual/layout; no toca contratos, RBAC, realtime ni routing `/crm` (FRONTEND_SPEC intacto). `cn()` y dark mode mantenidos; componentes <200 líneas.
+- Prueba local: `pnpm lint` (0 errores, 7 warnings preexistentes), `pnpm tsc --noEmit` (OK), `pnpm build` (OK). Verificación visual mobile pendiente en dev con sesión.
+- Commit: d944f1b
+
 ### 2026-06-29 · Nova · crm — embudo full-width/responsive + sidebar colapsable (#106, #107)
 - Qué cambió: (1) Embudo ([components/crm/pipeline-board.tsx](components/crm/pipeline-board.tsx)): las columnas (stages) pasan de ancho fijo `w-72` a llenar el ancho en desktop (`lg:w-auto lg:min-w-68 lg:flex-1`) y a un carrusel con scroll-snap en mobile (`w-[80vw] max-w-xs … snap-start`; contenedor `snap-x snap-mandatory lg:snap-none`). (2) Sidebar ([components/layout/Sidebar.tsx](components/layout/Sidebar.tsx)): el aside de desktop colapsa a solo-iconos (`w-64 ↔ w-16`) con botón toggle al pie; `NavList` recibe `collapsed` (oculta labels, agrega `title`/`aria-label`); `Logo` suma prop `compact`. Estado de colapso persistente en nuevo [store/ui-store.ts](store/ui-store.ts) (Zustand + persist, espejo de `auth-store`), con guard `hasHydrated` para evitar mismatch SSR. El drawer mobile (Sheet) no cambia.
 - Por qué: quick wins de UX pedidos por el cliente — aprovechar el ancho de pantalla en el tablero, hacerlo usable en mobile, y ganar espacio horizontal colapsando el menú.

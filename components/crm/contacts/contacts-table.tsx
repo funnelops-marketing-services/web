@@ -26,7 +26,7 @@ function formatDate(iso: string): string {
 export function ContactsTable({ contacts, selectedId, onSelect }: ContactsTableProps) {
   return (
     <div className="rounded-xl border border-white/5 bg-white/[0.02]">
-      <Table>
+      <Table className="min-w-120">
         <TableHeader>
           <TableRow className="border-white/5 hover:bg-transparent">
             <TableHead className="text-zinc-400">Nombre</TableHead>

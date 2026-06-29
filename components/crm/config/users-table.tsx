@@ -36,7 +36,7 @@ export function UsersTable() {
   // (sin auto-degradación del superadmin). Ver issue de RBAC.
   return (
     <div className="max-w-3xl rounded-xl border border-white/5 bg-white/[0.02]">
-      <Table>
+      <Table className="min-w-120">
         <TableHeader>
           <TableRow className="border-white/5 hover:bg-transparent">
             <TableHead className="text-zinc-400">Email</TableHead>

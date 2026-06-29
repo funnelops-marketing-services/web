@@ -76,7 +76,7 @@ export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
         <section key={group.key} className="space-y-2">
           <h2 className="text-sm font-semibold text-zinc-300">{group.label}</h2>
           <div className="rounded-xl border border-white/5 bg-white/[0.02]">
-            <Table className="table-fixed">
+            <Table className="min-w-170 table-fixed">
               <TableHeader>
                 <TableRow className="border-white/5 hover:bg-transparent">
                   <TableHead className="w-10" />
