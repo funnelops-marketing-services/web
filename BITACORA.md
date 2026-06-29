@@ -34,7 +34,7 @@
 - Spec/decisión que respeta: cambios solo sobre la landing pública (`mirkocalzadilla.com`); no toca CRM (`/crm`), inbox, pipeline, realtime ni contratos del backend (CLAUDE.md · FRONTEND_SPEC).
 - Mejora de flujo: el acento de los botones pasa de fucsia a rojo vino (cambio de diseño pedido explícitamente por la clienta) — se mantiene `--a1/--a2` violeta/fucsia para textos y glows, solo cambia el extremo del CTA.
 - Prueba local: `pnpm lint` (0 errores, 7 warnings preexistentes en CRM/UI) · `pnpm tsc --noEmit` OK · `pnpm build` OK (12 páginas estáticas, incl. `/`).
-- Commit:
+- Commit: e769dd3
 
 ### 2026-06-28 · Nova · crm/catálogo — doble confirmación al eliminar un servicio
 - Qué cambió: borrar un servicio del catálogo dejaba de dispararse directo (sin aviso). Nuevo [service-delete-dialog.tsx](components/crm/catalog/service-delete-dialog.tsx) con **doble confirmación** (abrir AlertDialog + tildar "Entiendo que se eliminará del catálogo" para habilitar el botón destructivo), calcado del patrón de baja de oportunidad ([opportunity-delete-dialog.tsx](components/crm/opportunity-delete-dialog.tsx), #54). [catalog-table.tsx](components/crm/catalog/catalog-table.tsx) usa el diálogo en vez del `onClick={() => remove.mutate(...)}` inmediato.
