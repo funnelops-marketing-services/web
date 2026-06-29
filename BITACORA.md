@@ -26,7 +26,7 @@
 - Por qué: cuando el agente deriva una oportunidad por un servicio fuera del catálogo (server #94), el operador necesita verla marcada para atenderla en "Por atender".
 - Spec/decisión que respeta: contrato server #94 (`CardOut.alert`/`CardDetailOut.alert` derivado del último `handoff_event.reason`, sin campo nuevo ni migración). Mismo patrón de badge que `RatingBadge`. PR par del server (#161).
 - Prueba local: `pnpm tsc --noEmit` (OK), `pnpm lint` (0 errores), `pnpm build` (OK).
-- Commit: (este)
+- Commit: a3ede31
 
 ### 2026-06-28 · Nova · catálogo — límites de longitud (nombre/slug)
 - Qué cambió: subí `LIMITS` en `components/crm/catalog/service-form.tsx` — `nombre` 30→50 y `slug` 20→40 (las `RULES` de validación del form de alta/edición de servicios derivan de ahí).
