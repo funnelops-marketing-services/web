@@ -1,11 +1,7 @@
+import { Instagram, Mail } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { CONTACT, whatsappLink } from "./data"
-
-const LINKS = [
-  { label: "WhatsApp", href: whatsappLink(), external: true },
-  { label: "Instagram", href: CONTACT.instagramUrl, external: true },
-]
+import { CONTACT } from "./data"
 
 export function SiteFooter() {
   return (
@@ -18,24 +14,23 @@ export function SiteFooter() {
             <div className="mt-1 text-[12.5px] text-[#8a7fb0]">Productor audiovisual · {CONTACT.location}</div>
           </div>
         </div>
-        <div className="flex flex-wrap gap-[22px] text-[13.5px] text-[#bcb3d6]">
-          {LINKS.map((link) =>
-            link.external ? (
-              <a
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-colors hover:text-white"
-              >
-                {link.label}
-              </a>
-            ) : (
-              <Link key={link.label} href={link.href} className="transition-colors hover:text-white">
-                {link.label}
-              </Link>
-            ),
-          )}
+        <div className="flex flex-col items-start gap-3 text-[13.5px] text-[#bcb3d6]">
+          <a
+            href={CONTACT.instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2.5 transition-colors hover:text-white"
+          >
+            <Instagram className="size-4" aria-hidden />
+            @{CONTACT.instagram}
+          </a>
+          <a
+            href={`mailto:${CONTACT.email}`}
+            className="inline-flex items-center gap-2.5 transition-colors hover:text-white"
+          >
+            <Mail className="size-4" aria-hidden />
+            {CONTACT.email}
+          </a>
         </div>
       </div>
       <div className="mx-auto mt-[30px] flex w-[min(1240px,92vw)] flex-col items-start justify-between gap-3 border-t border-white/[0.06] pt-[22px] font-mono text-[11.5px] tracking-[0.06em] text-[#6f6790] sm:flex-row sm:items-center">
