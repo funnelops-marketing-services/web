@@ -25,7 +25,7 @@ export function LandingPage() {
     <div
       ref={rootRef}
       className="relative overflow-x-hidden bg-[#0a0712] font-display text-[#f3f0fa]"
-      style={{ ["--a1" as string]: "#8b3df5", ["--a2" as string]: "#ef4488", ["--glow" as string]: "0.65", ["--grain" as string]: "1" }}
+      style={{ ["--a1" as string]: "#8b3df5", ["--a2" as string]: "#ef4488", ["--a3" as string]: "#7a1330", ["--glow" as string]: "0.65", ["--grain" as string]: "1" }}
     >
       {/* Barra de progreso de scroll */}
       <div className="fixed inset-x-0 top-0 z-[130] h-0.5 bg-white/5">

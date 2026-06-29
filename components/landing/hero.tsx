@@ -33,7 +33,7 @@ export function Hero() {
       </div>
 
       <h1
-        className="relative z-[1] m-0 max-w-[15ch] text-balance font-display text-[clamp(40px,7.4vw,104px)] font-bold leading-[0.98] tracking-[-0.035em]"
+        className="relative z-[1] m-0 max-w-[15ch] text-balance font-display text-[clamp(33px,7.4vw,104px)] font-bold leading-[1] tracking-[-0.035em]"
         style={{ animation: "introUp .9s cubic-bezier(.2,.75,.25,1) .14s both" }}
       >
         Hacemos que tu marca se{" "}
@@ -54,7 +54,7 @@ export function Hero() {
         style={{ animation: "introUp .9s cubic-bezier(.2,.75,.25,1) .3s both" }}
       >
         <a
-          className="shine-btn inline-flex items-center gap-2.5 rounded-full bg-[linear-gradient(100deg,var(--a1),var(--a2))] px-[30px] py-4 text-[15.5px] font-semibold text-white shadow-[0_14px_46px_rgba(239,68,136,.36)] transition-transform hover:-translate-y-[3px]"
+          className="shine-btn btn-grad inline-flex items-center gap-2.5 rounded-full px-[30px] py-4 text-[15.5px] font-semibold text-white shadow-[0_14px_46px_rgba(239,68,136,.36)] transition-transform hover:-translate-y-[3px]"
           href={whatsappLink()}
           target="_blank"
           rel="noopener noreferrer"
@@ -83,7 +83,6 @@ export function Hero() {
       </div>
 
       <div className="absolute bottom-[30px] left-1/2 z-[1] flex -translate-x-1/2 flex-col items-center gap-2.5">
-        <span className="font-mono text-[10px] tracking-[0.3em] text-[#6f6790]">DESLIZÁ</span>
         <span className="relative block h-[30px] w-5 rounded-[12px] border border-white/[0.22]">
           <span
             className="absolute left-1/2 top-[6px] h-[6px] w-[3px] -translate-x-1/2 rounded-sm bg-[var(--a2)]"

@@ -1,5 +1,5 @@
 import { Eyebrow } from "./atoms"
-import { CONTACT, whatsappLink } from "./data"
+import { whatsappLink } from "./data"
 
 export function ContactSection() {
   return (
@@ -11,7 +11,7 @@ export function ContactSection() {
         />
         <div className="relative">
           <Eyebrow centered>Contacto</Eyebrow>
-          <h2 className="mx-auto mt-[22px] max-w-[18ch] text-balance font-display text-[clamp(34px,5.6vw,76px)] font-bold leading-[1.02] tracking-[-0.035em]">
+          <h2 className="mx-auto mt-[22px] max-w-[18ch] text-balance font-display text-[clamp(29px,5.6vw,76px)] font-bold leading-[1.04] tracking-[-0.035em]">
             ¿Listo para que tu marca se vea como lo que <em className="font-serif font-normal text-gradient">cobrás</em>?
           </h2>
           <p className="mx-auto mt-[26px] max-w-[48ch] text-[clamp(16px,1.4vw,19px)] leading-[1.6] text-[#bcb3d6]">
@@ -19,21 +19,12 @@ export function ContactSection() {
           </p>
           <div className="mt-10">
             <a
-              className="shine-btn inline-flex items-center gap-3 rounded-full bg-[linear-gradient(100deg,var(--a1),var(--a2))] px-9 py-[18px] text-[16.5px] font-semibold text-white shadow-[0_18px_56px_rgba(239,68,136,.4)] transition-transform hover:-translate-y-[3px]"
+              className="shine-btn btn-grad inline-flex items-center gap-3 rounded-full px-9 py-[18px] text-[16.5px] font-semibold text-white shadow-[0_18px_56px_rgba(239,68,136,.4)] transition-transform hover:-translate-y-[3px]"
               href={whatsappLink()}
               target="_blank"
               rel="noopener noreferrer"
             >
               Hablar por WhatsApp <span className="text-[18px]">→</span>
-            </a>
-          </div>
-          <div className="mt-8 flex flex-wrap justify-center gap-x-7 gap-y-2 font-mono text-[13px] tracking-[0.04em] text-[#9a90bb]">
-            <a href={CONTACT.instagramUrl} target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-white">
-              @{CONTACT.instagram}
-            </a>
-            <span className="opacity-40">·</span>
-            <a href={`mailto:${CONTACT.email}`} className="transition-colors hover:text-white">
-              {CONTACT.email}
             </a>
           </div>
           <p className="mt-[46px] font-serif text-[clamp(22px,3vw,36px)] italic text-[#e9e4f5]">

@@ -21,7 +21,7 @@ export function ReserveLink({
       className={cn(
         "inline-flex items-center justify-between gap-2.5 rounded-[13px] px-[18px] py-3.5 text-sm font-semibold transition-all",
         variant === "gradient"
-          ? "shine-btn bg-[linear-gradient(100deg,var(--a1),var(--a2))] text-white shadow-[0_12px_36px_rgba(239,68,136,.32)] hover:-translate-y-0.5"
+          ? "shine-btn btn-grad text-white shadow-[0_12px_36px_rgba(239,68,136,.32)] hover:-translate-y-0.5"
           : "border border-white/[0.16] text-[#f3f0fa] hover:border-[var(--a2)] hover:bg-[rgba(239,68,136,.08)]",
         className,
       )}

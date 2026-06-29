@@ -8,7 +8,7 @@ export function ServicesSection() {
       <div className="mx-auto w-[min(1240px,90vw)]">
         <div className="reveal-up mx-auto max-w-[60ch] text-center">
           <Eyebrow centered>Servicios</Eyebrow>
-          <h2 className="mt-[18px] font-display text-[clamp(32px,4.8vw,62px)] font-bold leading-[1.02] tracking-[-0.03em]">
+          <h2 className="mt-[18px] font-display text-[clamp(28px,4.8vw,62px)] font-bold leading-[1.04] tracking-[-0.03em]">
             Paquetes exclusivos
           </h2>
           <p className="mt-[18px] text-[clamp(15px,1.2vw,18px)] leading-[1.6] text-[#a99fc8]">

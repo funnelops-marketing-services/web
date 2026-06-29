@@ -7,7 +7,7 @@ export function PremiumSection() {
       <div className="mx-auto w-[min(1240px,90vw)]">
         <div className="reveal-up mx-auto max-w-[64ch] text-center">
           <Eyebrow centered>Programas premium</Eyebrow>
-          <h2 className="mt-[18px] font-display text-[clamp(30px,4.6vw,58px)] font-bold leading-[1.03] tracking-[-0.03em]">
+          <h2 className="mt-[18px] font-display text-[clamp(26px,4.6vw,58px)] font-bold leading-[1.05] tracking-[-0.03em]">
             Para marcas que quieren <em className="font-serif font-normal text-gradient">evolucionar</em>
           </h2>
         </div>
