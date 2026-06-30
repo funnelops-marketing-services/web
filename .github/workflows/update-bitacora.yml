@@ -1,0 +1,57 @@
+name: Update Bitacora
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  merge-bitacora-fragments:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for fragments and merge
+        run: |
+          # Solo ejecutamos si existe la carpeta y no está vacía
+          if [ -d ".bitacora" ] && [ "$(ls -A .bitacora 2>/dev/null)" ]; then
+            echo "Found fragments in .bitacora/. Merging into BITACORA.md..."
+            
+            TEMP_FILE=$(mktemp)
+            
+            # Unir todos los archivos markdown de la carpeta
+            for file in .bitacora/*.md; do
+              # Añadir el contenido del fragmento
+              cat "$file" >> "$TEMP_FILE"
+              echo -e "\n" >> "$TEMP_FILE"
+            done
+            
+            # Juntar el contenido nuevo con la bitácora existente
+            if [ -f "BITACORA.md" ]; then
+              cat "$TEMP_FILE" "BITACORA.md" > BITACORA_NEW.md
+              mv BITACORA_NEW.md BITACORA.md
+            else
+              mv "$TEMP_FILE" BITACORA.md
+            fi
+            
+            # Limpiar la carpeta de fragmentos
+            rm -rf .bitacora
+            
+            # Configurar git y hacer commit
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            
+            # git rm -r --ignore-unmatch .bitacora para asegurar que git detecta el borrado
+            git rm -r --ignore-unmatch .bitacora
+            git add BITACORA.md
+            git commit -m "chore: actualiza BITACORA.md con fragmentos de PRs [skip ci]"
+            git push
+          else
+            echo "No fragments found in .bitacora/. Skipping."
+          fi
