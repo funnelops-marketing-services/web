@@ -60,7 +60,7 @@ Si el cambio depende del backend y este aún no está integrado: validá contra 
 
 ## 6. Bitácora
 
-Agregá una entrada NUEVA al tope de `BITACORA.md` con este formato exacto:
+Creá un archivo nuevo en `.bitacora/<nombre_de_rama>.md` (ej. `.bitacora/feature-x.md`) con este formato exacto (¡NUNCA edites `BITACORA.md` directamente para evitar conflictos!):
 
 ```
 ### YYYY-MM-DD · <autor> · <módulo/página>
@@ -79,7 +79,7 @@ Si el cambio incluye una mejora de flujo (refactor consensuado, extensión de un
 ## 7. Branch + commit
 
 1. Creá el branch: `git checkout -b <nombre-del-branch>` (del paso 3).
-2. Stagea los archivos relevantes (**no `git add .` ciego** — excluir `.next/`, `node_modules/`, `.env.local`).
+2. Stagea los archivos relevantes (**no `git add .` ciego** — asegurándote de incluir el archivo `.bitacora/` que creaste, y de excluir `.next/`, `node_modules/`, `.env.local`).
 3. Armá el commit. Mostrámelo **antes de ejecutarlo** para confirmación.
    - Formato: `<tipo>(<módulo>): <descripción corta en inglés>` (ej. `feat(crm): add inbox with AI takeover toggle`)
    - Autora = la usuaria del repo. **Sin co-author.**

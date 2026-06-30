@@ -36,7 +36,7 @@ Package manager is **pnpm** (`npx pnpm`).
 
 ## Antes de commitear
 
-Usá **`/close`**: muestra el diff, lo verifica contra `docs/FRONTEND_SPEC.md` + estas reglas, registra la entrada en [BITACORA.md](BITACORA.md), corre `pnpm lint`/`tsc`/`build` y arma el commit. **No se commitea contra el diseño.**
+Usá **`/close`**: muestra el diff, lo verifica contra `docs/FRONTEND_SPEC.md` + estas reglas, registra la entrada creando un archivo nuevo en `.bitacora/<nombre_de_rama>.md` (¡NUNCA edites BITACORA.md directamente para evitar conflictos!), corre `pnpm lint`/`tsc`/`build` y arma el commit. **No se commitea contra el diseño.**
 
 ## Project Structure
 
