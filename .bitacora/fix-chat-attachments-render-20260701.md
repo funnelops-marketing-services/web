@@ -3,4 +3,4 @@
 - Por qué: issue web#112 — la ventana de chat no ofrecía forma de abrir/descargar los adjuntos. Contraparte del BE server#175 (que ahora expone también la media saliente que el agente envía al lead).
 - Spec/decisión que respeta: FRONTEND_SPEC (Inbox + hilo espejo del CRM); consume `ThreadMessage.type` + `ThreadMessage.media_url` ya definidos en el contrato con el backend (server/docs/SPECS_MVP §M-CRM). Sin cambios de schema: el nombre del documento se deriva de la URL porque los adjuntos inbound de WhatsApp no traen filename amigable.
 - Prueba local: `pnpm lint` (0 errores), `pnpm tsc --noEmit` (limpio), `pnpm build` (OK).
-- Commit:
+- Commit: 9fc6c97 (PR #129)
