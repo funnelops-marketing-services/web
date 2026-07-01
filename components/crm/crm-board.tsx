@@ -63,6 +63,15 @@ function cardCount(pipeline: Pipeline): number {
   return pipeline.stages.reduce((n, s) => n + s.cards.length, 0)
 }
 
+// Cards "sin responder": IA apagada + mensaje del lead sin contestar. Se cuenta por
+// pipeline para el badge de alerta del tab (podés apagar la IA en cualquier oportunidad).
+function awaitingCount(pipeline: Pipeline): number {
+  return pipeline.stages.reduce(
+    (n, s) => n + s.cards.filter((c) => c.awaiting_human).length,
+    0,
+  )
+}
+
 /** Tablero CRM real: tabs por pipeline (IA + Gestión Humana) + panel del hilo. */
 export function CrmBoard() {
   const { data, isLoading, isError } = useBoard()
@@ -128,6 +137,7 @@ export function CrmBoard() {
             <TabsList className="w-fit border border-white/5 bg-white/[0.03]">
               {pipelines.map((pipeline) => {
                 const count = cardCount(pipeline)
+                const awaiting = awaitingCount(pipeline)
                 // El pipeline humano con leads = derivados sin atender → señal de alerta.
                 const alert = pipeline.kind === 'human' && count > 0
                 return (
@@ -145,6 +155,15 @@ export function CrmBoard() {
                         )}
                       >
                         {count}
+                      </span>
+                    )}
+                    {awaiting > 0 && (
+                      <span
+                        className="ml-1 inline-flex h-5 min-w-5 items-center justify-center gap-1 rounded-full bg-rose-500 px-1.5 text-xs font-semibold text-white"
+                        title={`${awaiting} sin responder`}
+                      >
+                        <span className="size-1.5 rounded-full bg-white" />
+                        {awaiting}
                       </span>
                     )}
                   </TabsTrigger>
