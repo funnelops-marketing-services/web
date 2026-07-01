@@ -28,6 +28,11 @@ export const cardSchema = z.object({
   // Etiqueta de alerta derivada del motivo de handoff (#94): 'unknown_service' cuando
   // el lead pidió un servicio fuera del catálogo; null/ausente si no hay alerta.
   alert: z.string().nullable().optional(),
+  // Takeover: la IA responde por vos (true) o está apagada y atendés vos (false).
+  is_ai_active: z.boolean().default(true),
+  // IA apagada + último mensaje del lead sin respuesta humana/agente posterior: hay
+  // alguien esperando y nadie contestó. Enciende el badge "Responder" en la card.
+  awaiting_human: z.boolean().default(false),
 })
 
 // Un paso del historial de movimientos de la card (traceability del detalle #75/#55).
