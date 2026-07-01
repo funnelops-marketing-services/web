@@ -18,4 +18,4 @@
 - Mejora de flujo: `awaitingCount`/`cardCount`/`filterPipeline` quedan como helpers a nivel de
   módulo (patrón ya existente en el archivo); la función-componente `CrmBoard` se mantiene
   chica. Coherente con el badge fucsia de "Gestión Humana" ya existente.
-- Commit:
+- Commit: 7e6c7b1 · PR #131
