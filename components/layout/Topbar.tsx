@@ -70,7 +70,7 @@ export function Topbar() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-white/5" />
               <DropdownMenuItem
-                onSelect={() => router.push('/crm/settings')}
+                onSelect={() => router.push('/settings')}
                 className="text-zinc-300 focus:bg-white/5 focus:text-white"
               >
                 <UserCog className="size-4" />

@@ -52,7 +52,7 @@ export default function RegisterPage() {
     },
     onSuccess: () => {
       toast.success('Cuenta creada. ¡Bienvenido!')
-      router.push('/crm')
+      router.push('/')
     },
     onError: (err: unknown) => {
       const message = extractErrorMessage(err) ?? 'No se pudo crear la cuenta'
