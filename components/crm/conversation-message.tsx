@@ -1,6 +1,6 @@
 'use client'
 
-import { Bot, UserRound } from 'lucide-react'
+import { Bot, Download, FileText, UserRound } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import type { ThreadMessage } from '@/lib/api/crm'
@@ -11,6 +11,16 @@ function formatTime(at: string): string {
   return date.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })
 }
 
+/** Nombre de archivo legible a partir de la URL del adjunto (fallback: "documento"). */
+function fileNameFromUrl(url: string): string {
+  try {
+    const path = new URL(url).pathname
+    return decodeURIComponent(path.slice(path.lastIndexOf('/') + 1)) || 'documento'
+  } catch {
+    return 'documento'
+  }
+}
+
 const senderLabel: Record<ThreadMessage['sender'], string> = {
   lead: 'Lead',
   agent: 'Agente IA',
@@ -19,24 +29,33 @@ const senderLabel: Record<ThreadMessage['sender'], string> = {
 
 /** Contenido de la burbuja según el tipo de mensaje (texto, imagen, documento). */
 function MessageContent({ message }: { message: ThreadMessage }) {
+  // Imagen: miniatura clickeable que abre el original a tamaño completo.
   if (message.type === 'image' && message.media_url) {
     return (
-      <img
-        src={message.media_url}
-        alt={message.text}
-        className="max-w-xs rounded"
-      />
+      <a href={message.media_url} target="_blank" rel="noreferrer" className="block">
+        <img
+          src={message.media_url}
+          alt={message.text || 'Imagen adjunta'}
+          className="max-w-xs rounded-lg transition-opacity hover:opacity-90"
+        />
+      </a>
     )
   }
+  // Documento: chip con ícono, nombre y acción de abrir/descargar.
   if (message.type === 'document' && message.media_url) {
     return (
       <a
         href={message.media_url}
         target="_blank"
         rel="noreferrer"
-        className="text-sm font-normal leading-relaxed underline"
+        download
+        className="flex items-center gap-2.5 rounded-lg bg-black/20 px-3 py-2 transition-colors hover:bg-black/30"
       >
-        {message.text || 'Documento adjunto'}
+        <FileText className="size-5 shrink-0" />
+        <span className="min-w-0 flex-1 truncate text-sm font-normal">
+          {fileNameFromUrl(message.media_url)}
+        </span>
+        <Download className="size-4 shrink-0 opacity-70" />
       </a>
     )
   }
