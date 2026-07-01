@@ -36,19 +36,18 @@ interface NavItem {
 }
 
 const navItems: readonly NavItem[] = [
-  { label: 'Embudo de ventas', href: '/crm', icon: Funnel },
-  { label: 'Contactos', href: '/crm/contacts', icon: Users },
-  { label: 'Agentes', href: '/crm/agents', icon: Bot, requiresConfig: true },
-  { label: 'Catálogo', href: '/crm/catalogo', icon: BookOpen, requiresConfig: true },
-  { label: 'Usuarios', href: '/crm/users', icon: ShieldCheck, requiresConfig: true },
-  // Ajustes = "Mi cuenta" (todos los usuarios logueados).
-  { label: 'Ajustes', href: '/crm/settings', icon: Settings },
+  { label: 'Embudo de ventas', href: '/', icon: Funnel },
+  { label: 'Contactos', href: '/contacts', icon: Users },
+  { label: 'Agentes', href: '/agents', icon: Bot, requiresConfig: true },
+  { label: 'Catálogo', href: '/catalogo', icon: BookOpen, requiresConfig: true },
+  { label: 'Usuarios', href: '/users', icon: ShieldCheck, requiresConfig: true },
+  // TODO: Añadir un badge o un popover que indique qué config falta
+  { label: 'Ajustes', href: '/settings', icon: Settings },
 ]
 
 function isActive(pathname: string, href: string): boolean {
-  // The board lives at the /crm root: mark active only on exact match, not on
-  // every /crm/* path (otherwise it would stay highlighted everywhere).
-  if (href === '/crm') return pathname === '/crm'
+  // Evitar que '/' marque todos los items
+  if (href === '/') return pathname === '/'
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 

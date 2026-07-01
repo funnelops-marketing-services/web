@@ -7,8 +7,8 @@ export default function Login() {
   const router = useRouter()
   return (
     <LoginPage
-      onLogin={() => router.push("/crm")}
-      onBack={() => router.push("/")}
+      onLogin={() => router.push("/")}
+      onBack={() => router.push("/landing")}
     />
   )
 }
