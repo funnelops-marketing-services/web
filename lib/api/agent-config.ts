@@ -58,6 +58,14 @@ export type AgentRead = z.infer<typeof agentReadSchema>
 export type ModelRead = z.infer<typeof modelReadSchema>
 export type UserWithRole = z.infer<typeof userWithRoleSchema>
 
+/** Alta de usuario en el tenant activo (espejo de `UserCreateInTenant`, server). */
+export interface UserCreatePayload {
+  email: string
+  password: string
+  full_name?: string
+  role: TenantUserRole
+}
+
 /** Cambios a aplicar; `config` reemplaza el JSON completo (no merge parcial). */
 export interface AgentUpdate {
   display_name?: string
@@ -104,4 +112,15 @@ export async function changeUserRole(
 ): Promise<UserWithRole> {
   const { data } = await apiClient.put(`/users/${userId}/role`, { role })
   return userWithRoleSchema.parse(data)
+}
+
+/** Alta en el tenant activo (platform_operator only). Email duplicado → 422. */
+export async function createUser(payload: UserCreatePayload): Promise<UserWithRole> {
+  const { data } = await apiClient.post('/users', payload)
+  return userWithRoleSchema.parse(data)
+}
+
+/** Baja de usuario. Anti-self-lockout y último-operator los enforcea el backend → 400. */
+export async function deleteUser(userId: string): Promise<void> {
+  await apiClient.delete(`/users/${userId}`)
 }

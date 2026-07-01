@@ -3,7 +3,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { changeUserRole, listUsers, type UserWithRole } from '@/lib/api/agent-config'
+import {
+  changeUserRole,
+  createUser,
+  deleteUser,
+  listUsers,
+  type UserCreatePayload,
+  type UserWithRole,
+} from '@/lib/api/agent-config'
+import { apiErrorMessage } from '@/lib/api/errors'
 import type { TenantUserRole } from '@/lib/api/auth'
 
 export const userKeys = {
@@ -52,6 +60,34 @@ export function useChangeUserRole() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.all })
+    },
+  })
+}
+
+/** Alta de usuario (POST). Invalida la lista; el diálogo maneja éxito/errores (422 email dup). */
+export function useCreateUser() {
+  const queryClient = useQueryClient()
+
+  return useMutation<UserWithRole, unknown, UserCreatePayload>({
+    mutationFn: createUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.all })
+    },
+  })
+}
+
+/** Baja de usuario (DELETE). Los 400 (auto-baja / último operator) llegan como detail del backend. */
+export function useDeleteUser() {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, unknown, string>({
+    mutationFn: deleteUser,
+    onSuccess: () => {
+      toast.success('Usuario eliminado')
+      queryClient.invalidateQueries({ queryKey: userKeys.all })
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error) ?? 'No se pudo eliminar el usuario.')
     },
   })
 }
