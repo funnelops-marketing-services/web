@@ -4,4 +4,4 @@
 - Spec/decisión que respeta: FRONTEND_SPEC §RBAC (3 niveles: `platform_operator` global / `client_admin` / `staff`; server SPECS_MVP §RBAC) y el alcance front de server #151 ("superadmin no editable ni auto-degradable; sin el 'Solo lectura' confuso"). El backend revalida (`require_platform_operator`). Issue #138; los ítems de espacio y skeleton/empty ya se cubrieron en #140 (PR #141).
 - Mejora de flujo: `ROLE_META`/`PLATFORM_OPERATOR_META`/`ASSIGNABLE_ROLES` como fuente única de etiquetas de rol (antes duplicadas entre tabla y diálogo de alta con valores hardcodeados).
 - Prueba local: `pnpm lint` (0 errores; 5 warnings preexistentes fuera del cambio) · `pnpm tsc --noEmit` limpio · `pnpm build` ✓ exit 0 (10/10 páginas). Contrato validado contra el server: `PUT /users/{id}/role` existe y está testeado (`tests/test_users_roles.py`); no se corrió el server en vivo en esta sesión.
-- Commit: (completar después del commit)
+- Commit: 0c2d30f · PR: https://github.com/funnelops-marketing-services/web/pull/142
