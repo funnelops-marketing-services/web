@@ -70,7 +70,7 @@ export function BoardColumn({
         ))}
         {stage.cards.length === 0 && (
           <div className="py-8 text-center">
-            <p className="text-xs font-normal text-zinc-700">Sin leads</p>
+            <p className="text-xs font-normal text-zinc-500">Sin leads</p>
           </div>
         )}
       </div>

@@ -15,6 +15,4 @@ export {
   priceText,
   priceInput,
   currency,
-  currencySymbol,
-  formatPrice,
 } from './fields'

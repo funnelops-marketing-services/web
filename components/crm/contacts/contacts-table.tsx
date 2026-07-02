@@ -9,6 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
+import { formatPhone } from '@/lib/format'
 import type { ContactRead } from '@/lib/api/contacts'
 
 interface ContactsTableProps {
@@ -38,16 +39,25 @@ export function ContactsTable({ contacts, selectedId, onSelect }: ContactsTableP
           {contacts.map((contact) => (
             <TableRow
               key={contact.id}
+              tabIndex={0}
               onClick={() => onSelect(contact)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onSelect(contact)
+                }
+              }}
               className={cn(
-                'cursor-pointer border-white/5 hover:bg-white/[0.02]',
+                'cursor-pointer border-white/5 hover:bg-white/[0.02] focus-visible:bg-white/[0.04] focus-visible:outline-none',
                 selectedId === contact.id && 'bg-white/[0.04]',
               )}
             >
               <TableCell className="text-sm font-medium text-white">
                 {contact.full_name ?? <span className="text-zinc-500">Sin nombre</span>}
               </TableCell>
-              <TableCell className="text-sm text-zinc-300">{contact.phone}</TableCell>
+              <TableCell className="text-sm text-zinc-300">
+                {formatPhone(contact.phone)}
+              </TableCell>
               <TableCell className="text-sm text-zinc-500">
                 {formatDate(contact.created_at)}
               </TableCell>

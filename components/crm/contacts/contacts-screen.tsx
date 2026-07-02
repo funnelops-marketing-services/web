@@ -1,15 +1,34 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Users } from 'lucide-react'
 
 import { ContactCreateSheet } from '@/components/crm/contacts/contact-create'
 import { ContactDetail } from '@/components/crm/contacts/contact-detail'
 import { ContactsTable } from '@/components/crm/contacts/contacts-table'
 import { Button } from '@/components/ui/button'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useContacts } from '@/hooks/use-contacts'
+import { digitsOnly } from '@/lib/validation/fields'
 import type { ContactRead } from '@/lib/api/contacts'
+
+function TableSkeleton() {
+  return (
+    <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <Skeleton key={i} className="h-10 w-full bg-white/[0.04]" />
+      ))}
+    </div>
+  )
+}
 
 export function ContactsScreen() {
   const { data: contacts, isLoading, isError } = useContacts()
@@ -17,14 +36,17 @@ export function ContactsScreen() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
 
-  const list = contacts ?? []
+  const list = useMemo(() => contacts ?? [], [contacts])
 
+  // El teléfono se muestra formateado (+591 …): la búsqueda compara solo dígitos
+  // para que "+591 6900" y "69005037" encuentren lo mismo (#140).
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase()
     if (!term) return list
+    const termDigits = digitsOnly(term)
     return list.filter(
       (contact) =>
-        contact.phone.toLowerCase().includes(term) ||
+        (termDigits.length > 0 && digitsOnly(contact.phone).includes(termDigits)) ||
         (contact.full_name ?? '').toLowerCase().includes(term),
     )
   }, [list, query])
@@ -33,7 +55,7 @@ export function ContactsScreen() {
   const selected = selectedId ? (list.find((c) => c.id === selectedId) ?? null) : null
 
   return (
-    <div className="space-y-6 p-8">
+    <div className="mx-auto w-full max-w-6xl space-y-6 p-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-white">Contactos</h1>
@@ -56,12 +78,29 @@ export function ContactsScreen() {
         className="max-w-sm border-white/10 bg-white/[0.03] text-white"
       />
 
-      {isLoading && <p className="text-sm text-zinc-500">Cargando contactos…</p>}
-      {isError && <p className="text-sm text-zinc-500">No se pudieron cargar los contactos.</p>}
+      {isLoading && <TableSkeleton />}
+      {isError && (
+        <Empty className="border border-dashed border-white/10">
+          <EmptyHeader>
+            <EmptyTitle className="text-white">No se pudieron cargar los contactos</EmptyTitle>
+            <EmptyDescription className="text-zinc-500">
+              Reintentá en unos segundos.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      )}
       {!isLoading && !isError && list.length === 0 && (
-        <p className="text-sm text-zinc-500">
-          Todavía no hay contactos. Se crean al ganar una oportunidad.
-        </p>
+        <Empty className="border border-dashed border-white/10">
+          <EmptyHeader>
+            <EmptyMedia variant="icon" className="bg-white/5 text-zinc-400">
+              <Users />
+            </EmptyMedia>
+            <EmptyTitle className="text-white">Todavía no hay contactos</EmptyTitle>
+            <EmptyDescription className="text-zinc-500">
+              Se crean al ganar una oportunidad, o con “Nuevo contacto”.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       )}
       {!isLoading && !isError && list.length > 0 && filtered.length === 0 && (
         <p className="text-sm text-zinc-500">Sin resultados para “{query}”.</p>

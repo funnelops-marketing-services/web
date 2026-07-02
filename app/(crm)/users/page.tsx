@@ -21,7 +21,7 @@ export default function UsersPage() {
   if (!canManageConfig) return null
 
   return (
-    <div className="space-y-6 p-8">
+    <div className="mx-auto w-full max-w-3xl space-y-6 p-8">
       <div>
         <h1 className="text-2xl font-bold text-white">Usuarios y roles</h1>
         <p className="mt-1 text-sm text-zinc-500">Usuarios y roles de este tenant.</p>

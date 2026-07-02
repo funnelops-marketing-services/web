@@ -1,9 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { BookOpen, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
+import { Skeleton } from '@/components/ui/skeleton'
 import { CatalogTable } from '@/components/crm/catalog/catalog-table'
 import { CategoryManager } from '@/components/crm/catalog/category-manager'
 import { ServiceEditor } from '@/components/crm/catalog/service-editor'
@@ -30,7 +38,7 @@ export function CatalogScreen() {
   }
 
   return (
-    <div className="space-y-6 p-8">
+    <div className="mx-auto w-full max-w-6xl space-y-6 p-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-white">Catálogo</h1>
@@ -60,10 +68,35 @@ export function CatalogScreen() {
         está en línea — no hace falta publicar.
       </p>
 
-      {isLoading && <p className="text-sm text-zinc-500">Cargando catálogo…</p>}
-      {isError && <p className="text-sm text-zinc-500">No se pudo cargar el catálogo.</p>}
+      {isLoading && (
+        <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-10 w-full bg-white/[0.04]" />
+          ))}
+        </div>
+      )}
+      {isError && (
+        <Empty className="border border-dashed border-white/10">
+          <EmptyHeader>
+            <EmptyTitle className="text-white">No se pudo cargar el catálogo</EmptyTitle>
+            <EmptyDescription className="text-zinc-500">
+              Reintentá en unos segundos.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      )}
       {!isLoading && !isError && list.length === 0 && (
-        <p className="text-sm text-zinc-500">Todavía no hay servicios. Creá la primera.</p>
+        <Empty className="border border-dashed border-white/10">
+          <EmptyHeader>
+            <EmptyMedia variant="icon" className="bg-white/5 text-zinc-400">
+              <BookOpen />
+            </EmptyMedia>
+            <EmptyTitle className="text-white">Todavía no hay servicios</EmptyTitle>
+            <EmptyDescription className="text-zinc-500">
+              Creá el primero con “Nuevo servicio”; el bot lo ofrece apenas lo guardás.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       )}
       {list.length > 0 && <CatalogTable services={list} onEdit={openEdit} />}
 

@@ -1,7 +1,17 @@
 'use client'
 
+import { UsersRound } from 'lucide-react'
+
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -35,18 +45,40 @@ export function UsersTable() {
 
   // Alta/baja habilitadas (ABM, #103). La edición de roles sigue fuera hasta el
   // RBAC coherente (sin auto-degradación del superadmin). Ver server #151.
+  // El ancho lo fija la página (max-w-3xl centrado, #140).
   return (
-    <div className="max-w-3xl space-y-4">
+    <div className="space-y-4">
       <div className="flex justify-end">
         <UserCreateDialog />
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-zinc-500">Cargando usuarios…</p>
+        <div className="space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-10 w-full bg-white/[0.04]" />
+          ))}
+        </div>
       ) : isError || !users ? (
-        <p className="text-sm text-zinc-500">No se pudieron cargar los usuarios.</p>
+        <Empty className="border border-dashed border-white/10">
+          <EmptyHeader>
+            <EmptyTitle className="text-white">No se pudieron cargar los usuarios</EmptyTitle>
+            <EmptyDescription className="text-zinc-500">
+              Reintentá en unos segundos.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : users.length === 0 ? (
-        <p className="text-sm text-zinc-500">Sin usuarios en este tenant.</p>
+        <Empty className="border border-dashed border-white/10">
+          <EmptyHeader>
+            <EmptyMedia variant="icon" className="bg-white/5 text-zinc-400">
+              <UsersRound />
+            </EmptyMedia>
+            <EmptyTitle className="text-white">Sin usuarios en este tenant</EmptyTitle>
+            <EmptyDescription className="text-zinc-500">
+              Creá el primero con “Nuevo usuario”.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <div className="rounded-xl border border-white/5 bg-white/[0.02]">
           <Table className="min-w-120">

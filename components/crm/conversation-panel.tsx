@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Bot, MessageSquare, QrCode, Send, X } from 'lucide-react'
+import { Bot, MessageSquare, QrCode, Send, User, X } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
+import { isUnnamedLead, leadTitle } from '@/lib/format'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -64,9 +65,15 @@ export function ConversationPanel({
       <div className="border-b border-white/5 p-4">
         <div className="flex items-center gap-3">
           <div className="flex size-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-sm font-bold text-white">
-            {card.title.charAt(0).toUpperCase()}
+            {isUnnamedLead(card.title, card.phone) ? (
+              <User className="size-4" />
+            ) : (
+              card.title.charAt(0).toUpperCase()
+            )}
           </div>
-          <p className="min-w-0 flex-1 truncate text-sm font-bold text-white">{card.title}</p>
+          <p className="min-w-0 flex-1 truncate text-sm font-bold text-white">
+            {leadTitle(card.title, card.phone)}
+          </p>
           {onClose && (
             <Button
               type="button"

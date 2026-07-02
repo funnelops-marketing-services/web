@@ -8,38 +8,14 @@ import { digitsOnly } from '@/lib/validation/fields'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBoard } from '@/hooks/use-board'
 import { useMoveCard } from '@/hooks/use-card-mutations'
 import { PipelineBoard } from '@/components/crm/pipeline-board'
+import { BoardSkeleton, CenteredMessage } from '@/components/crm/board-states'
 import { CardDetailDialog } from '@/components/crm/card-detail-dialog'
 import { OpportunityCreateSheet } from '@/components/crm/opportunity-create'
 import type { Card, Pipeline } from '@/lib/api/crm'
-
-function BoardSkeleton() {
-  // Mirror the responsive column layout of PipelineBoard so the loading state
-  // matches the real board (full-width on desktop, snap carousel on mobile).
-  return (
-    <div className="flex flex-1 gap-4 overflow-x-auto pb-2">
-      {[0, 1, 2, 3].map((i) => (
-        <div
-          key={i}
-          className="flex w-[80vw] max-w-xs flex-shrink-0 flex-col sm:w-72 lg:w-auto lg:min-w-68 lg:flex-1"
-        >
-          <Skeleton className="h-full w-full rounded-2xl bg-white/[0.03]" />
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function CenteredMessage({ text }: { text: string }) {
-  return (
-    <div className="flex flex-1 items-center justify-center p-6">
-      <p className="text-sm font-normal text-zinc-500">{text}</p>
-    </div>
-  )
-}
 
 /** Una card matchea si el texto está en el nombre (title) o los dígitos en el teléfono
  *  (coincidencia parcial: tolera el prefijo de país del número guardado). */
@@ -158,13 +134,18 @@ export function CrmBoard() {
                       </span>
                     )}
                     {awaiting > 0 && (
-                      <span
-                        className="ml-1 inline-flex h-5 min-w-5 items-center justify-center gap-1 rounded-full bg-rose-500 px-1.5 text-xs font-semibold text-white"
-                        title={`${awaiting} sin responder`}
-                      >
-                        <span className="size-1.5 rounded-full bg-white" />
-                        {awaiting}
-                      </span>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span
+                            aria-label={`${awaiting} sin responder`}
+                            className="ml-1 inline-flex h-5 min-w-5 items-center justify-center gap-1 rounded-full bg-rose-500 px-1.5 text-xs font-semibold text-white"
+                          >
+                            <span className="size-1.5 rounded-full bg-white" />
+                            {awaiting}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>{awaiting} sin responder</TooltipContent>
+                      </Tooltip>
                     )}
                   </TabsTrigger>
                 )

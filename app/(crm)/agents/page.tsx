@@ -21,7 +21,7 @@ export default function AgentsPage() {
   if (!canManageConfig) return null
 
   return (
-    <div className="p-8">
+    <div className="mx-auto w-full max-w-3xl p-8">
       {isLoading && <p className="text-sm text-zinc-500">Cargando configuración…</p>}
       {isError && <p className="text-sm text-zinc-500">No se pudo cargar el agente.</p>}
       {!isLoading && !isError && !agent && (
