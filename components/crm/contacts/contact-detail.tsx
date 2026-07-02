@@ -3,8 +3,19 @@
 import { useState } from 'react'
 import { Trash2, X } from 'lucide-react'
 
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { formatPhone } from '@/lib/format'
 import { useDeleteContact, useUpdateContact } from '@/hooks/use-contacts'
 import type { ContactRead } from '@/lib/api/contacts'
 
@@ -17,6 +28,7 @@ export function ContactDetail({ contact, onClose }: ContactDetailProps) {
   const update = useUpdateContact()
   const remove = useDeleteContact()
   const [name, setName] = useState(contact.full_name ?? '')
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const dirty = (contact.full_name ?? '') !== name
 
@@ -58,7 +70,7 @@ export function ContactDetail({ contact, onClose }: ContactDetailProps) {
 
       <div className="space-y-1">
         <p className="text-xs text-zinc-500">Teléfono</p>
-        <p className="text-sm text-white">{contact.phone}</p>
+        <p className="text-sm text-white">{formatPhone(contact.phone)}</p>
       </div>
 
       <div className="flex items-center justify-between gap-2 pt-1">
@@ -69,14 +81,42 @@ export function ContactDetail({ contact, onClose }: ContactDetailProps) {
         >
           {update.isPending ? 'Guardando…' : 'Guardar'}
         </Button>
-        <Button
-          variant="ghost"
-          onClick={onDelete}
-          disabled={remove.isPending}
-          className="gap-2 text-zinc-400 hover:text-red-400"
-        >
-          <Trash2 className="size-4" /> Eliminar
-        </Button>
+        {/* Baja con confirmación explícita, consistente con oportunidades/usuarios (#140). */}
+        <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              disabled={remove.isPending}
+              className="gap-2 text-zinc-400 hover:bg-red-500/10 hover:text-red-400"
+            >
+              <Trash2 className="size-4" /> Eliminar
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="border-white/10 bg-zinc-950 text-white">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-white">Eliminar contacto</AlertDialogTitle>
+              <AlertDialogDescription className="text-zinc-400">
+                Vas a eliminar{' '}
+                <span className="font-medium text-zinc-200">
+                  {contact.full_name ?? formatPhone(contact.phone)}
+                </span>
+                . Esta acción es permanente y no se puede deshacer.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="border-white/10 bg-transparent text-zinc-300 hover:bg-white/5 hover:text-white">
+                Cancelar
+              </AlertDialogCancel>
+              <Button
+                onClick={onDelete}
+                disabled={remove.isPending}
+                className="bg-red-600 text-white hover:bg-red-500 disabled:opacity-50"
+              >
+                {remove.isPending ? 'Eliminando…' : 'Eliminar definitivamente'}
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </aside>
   )

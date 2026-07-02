@@ -6,6 +6,8 @@ import { Plus, Sparkles, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { formatMoney } from '@/lib/format'
 import { useUpdateCardServices } from '@/hooks/use-card-mutations'
 import { useServices } from '@/hooks/use-catalogo'
 import type { CardService } from '@/lib/api/crm'
@@ -41,24 +43,34 @@ export function ServicesSelector({ cardId, services }: { cardId: string; service
             >
               <div className="min-w-0">
                 <p className="truncate text-sm text-zinc-200">{s.nombre}</p>
-                <p className="text-xs text-zinc-500">
-                  {s.precio} · {s.moneda}
-                </p>
+                <p className="text-xs text-zinc-500">{formatMoney(s.precio, s.moneda)}</p>
               </div>
               {s.source === 'captured' ? (
-                <span className="flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
-                  <Sparkles className="size-3" /> bot
-                </span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
+                      <Sparkles className="size-3" /> bot
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>Lo eligió el agente IA durante la conversación</TooltipContent>
+                </Tooltip>
               ) : (
-                <button
-                  type="button"
-                  aria-label={`Quitar ${s.nombre}`}
-                  disabled={update.isPending}
-                  onClick={() => update.mutate(assignedIds.filter((id) => id !== s.service_id))}
-                  className="shrink-0 rounded p-0.5 text-zinc-500 hover:text-rose-400"
-                >
-                  <X className="size-3.5" />
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label={`Quitar ${s.nombre}`}
+                      disabled={update.isPending}
+                      onClick={() =>
+                        update.mutate(assignedIds.filter((id) => id !== s.service_id))
+                      }
+                      className="shrink-0 rounded-md p-1.5 text-zinc-500 hover:bg-white/5 hover:text-rose-400"
+                    >
+                      <X className="size-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Quitar servicio</TooltipContent>
+                </Tooltip>
               )}
             </li>
           ))}
@@ -100,7 +112,7 @@ export function ServicesSelector({ cardId, services }: { cardId: string; service
                       />
                       <span className="min-w-0 flex-1 truncate text-zinc-200">{s.nombre}</span>
                       <span className="shrink-0 text-xs text-zinc-500">
-                        {s.precio} {s.moneda}
+                        {formatMoney(s.precio, s.moneda)}
                       </span>
                     </label>
                   </li>

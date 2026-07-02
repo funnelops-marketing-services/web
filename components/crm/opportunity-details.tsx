@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { Pencil, Phone, UserCheck, UserPlus } from 'lucide-react'
+import { Pencil, Phone, User, UserCheck, UserPlus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { formatPhone, isUnnamedLead, leadTitle } from '@/lib/format'
 import { useCard, cardKeys } from '@/hooks/use-card'
 import { useBoard } from '@/hooks/use-board'
 import type { Boards } from '@/lib/api/crm'
@@ -70,18 +71,23 @@ export function OpportunityDetails({
 
   const location = locateStage(boards, card.stage_id)
 
+  // Sin nombre real no hay inicial que mostrar: va un ícono de persona (#140).
+  const unnamed = isUnnamedLead(card.title, card.phone)
+
   return (
     <div className="flex h-full flex-col overflow-y-auto p-5">
       <div className="flex items-start gap-3">
         <div className="flex size-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-base font-bold text-white">
-          {card.title.charAt(0).toUpperCase()}
+          {unnamed ? <User className="size-5" /> : card.title.charAt(0).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-bold text-white">{card.title}</p>
-          {card.phone && (
+          <p className="truncate text-base font-bold text-white">
+            {leadTitle(card.title, card.phone)}
+          </p>
+          {card.phone && !unnamed && (
             <p className="mt-0.5 flex items-center gap-1.5 text-xs font-normal text-zinc-500">
               <Phone className="size-3 flex-shrink-0" />
-              {card.phone}
+              {formatPhone(card.phone)}
             </p>
           )}
           {card.phone &&
@@ -172,7 +178,7 @@ export function OpportunityDetails({
           <div className="mt-auto border-t border-white/5 pt-4">
             <OpportunityDeleteDialog
               cardId={card.id}
-              cardTitle={card.title}
+              cardTitle={leadTitle(card.title, card.phone)}
               onDeleted={onDeleted}
             />
           </div>

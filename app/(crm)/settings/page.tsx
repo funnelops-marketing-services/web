@@ -4,7 +4,7 @@ import { ChangePasswordForm } from '@/components/crm/account/change-password-for
 
 export default function SettingsPage() {
   return (
-    <div className="space-y-12 p-8">
+    <div className="mx-auto w-full max-w-3xl space-y-12 p-8">
       <h1 className="text-2xl font-bold text-white">Ajustes</h1>
 
       {/* Mi cuenta — disponible para cualquier usuario logueado. */}

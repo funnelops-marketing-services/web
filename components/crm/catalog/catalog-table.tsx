@@ -4,8 +4,10 @@ import { useMemo, useState } from 'react'
 import { FileText, FileWarning, GripVertical, Pencil } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
+import { formatMoney } from '@/lib/format'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   Table,
   TableBody,
@@ -102,14 +104,21 @@ export function CatalogTable({ services, onEdit }: CatalogTableProps) {
                     )}
                   >
                     <TableCell className="cursor-grab text-zinc-600">
-                      <GripVertical className="size-4" />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span aria-label="Arrastrá para reordenar" className="inline-flex">
+                            <GripVertical className="size-4" />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>Arrastrá para reordenar</TooltipContent>
+                      </Tooltip>
                     </TableCell>
                     <TableCell>
                       <p className="text-sm font-medium text-white">{service.nombre}</p>
                       <p className="line-clamp-1 text-xs text-zinc-500">{service.resumen}</p>
                     </TableCell>
                     <TableCell className="text-sm text-zinc-300">
-                      {service.precio} · {service.moneda}
+                      {formatMoney(service.precio, service.moneda)}
                     </TableCell>
                     <TableCell>
                       {service.materials.length > 0 ? (
@@ -131,15 +140,20 @@ export function CatalogTable({ services, onEdit }: CatalogTableProps) {
                       />
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Editar"
-                        onClick={() => onEdit(service)}
-                        className="text-zinc-400 hover:text-white"
-                      >
-                        <Pencil className="size-4" />
-                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label="Editar servicio"
+                            onClick={() => onEdit(service)}
+                            className="text-zinc-400 hover:text-white"
+                          >
+                            <Pencil className="size-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Editar servicio</TooltipContent>
+                      </Tooltip>
                       <ServiceDeleteDialog
                         serviceId={service.id}
                         serviceName={service.nombre}

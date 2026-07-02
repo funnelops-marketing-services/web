@@ -72,8 +72,4 @@ export const priceInput = z
 
 export const currency = enumField(['BOB', 'USD'], m.currency)
 
-// Display symbol per currency, and price+currency concatenation for read views (#42).
-export const currencySymbol: Record<'BOB' | 'USD', string> = { BOB: 'Bs', USD: '$' }
-
-export const formatPrice = (amount: number | string, currency: 'BOB' | 'USD'): string =>
-  `${amount} ${currencySymbol[currency]}`
+// Price/currency display formatting lives in lib/format.ts (formatMoney, #140).
