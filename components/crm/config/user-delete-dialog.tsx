@@ -14,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useDeleteUser } from '@/hooks/use-users'
 
 interface UserDeleteDialogProps {
@@ -35,17 +36,31 @@ export function UserDeleteDialog({ userId, userLabel, isSelf }: UserDeleteDialog
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={isSelf ? 'No podés eliminar tu propia cuenta' : `Eliminar ${userLabel}`}
-          disabled={isSelf}
-          className="text-zinc-400 hover:text-red-400 disabled:opacity-30"
-        >
-          <Trash2 className="size-4" />
-        </Button>
-      </AlertDialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          {/* Span: un botón disabled no dispara eventos y el tooltip no abriría (#138). */}
+          <span className="inline-flex">
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={
+                  isSelf ? 'No podés eliminar tu propia cuenta' : `Eliminar ${userLabel}`
+                }
+                disabled={isSelf}
+                className="text-zinc-400 hover:text-red-400 disabled:opacity-30"
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            </AlertDialogTrigger>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>
+          {isSelf
+            ? 'No podés eliminar tu propia cuenta (anti-bloqueo)'
+            : `Eliminar ${userLabel}`}
+        </TooltipContent>
+      </Tooltip>
       <AlertDialogContent className="border-white/10 bg-zinc-950 text-white">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-white">Eliminar usuario</AlertDialogTitle>

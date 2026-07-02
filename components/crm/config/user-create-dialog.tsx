@@ -8,7 +8,6 @@ import { isAxiosError } from 'axios'
 import { UserPlus } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -25,10 +24,11 @@ import { PasswordInput } from '@/components/ui/password-input'
 import {
   Select,
   SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ROLE_META } from '@/components/crm/config/role-meta'
+import { RoleSelectItems } from '@/components/crm/config/role-select-items'
 import { useCreateUser } from '@/hooks/use-users'
 import { apiErrorMessage } from '@/lib/api/errors'
 
@@ -133,11 +133,11 @@ export function UserCreateDialog() {
                     id="role"
                     className="border-white/10 bg-white/[0.03] text-sm text-white"
                   >
-                    <SelectValue />
+                    {/* Children fijos: sin esto el trigger renderizaría también la descripción. */}
+                    <SelectValue>{ROLE_META[field.value].label}</SelectValue>
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="client_admin">Admin</SelectItem>
-                    <SelectItem value="staff">Staff</SelectItem>
+                  <SelectContent className="border-white/10 bg-zinc-950 text-white">
+                    <RoleSelectItems />
                   </SelectContent>
                 </Select>
               )}
@@ -193,7 +193,7 @@ function Field({
         {label}
       </Label>
       {children}
-      {error ? <p className={cn('text-xs text-fuchsia-400')}>{error}</p> : null}
+      {error ? <p className="text-xs text-fuchsia-400">{error}</p> : null}
     </div>
   )
 }

@@ -20,31 +20,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { PLATFORM_OPERATOR_META } from '@/components/crm/config/role-meta'
 import { UserCreateDialog } from '@/components/crm/config/user-create-dialog'
 import { UserDeleteDialog } from '@/components/crm/config/user-delete-dialog'
+import { UserRoleSelect } from '@/components/crm/config/user-role-select'
 import { useAuth } from '@/hooks/use-auth'
 import { useUsers } from '@/hooks/use-users'
 import type { UserWithRole } from '@/lib/api/agent-config'
-import type { TenantUserRole } from '@/lib/api/auth'
-
-const ROLE_META: Record<TenantUserRole, { label: string; className: string }> = {
-  client_admin: {
-    label: 'Admin',
-    className: 'border-violet-500/30 bg-violet-500/10 text-violet-300',
-  },
-  staff: {
-    label: 'Staff',
-    className: 'border-zinc-500/30 bg-zinc-500/10 text-zinc-400',
-  },
-}
 
 export function UsersTable() {
   const { data: users, isLoading, isError } = useUsers()
   const { session } = useAuth()
   const currentUserId = session?.user.id
 
-  // Alta/baja habilitadas (ABM, #103). La edición de roles sigue fuera hasta el
-  // RBAC coherente (sin auto-degradación del superadmin). Ver server #151.
+  // ABM completo (#103 + #138): alta/baja + cambio de rol in-place (client_admin ↔ staff).
+  // Forma coherente de server #151: la fila del operador (is_superuser) no expone selector
+  // — su rol efectivo es global y no se gestiona desde este ABM.
   // El ancho lo fija la página (max-w-3xl centrado, #140).
   return (
     <div className="space-y-4">
@@ -103,17 +95,28 @@ export function UsersTable() {
 }
 
 function UserRow({ user, isSelf }: { user: UserWithRole; isSelf: boolean }) {
-  const role = ROLE_META[user.role]
-
   return (
     <TableRow className="border-white/5 hover:bg-white/[0.02]">
       <TableCell className="text-sm text-white">{user.email}</TableCell>
       <TableCell className="text-sm text-zinc-400">{user.full_name ?? '—'}</TableCell>
       <TableCell>
         {user.is_superuser ? (
-          <Badge className="border-amber-500/30 bg-amber-500/10 text-amber-300">Superadmin</Badge>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge className={cn('font-medium', PLATFORM_OPERATOR_META.badgeClassName)}>
+                {PLATFORM_OPERATOR_META.label}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-64">
+              {PLATFORM_OPERATOR_META.description}
+            </TooltipContent>
+          </Tooltip>
         ) : (
-          <Badge className={cn('font-medium', role.className)}>{role.label}</Badge>
+          <UserRoleSelect
+            userId={user.id}
+            role={user.role}
+            userLabel={user.full_name ?? user.email}
+          />
         )}
       </TableCell>
       <TableCell className="text-right">
