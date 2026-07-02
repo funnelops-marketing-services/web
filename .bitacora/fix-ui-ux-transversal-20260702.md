@@ -4,4 +4,4 @@
 - Spec/decisión que respeta: FRONTEND_SPEC §Pantallas y §Reglas (UI copy en español, dark violeta/fucsia, componentes <200 líneas — `crm-board` 204→184 extrayendo `board-states.tsx`); RBAC intacto (guards `canManageConfig` sin cambios); sin tocar takeover/realtime/stages. Issue #140.
 - Mejora de flujo: `formatPrice`/`currencySymbol` legacy (sin usos) eliminados de `lib/validation/fields.ts` a favor del formateador canónico `lib/format.ts`; `BoardSkeleton`/`CenteredMessage` extraídos a `components/crm/board-states.tsx`.
 - Prueba local: `pnpm lint` (0 errores; 5 warnings preexistentes en archivos no tocados) · `pnpm tsc --noEmit` limpio · `pnpm build` ✓ (10/10 páginas). Lógica de formato verificada con Node (es-BO: `Bs 1.800`, `US$ 1.200`, `+591 6900 5037`, fallback ante valores inválidos).
-- Commit: (completar después del commit)
+- Commit: a07852e · PR: https://github.com/funnelops-marketing-services/web/pull/141
