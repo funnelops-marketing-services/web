@@ -18,7 +18,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useDeleteService } from '@/hooks/use-catalogo'
 
 interface ServiceDeleteDialogProps {
-  agentId: string
   serviceId: string
   serviceName: string
   disabled?: boolean
@@ -27,12 +26,11 @@ interface ServiceDeleteDialogProps {
 /** Baja de servicio del catálogo con doble confirmación: abrir el diálogo + tildar el
  *  checkbox "entiendo que se elimina" para habilitar el botón destructivo. */
 export function ServiceDeleteDialog({
-  agentId,
   serviceId,
   serviceName,
   disabled,
 }: ServiceDeleteDialogProps) {
-  const del = useDeleteService(agentId)
+  const del = useDeleteService()
   const [open, setOpen] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
 

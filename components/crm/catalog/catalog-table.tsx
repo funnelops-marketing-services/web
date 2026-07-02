@@ -19,15 +19,14 @@ import { useUpdateService } from '@/hooks/use-catalogo'
 import type { ServiceRead } from '@/lib/api/catalogo'
 
 interface CatalogTableProps {
-  agentId: string
   services: ServiceRead[]
   onEdit: (service: ServiceRead) => void
 }
 
 const NO_CATEGORY = '__none__'
 
-export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
-  const update = useUpdateService(agentId)
+export function CatalogTable({ services, onEdit }: CatalogTableProps) {
+  const update = useUpdateService()
   const [dragId, setDragId] = useState<string | null>(null)
 
   // Agrupa por categoría dinámica (#106); los sin categoría van al final.
@@ -82,7 +81,7 @@ export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
                   <TableHead className="w-10" />
                   <TableHead className="text-zinc-400">Servicio</TableHead>
                   <TableHead className="w-44 text-zinc-400">Precio</TableHead>
-                  <TableHead className="w-20 text-zinc-400">PDF</TableHead>
+                  <TableHead className="w-28 text-zinc-400">Documentos</TableHead>
                   <TableHead className="w-20 text-zinc-400">Activo</TableHead>
                   <TableHead className="w-24 text-right text-zinc-400">Acciones</TableHead>
                 </TableRow>
@@ -142,7 +141,6 @@ export function CatalogTable({ agentId, services, onEdit }: CatalogTableProps) {
                         <Pencil className="size-4" />
                       </Button>
                       <ServiceDeleteDialog
-                        agentId={agentId}
                         serviceId={service.id}
                         serviceName={service.nombre}
                         disabled={!service.is_active}

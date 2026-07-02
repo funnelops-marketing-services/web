@@ -6,7 +6,6 @@ import { Plus, Sparkles, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { useAgentConfig } from '@/hooks/use-agent-config'
 import { useUpdateCardServices } from '@/hooks/use-card-mutations'
 import { useServices } from '@/hooks/use-catalogo'
 import type { CardService } from '@/lib/api/crm'
@@ -15,8 +14,7 @@ import { cn } from '@/lib/utils'
 /** Asigna/quita servicios del catálogo a la oportunidad (#82). Los `assigned` (operador)
  *  se editan; los `captured` (bot, #133) se muestran read-only. */
 export function ServicesSelector({ cardId, services }: { cardId: string; services: CardService[] }) {
-  const { data: agent } = useAgentConfig()
-  const { data: catalog } = useServices(agent?.id)
+  const { data: catalog } = useServices()
   const update = useUpdateCardServices(cardId)
   const [open, setOpen] = useState(false)
 
@@ -72,7 +70,7 @@ export function ServicesSelector({ cardId, services }: { cardId: string; service
           <Button
             variant="outline"
             size="sm"
-            disabled={!agent || update.isPending}
+            disabled={update.isPending}
             className="mt-2 gap-1.5 border-white/10 bg-white/[0.03] text-xs text-white"
           >
             <Plus className="size-3.5" /> Asignar servicio

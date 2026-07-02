@@ -10,8 +10,8 @@ import { ServiceEditor } from '@/components/crm/catalog/service-editor'
 import { useServices } from '@/hooks/use-catalogo'
 import type { ServiceRead } from '@/lib/api/catalogo'
 
-export function CatalogScreen({ agentId }: { agentId: string }) {
-  const { data: services, isLoading, isError } = useServices(agentId)
+export function CatalogScreen() {
+  const { data: services, isLoading, isError } = useServices()
   const [editorOpen, setEditorOpen] = useState(false)
   const [editing, setEditing] = useState<ServiceRead | null>(null)
 
@@ -65,12 +65,11 @@ export function CatalogScreen({ agentId }: { agentId: string }) {
       {!isLoading && !isError && list.length === 0 && (
         <p className="text-sm text-zinc-500">Todavía no hay servicios. Creá la primera.</p>
       )}
-      {list.length > 0 && <CatalogTable agentId={agentId} services={list} onEdit={openEdit} />}
+      {list.length > 0 && <CatalogTable services={list} onEdit={openEdit} />}
 
       {editorOpen && (
         <ServiceEditor
           key={editing?.id ?? 'new'}
-          agentId={agentId}
           service={editing}
           defaultOrden={nextOrden}
           open={editorOpen}

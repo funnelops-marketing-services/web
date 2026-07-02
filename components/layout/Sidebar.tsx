@@ -32,16 +32,17 @@ interface NavItem {
   label: string
   href: string
   icon: LucideIcon
-  requiresConfig?: boolean
+  /** Capacidad requerida para ver el ítem; sin ella, visible para toda sesión CRM. */
+  requires?: 'canManageConfig' | 'canManageCatalog'
 }
 
 const navItems: readonly NavItem[] = [
   { label: 'Embudo de ventas', href: '/', icon: Funnel },
   { label: 'Contactos', href: '/contacts', icon: Users },
-  { label: 'Agentes', href: '/agents', icon: Bot, requiresConfig: true },
-  { label: 'Catálogo', href: '/catalogo', icon: BookOpen, requiresConfig: true },
-  { label: 'Usuarios', href: '/users', icon: ShieldCheck, requiresConfig: true },
-  // TODO: Añadir un badge o un popover que indique qué config falta
+  // Agentes/Usuarios: solo platform_operator (superadmin). Catálogo: + client_admin.
+  { label: 'Agentes', href: '/agents', icon: Bot, requires: 'canManageConfig' },
+  { label: 'Catálogo', href: '/catalogo', icon: BookOpen, requires: 'canManageCatalog' },
+  { label: 'Usuarios', href: '/users', icon: ShieldCheck, requires: 'canManageConfig' },
   { label: 'Ajustes', href: '/settings', icon: Settings },
 ]
 
@@ -58,8 +59,8 @@ interface NavListProps {
 }
 
 function NavList({ pathname, collapsed = false, onSelect }: NavListProps) {
-  const { canManageConfig } = usePermissions()
-  const visibleItems = navItems.filter((item) => !item.requiresConfig || canManageConfig)
+  const permissions = usePermissions()
+  const visibleItems = navItems.filter((item) => !item.requires || permissions[item.requires])
 
   return (
     <nav className="flex flex-col gap-1 px-3 py-4">
