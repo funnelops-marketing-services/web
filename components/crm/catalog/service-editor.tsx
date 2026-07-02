@@ -36,17 +36,16 @@ import {
 } from '@/lib/api/catalogo'
 
 interface ServiceEditorProps {
-  agentId: string
   service: ServiceRead | null
   defaultOrden: number
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function ServiceEditor({ agentId, service, defaultOrden, open, onOpenChange }: ServiceEditorProps) {
+export function ServiceEditor({ service, defaultOrden, open, onOpenChange }: ServiceEditorProps) {
   const isEdit = service !== null
-  const create = useCreateService(agentId)
-  const update = useUpdateService(agentId)
+  const create = useCreateService()
+  const update = useUpdateService()
   const [materials, setMaterials] = useState<AssetRead[]>(service?.materials ?? [])
   const {
     control,

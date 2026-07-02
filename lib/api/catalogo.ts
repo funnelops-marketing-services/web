@@ -96,13 +96,14 @@ export interface ServiceCategoryUpdate {
 
 // ---------- Llamadas tipadas: servicios ----------
 
-export async function listServices(agentId: string): Promise<ServiceRead[]> {
-  const { data } = await apiClient.get(`/agents/${agentId}/services`)
+// El catálogo es del tenant: el backend resuelve el agente por detrás (/catalog/*).
+export async function listServices(): Promise<ServiceRead[]> {
+  const { data } = await apiClient.get('/catalog/services')
   return z.array(serviceReadSchema).parse(data)
 }
 
-export async function createService(agentId: string, body: ServiceCreate): Promise<ServiceRead> {
-  const { data } = await apiClient.post(`/agents/${agentId}/services`, body)
+export async function createService(body: ServiceCreate): Promise<ServiceRead> {
+  const { data } = await apiClient.post('/catalog/services', body)
   return serviceReadSchema.parse(data)
 }
 
