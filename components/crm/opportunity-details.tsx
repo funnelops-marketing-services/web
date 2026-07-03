@@ -2,13 +2,11 @@
 
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { Pencil, Phone, User, UserCheck, UserPlus } from 'lucide-react'
-
-import { Button } from '@/components/ui/button'
-import { formatPhone, isUnnamedLead, leadTitle } from '@/lib/format'
+import { leadTitle } from '@/lib/format'
 import { useCard, cardKeys } from '@/hooks/use-card'
 import { useBoard } from '@/hooks/use-board'
 import type { Boards } from '@/lib/api/crm'
+import { OpportunityHeader } from '@/components/crm/opportunity-header'
 import { OpportunityHistory } from '@/components/crm/opportunity-history'
 import { OpportunityEditForm } from '@/components/crm/opportunity-edit-form'
 import { OpportunityDeleteDialog } from '@/components/crm/opportunity-delete-dialog'
@@ -71,55 +69,14 @@ export function OpportunityDetails({
 
   const location = locateStage(boards, card.stage_id)
 
-  // Sin nombre real no hay inicial que mostrar: va un ícono de persona (#140).
-  const unnamed = isUnnamedLead(card.title, card.phone)
-
   return (
     <div className="flex h-full flex-col overflow-y-auto p-5">
-      <div className="flex items-start gap-3">
-        <div className="flex size-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-base font-bold text-white">
-          {unnamed ? <User className="size-5" /> : card.title.charAt(0).toUpperCase()}
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-bold text-white">
-            {leadTitle(card.title, card.phone)}
-          </p>
-          {card.phone && !unnamed && (
-            <p className="mt-0.5 flex items-center gap-1.5 text-xs font-normal text-zinc-500">
-              <Phone className="size-3 flex-shrink-0" />
-              {formatPhone(card.phone)}
-            </p>
-          )}
-          {card.phone &&
-            (card.contact ? (
-              <p className="mt-1 flex items-center gap-1.5 text-xs font-medium text-emerald-400">
-                <UserCheck className="size-3 flex-shrink-0" />
-                Ya es contacto
-                {card.contact.full_name ? ` · ${card.contact.full_name}` : ''}
-              </p>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setContactSheetOpen(true)}
-                className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-violet-400 transition-colors hover:text-violet-300"
-              >
-                <UserPlus className="size-3 flex-shrink-0" />
-                Convertir en contacto
-              </button>
-            ))}
-        </div>
-        {!editing && (
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Editar oportunidad"
-            onClick={() => setEditing(true)}
-            className="size-8 flex-shrink-0 rounded-lg text-zinc-500 hover:bg-white/5 hover:text-white"
-          >
-            <Pencil className="size-4" />
-          </Button>
-        )}
-      </div>
+      <OpportunityHeader
+        card={card}
+        editing={editing}
+        onEdit={() => setEditing(true)}
+        onConvertContact={() => setContactSheetOpen(true)}
+      />
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <RatingBadge rating={card.rating} showLabel className="px-2.5 py-0.5 text-xs" />

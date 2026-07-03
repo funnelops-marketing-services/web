@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { Bot, MessageSquare, QrCode, Send, User, X } from 'lucide-react'
+import { Fragment, useState } from 'react'
+import { Bot, Loader2, MessageSquare, QrCode, Send, User, X } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
-import { isUnnamedLead, leadTitle } from '@/lib/format'
+import { formatThreadDay, isUnnamedLead, leadTitle, sameCalendarDay } from '@/lib/format'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -95,9 +95,25 @@ export function ConversationPanel({
             Sin mensajes todavía
           </p>
         ) : (
-          card.thread.map((message, idx) => (
-            <ConversationMessage key={`${message.at}-${idx}`} message={message} />
-          ))
+          card.thread.map((message, idx) => {
+            const prev = idx > 0 ? card.thread[idx - 1] : null
+            // Separador "Hoy / Ayer / 1 jul" al cambiar de día (#134).
+            const newDay = !prev || !sameCalendarDay(prev.at, message.at)
+            return (
+              <Fragment key={`${message.at}-${idx}`}>
+                {newDay && (
+                  <div className="flex items-center gap-3 py-1">
+                    <span className="h-px flex-1 bg-white/5" />
+                    <span className="rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-zinc-500">
+                      {formatThreadDay(message.at)}
+                    </span>
+                    <span className="h-px flex-1 bg-white/5" />
+                  </div>
+                )}
+                <ConversationMessage message={message} />
+              </Fragment>
+            )
+          })
         )}
       </div>
 
@@ -114,7 +130,16 @@ export function ConversationPanel({
               htmlFor="ai-active"
               className="cursor-pointer truncate text-xs font-normal text-zinc-300"
             >
-              Agente IA <span className="text-zinc-500">(responde por vos)</span>
+              {/* Label según estado: qué está pasando ahora, no solo el nombre del switch (#134). */}
+              {card.is_ai_active ? (
+                <>
+                  Agente IA <span className="text-zinc-500">(responde por vos)</span>
+                </>
+              ) : (
+                <>
+                  Agente IA apagado <span className="text-zinc-500">(respondés vos)</span>
+                </>
+              )}
             </Label>
           </div>
           <Switch
@@ -159,10 +184,14 @@ export function ConversationPanel({
             <Button
               type="submit"
               disabled={sendReply.isPending || reply.trim().length === 0}
-              aria-label="Enviar"
+              aria-label={sendReply.isPending ? 'Enviando…' : 'Enviar'}
               className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-b from-violet-500 to-violet-700 p-0 hover:from-violet-400 hover:to-violet-600 disabled:opacity-40"
             >
-              <Send className="size-4" />
+              {sendReply.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Send className="size-4" />
+              )}
             </Button>
           </form>
         )}
