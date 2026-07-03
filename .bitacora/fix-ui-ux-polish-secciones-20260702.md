@@ -10,4 +10,4 @@
 - Spec/decisión que respeta: FRONTEND_SPEC §Pantallas (inbox/takeover/pipeline sin cambios funcionales, solo presentación y feedback), §Reglas (<200 líneas: extracciones `opportunity-header`/`agent-form-header`; copy en español; dark violeta/fucsia). El badge fucsia de tabs se mantiene como señal intencional de derivados sin atender — ahora explicado en la leyenda.
 - Mejora de flujo: `lib/format.ts` suma helpers de día para hilos; el header del detalle y el del form del agente quedan reutilizables.
 - Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes fuera del cambio) · `pnpm tsc --noEmit` limpio · `pnpm build` ✓ exit 0 (10/10). tsc corrido antes de cada commit parcial.
-- Commit: (completar después del push)
+- Commit: 4d99787 / 5685211 / 805389c / 01d950b / fd21ba6 / 6d4ebbc (uno por sección) · PR: https://github.com/funnelops-marketing-services/web/pull/143
