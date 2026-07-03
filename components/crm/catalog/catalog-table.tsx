@@ -126,9 +126,15 @@ export function CatalogTable({ services, onEdit }: CatalogTableProps) {
                           <FileText className="size-3.5 text-emerald-400/70" /> {service.materials.length}
                         </span>
                       ) : (
-                        <span className="flex items-center gap-1 text-xs text-zinc-600">
-                          <FileWarning className="size-3.5" /> falta
-                        </span>
+                        // CTA directo: abre el editor (ahí vive el dropzone de materiales) (#137).
+                        <button
+                          type="button"
+                          onClick={() => onEdit(service)}
+                          className="flex items-center gap-1 rounded text-xs text-amber-400/80 transition-colors hover:text-amber-300 focus-visible:ring-2 focus-visible:ring-violet-500/60 focus-visible:outline-none"
+                        >
+                          <FileWarning className="size-3.5" />
+                          <span className="underline-offset-2 hover:underline">Subir material</span>
+                        </button>
                       )}
                     </TableCell>
                     <TableCell>
