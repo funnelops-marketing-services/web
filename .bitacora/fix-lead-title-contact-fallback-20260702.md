@@ -3,4 +3,4 @@
 - Por qué: contraparte visual del fix de identidad card↔contacto del server (server#222 / PR server#223, que resuelve `title` como `conversation.full_name → contact.full_name → phone` en la API). Este fallback cubre el detalle mientras esa versión llega a prod y ante respuestas cacheadas.
 - Spec/decisión que respeta: FRONTEND_SPEC §Pantallas (identidad del lead unificada, #140); sin cambios de contrato (usa `card.contact` que ya viene en `CardDetailOut`).
 - Prueba local: `pnpm tsc --noEmit` limpio · `pnpm lint` 0 errores (5 warnings preexistentes) · `pnpm build` ✓ exit 0.
-- Commit: (completar después del commit)
+- Commit: 5965088 · PR: https://github.com/funnelops-marketing-services/web/pull/144
