@@ -15,24 +15,28 @@ interface OpportunityHeaderProps {
 }
 
 /** Cabecera del detalle: avatar + identidad del lead + acción de editar (#134).
- *  Sin nombre real no hay inicial que mostrar: va un ícono de persona (#140). */
+ *  Sin nombre propio, el título cae al nombre del contacto vinculado antes que al
+ *  teléfono (server#222 lo resuelve en la API; esto cubre respuestas previas).
+ *  Sin nombre en ningún lado: ícono de persona en vez de inicial (#140). */
 export function OpportunityHeader({
   card,
   editing,
   onEdit,
   onConvertContact,
 }: OpportunityHeaderProps) {
-  const unnamed = isUnnamedLead(card.title, card.phone)
+  const contactName = card.contact?.full_name ?? null
+  const untitled = isUnnamedLead(card.title, card.phone)
+  const displayTitle =
+    untitled && contactName ? contactName : leadTitle(card.title, card.phone)
+  const unnamed = untitled && !contactName
 
   return (
     <div className="flex items-start gap-3">
       <div className="flex size-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-base font-bold text-white">
-        {unnamed ? <User className="size-5" /> : card.title.charAt(0).toUpperCase()}
+        {unnamed ? <User className="size-5" /> : displayTitle.charAt(0).toUpperCase()}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-base font-bold text-white">
-          {leadTitle(card.title, card.phone)}
-        </p>
+        <p className="truncate text-base font-bold text-white">{displayTitle}</p>
         {card.phone && !unnamed && (
           <p className="mt-0.5 flex items-center gap-1.5 text-xs font-normal text-zinc-500">
             <Phone className="size-3 flex-shrink-0" />
