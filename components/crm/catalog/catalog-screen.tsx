@@ -12,6 +12,7 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { CatalogTable } from '@/components/crm/catalog/catalog-table'
 import { CategoryManager } from '@/components/crm/catalog/category-manager'
 import { ServiceEditor } from '@/components/crm/catalog/service-editor'
@@ -47,9 +48,17 @@ export function CatalogScreen() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.06] px-2.5 py-1 text-xs text-emerald-300/90">
-            <span className="size-1.5 rounded-full bg-emerald-400" /> En línea
-          </span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.06] px-2.5 py-1 text-xs text-emerald-300/90">
+                <span className="size-1.5 rounded-full bg-emerald-400" /> En línea
+              </span>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-64">
+              El catálogo está conectado al bot: cada servicio con el switch Activo encendido se
+              ofrece ahora mismo, sin publicar nada.
+            </TooltipContent>
+          </Tooltip>
           <CategoryManager />
           <Button
             variant="outline"

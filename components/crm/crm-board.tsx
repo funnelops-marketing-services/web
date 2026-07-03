@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useBoard } from '@/hooks/use-board'
 import { useMoveCard } from '@/hooks/use-card-mutations'
 import { PipelineBoard } from '@/components/crm/pipeline-board'
+import { BoardLegend } from '@/components/crm/board-legend'
 import { BoardSkeleton, CenteredMessage } from '@/components/crm/board-states'
 import { CardDetailDialog } from '@/components/crm/card-detail-dialog'
 import { OpportunityCreateSheet } from '@/components/crm/opportunity-create'
@@ -79,13 +80,15 @@ export function CrmBoard() {
             </p>
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">
-            <div className="relative w-64">
+            <BoardLegend />
+            {/* w-72: que el placeholder entre completo sin truncarse (#133). */}
+            <div className="relative w-72">
               <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-600" />
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar por nombre o número…"
-                className="h-10 rounded-full border-white/10 bg-white/[0.03] pl-9 text-sm font-normal text-white placeholder:text-zinc-600"
+                placeholder="Buscar nombre o número…"
+                className="h-10 rounded-full border-white/10 bg-white/[0.03] pl-9 text-sm font-normal text-white placeholder:text-zinc-500"
               />
             </div>
             <Button

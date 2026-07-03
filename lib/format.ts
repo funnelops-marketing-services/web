@@ -34,3 +34,30 @@ export function isUnnamedLead(title: string, phone: string | null | undefined): 
 export function leadTitle(title: string, phone: string | null | undefined): string {
   return isUnnamedLead(title, phone) && phone ? formatPhone(phone) : title
 }
+
+function sameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  )
+}
+
+/** True if both ISO timestamps fall on the same calendar day (thread grouping, #134). */
+export function sameCalendarDay(aIso: string, bIso: string): boolean {
+  const a = new Date(aIso)
+  const b = new Date(bIso)
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return true
+  return sameDay(a, b)
+}
+
+/** Day label for thread separators: "Hoy", "Ayer" or "1 jul" (#134). */
+export function formatThreadDay(iso: string, now: Date = new Date()): string {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return ''
+  if (sameDay(date, now)) return 'Hoy'
+  const yesterday = new Date(now)
+  yesterday.setDate(now.getDate() - 1)
+  if (sameDay(date, yesterday)) return 'Ayer'
+  return date.toLocaleDateString('es-BO', { day: 'numeric', month: 'short' })
+}

@@ -75,6 +75,8 @@ export function ChangePasswordForm() {
           {...register('new_password')}
           className="border-white/10 bg-white/[0.03] text-sm text-white"
         />
+        {/* Requisito visible antes del primer error (#139). */}
+        <p className="text-xs text-zinc-600">Mínimo 8 caracteres.</p>
       </Field>
 
       <Field

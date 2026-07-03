@@ -1,9 +1,9 @@
 'use client'
 
-import { Controller, useForm } from 'react-hook-form'
+import { useEffect } from 'react'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -16,6 +16,7 @@ import {
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { AgentFormHeader } from '@/components/crm/config/agent-form-header'
 import { useAgentModels, useUpdateAgentConfig } from '@/hooks/use-agent-config'
 import type { AgentRead, AgentUpdate } from '@/lib/api/agent-config'
 
@@ -44,6 +45,17 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
     },
   })
   const { dirtyFields, isDirty } = formState
+  // Contador del prompt: re-renderiza solo por este campo (no watch() global).
+  const promptValue = useWatch({ control, name: 'system_prompt' })
+
+  // Red de seguridad ante cerrar/recargar la pestaña con cambios sin guardar (#136).
+  // La navegación interna (App Router) no dispara beforeunload: el chip visible cubre eso.
+  useEffect(() => {
+    if (!isDirty) return
+    const handler = (event: BeforeUnloadEvent) => event.preventDefault()
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [isDirty])
 
   // El modelo guardado podría no estar en el catálogo (valor viejo): lo agregamos
   // para que el dropdown lo muestre en vez de quedar vacío.
@@ -74,29 +86,14 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
     mutation.mutate(body)
   }
 
-  const version = agent.current_version?.version_number ?? null
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1.5">
-          <h1 className="text-2xl font-bold text-white">{agent.display_name}</h1>
-          {version !== null ? (
-            <span className="inline-flex items-center rounded-full bg-violet-500/15 px-2.5 py-0.5 text-xs font-medium text-violet-300 ring-1 ring-violet-500/30">
-              Versión {version}
-            </span>
-          ) : (
-            <p className="text-sm text-zinc-500">Sin versiones guardadas</p>
-          )}
-        </div>
-        <Button
-          type="submit"
-          disabled={!isDirty || mutation.isPending}
-          className="h-10 gap-2 rounded-xl bg-gradient-to-b from-violet-500 to-violet-700 px-5 text-sm font-medium text-white hover:from-violet-400 hover:to-violet-600 disabled:opacity-50"
-        >
-          {mutation.isPending ? 'Guardando…' : 'Guardar'}
-        </Button>
-      </div>
+      <AgentFormHeader
+        title={agent.display_name}
+        version={agent.current_version?.version_number ?? null}
+        isDirty={isDirty}
+        isSaving={mutation.isPending}
+      />
 
       <Field label="Nombre del agente" htmlFor="display_name">
         <Input
@@ -107,12 +104,16 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
       </Field>
 
       <Field label="System prompt" htmlFor="system_prompt">
+        {/* Alto generoso + resize manual: editar un prompt largo sin pelear con el scroll (#136). */}
         <Textarea
           id="system_prompt"
-          rows={8}
+          rows={18}
           {...register('system_prompt')}
-          className="border-white/10 bg-white/[0.03] font-mono text-sm text-white"
+          className="min-h-72 resize-y border-white/10 bg-white/[0.03] font-mono text-sm text-white"
         />
+        <p className="text-right text-xs text-zinc-500">
+          {promptValue.length.toLocaleString('es-BO')} caracteres
+        </p>
       </Field>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
