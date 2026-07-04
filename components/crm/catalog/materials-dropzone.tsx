@@ -5,7 +5,7 @@ import { FileText, Image as ImageIcon, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Label } from '@/components/ui/label'
-import { useUploadAsset } from '@/hooks/use-catalogo'
+import { useUploadAsset, useDeleteAsset } from '@/hooks/use-catalogo'
 import type { AssetRead } from '@/lib/api/catalogo'
 import { cn } from '@/lib/utils'
 
@@ -21,6 +21,7 @@ interface MaterialsDropzoneProps {
 /** Dropzone de materiales: pdf/jpg/png ≤5 MB, máx. 5 por servicio, con listado en vivo. */
 export function MaterialsDropzone({ materials, onChange }: MaterialsDropzoneProps) {
   const upload = useUploadAsset()
+  const deleteAsset = useDeleteAsset()
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragOver, setDragOver] = useState(false)
   const full = materials.length >= MAX_FILES
@@ -48,6 +49,15 @@ export function MaterialsDropzone({ materials, onChange }: MaterialsDropzoneProp
       }
     }
     if (uploaded.length) onChange([...materials, ...uploaded])
+  }
+
+  async function removeAsset(id: string) {
+    try {
+      await deleteAsset.mutateAsync(id)
+      onChange(materials.filter((m) => m.id !== id))
+    } catch {
+      // El hook ya notifica el error
+    }
   }
 
   return (
@@ -117,8 +127,9 @@ export function MaterialsDropzone({ materials, onChange }: MaterialsDropzoneProp
               </span>
               <button
                 type="button"
-                onClick={() => onChange(materials.filter((m) => m.id !== material.id))}
-                className="shrink-0 rounded p-0.5 text-zinc-500 hover:text-rose-400"
+                onClick={() => removeAsset(material.id)}
+                disabled={deleteAsset.isPending}
+                className="shrink-0 rounded p-0.5 text-zinc-500 hover:text-rose-400 disabled:opacity-50"
                 aria-label={`Quitar ${material.filename}`}
               >
                 <X className="size-3.5" />

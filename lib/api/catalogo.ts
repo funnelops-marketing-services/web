@@ -125,6 +125,10 @@ export async function uploadAsset(file: File): Promise<AssetRead> {
   return assetReadSchema.parse(data)
 }
 
+export async function deleteAsset(assetId: string): Promise<void> {
+  await apiClient.delete(`/assets/${assetId}`)
+}
+
 // ---------- Llamadas tipadas: categorías (#106, org-scoped) ----------
 
 export async function listServiceCategories(): Promise<ServiceCategoryRead[]> {
