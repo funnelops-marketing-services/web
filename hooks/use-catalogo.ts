@@ -13,6 +13,7 @@ import {
   updateService,
   updateServiceCategory,
   uploadAsset,
+  deleteAsset,
   type AssetRead,
   type ServiceCategoryCreate,
   type ServiceCategoryRead,
@@ -79,6 +80,13 @@ export function useUploadAsset() {
   return useMutation<AssetRead, Error, File>({
     mutationFn: (file) => uploadAsset(file),
     onError: (error) => fail(error, 'No se pudo subir el material.'),
+  })
+}
+
+export function useDeleteAsset() {
+  return useMutation<void, Error, string>({
+    mutationFn: (assetId) => deleteAsset(assetId),
+    onError: (error) => fail(error, 'No se pudo eliminar el material.'),
   })
 }
 
