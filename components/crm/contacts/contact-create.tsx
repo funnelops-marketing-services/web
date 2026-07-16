@@ -19,6 +19,8 @@ interface ContactCreateSheetProps {
   onOpenChange: (open: boolean) => void
   /** Teléfono precargado (ej. convertir el número de una oportunidad en contacto, #84). */
   defaultPhone?: string
+  /** Nombre precargado (ej. el nombre ya capturado en la oportunidad). */
+  defaultName?: string
   /** Se invoca tras crear con éxito (ej. refrescar el detalle de la card). */
   onCreated?: () => void
 }
@@ -27,29 +29,31 @@ export function ContactCreateSheet({
   open,
   onOpenChange,
   defaultPhone = '',
+  defaultName = '',
   onCreated,
 }: ContactCreateSheetProps) {
   const create = useCreateContact()
   const [phone, setPhone] = useState('')
   const [name, setName] = useState('')
 
-  // Al abrir, precarga el teléfono y limpia el nombre para un alta nueva. Patrón de
-  // ajuste-en-render (sin effect): React reejecuta antes de pintar, sin parpadeo.
+  // Al abrir, precarga teléfono y nombre desde la oportunidad. Patrón de ajuste-en-render
+  // (sin effect): React reejecuta antes de pintar, sin parpadeo.
   const [wasOpen, setWasOpen] = useState(false)
   if (open !== wasOpen) {
     setWasOpen(open)
     if (open) {
       setPhone(defaultPhone)
-      setName('')
+      setName(defaultName)
     }
   }
 
-  const canSave = phone.trim().length > 0 && !create.isPending
+  // Nombre y teléfono son obligatorios: no puede haber un contacto sin nombre (server#229).
+  const canSave = phone.trim().length > 0 && name.trim().length > 0 && !create.isPending
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault()
     if (!canSave) return
-    await create.mutateAsync({ phone: phone.trim(), full_name: name.trim() || null })
+    await create.mutateAsync({ phone: phone.trim(), full_name: name.trim() })
     setPhone('')
     setName('')
     onCreated?.()
@@ -82,7 +86,7 @@ export function ContactCreateSheet({
 
           <div className="space-y-1.5">
             <Label htmlFor="new-name" className="text-xs font-medium text-zinc-400">
-              Nombre (opcional)
+              Nombre
             </Label>
             <Input
               id="new-name"

@@ -13,13 +13,14 @@ export const contactReadSchema = z.object({
 
 export type ContactRead = z.infer<typeof contactReadSchema>
 
+// full_name obligatorio: no puede haber un contacto sin nombre (server#229).
 export interface ContactCreate {
   phone: string
-  full_name?: string | null
+  full_name: string
 }
 
 export interface ContactUpdate {
-  full_name?: string | null
+  full_name: string
 }
 
 // ---------- Llamadas tipadas ----------
