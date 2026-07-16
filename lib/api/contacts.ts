@@ -51,16 +51,23 @@ export async function deleteContact(contactId: string): Promise<void> {
 // ---------- Export CSV (#113, BE server#176) ----------
 
 export type ExportRating = 'hot' | 'medium' | 'cold'
+export type ExportScope = 'leads' | 'contacts'
+
+export interface ExportParams {
+  /** Filtra por calificación (`cold` = leads fríos). Solo aplica a scope `leads`. */
+  rating?: ExportRating
+  /** `leads` (default): todo el tablero. `contacts`: solo contactos registrados. */
+  scope?: ExportScope
+}
 
 export interface ContactsExport {
   blob: Blob
   filename: string
 }
 
-/** Baja el CSV de leads: todos, o filtrado por calificación (`cold` = leads fríos). */
-export async function exportContacts(rating?: ExportRating): Promise<ContactsExport> {
+export async function exportContacts(params: ExportParams = {}): Promise<ContactsExport> {
   const response = await apiClient.get<Blob>('/crm/contacts/export', {
-    params: rating ? { rating } : undefined,
+    params,
     responseType: 'blob',
   })
   const disposition = String(response.headers['content-disposition'] ?? '')

@@ -15,6 +15,7 @@ import { PipelineBoard } from '@/components/crm/pipeline-board'
 import { BoardLegend } from '@/components/crm/board-legend'
 import { BoardSkeleton, CenteredMessage } from '@/components/crm/board-states'
 import { CardDetailDialog } from '@/components/crm/card-detail-dialog'
+import { LeadsExportMenu } from '@/components/crm/leads-export-menu'
 import { OpportunityCreateSheet } from '@/components/crm/opportunity-create'
 import type { Card, Pipeline } from '@/lib/api/crm'
 
@@ -91,6 +92,7 @@ export function CrmBoard() {
                 className="h-10 rounded-full border-white/10 bg-white/[0.03] pl-9 text-sm font-normal text-white placeholder:text-zinc-500"
               />
             </div>
+            <LeadsExportMenu className="h-10 flex-shrink-0 rounded-full px-4 text-sm font-medium" />
             <Button
               onClick={() => setCreateOpen(true)}
               className="h-10 flex-shrink-0 gap-1.5 rounded-full bg-gradient-to-b from-violet-500 to-violet-700 px-4 text-sm font-medium text-white hover:from-violet-400 hover:to-violet-600"
