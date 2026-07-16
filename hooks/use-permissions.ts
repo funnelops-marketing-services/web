@@ -11,6 +11,8 @@ interface Capabilities {
   canManageConfig: boolean
   /** Administrar el catálogo (servicios/materiales). client_admin + platform_operator. */
   canManageCatalog: boolean
+  /** Exportar la base de leads (CSV, #113). client_admin + platform_operator. */
+  canExportContacts: boolean
 }
 
 /** Mapea la sesión a capacidades; default sin permisos si no hay sesión. */
@@ -22,5 +24,6 @@ export function usePermissions(): Capabilities {
     canOperateCrm: session !== null,
     canManageConfig: isPlatformOperator,
     canManageCatalog: isPlatformOperator || session?.role === 'client_admin',
+    canExportContacts: isPlatformOperator || session?.role === 'client_admin',
   }
 }

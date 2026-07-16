@@ -6,11 +6,14 @@ import { toast } from 'sonner'
 import {
   createContact,
   deleteContact,
+  exportContacts,
   listContacts,
   updateContact,
   type ContactCreate,
   type ContactRead,
   type ContactUpdate,
+  type ContactsExport,
+  type ExportRating,
 } from '@/lib/api/contacts'
 import { apiErrorMessage } from '@/lib/api/errors'
 
@@ -50,6 +53,23 @@ export function useUpdateContact() {
       queryClient.invalidateQueries({ queryKey: contactKeys.all })
     },
     onError: (error) => fail(error, 'No se pudo actualizar el contacto.'),
+  })
+}
+
+/** Baja el CSV de leads y dispara la descarga en el browser (#113). */
+export function useExportContacts() {
+  return useMutation<ContactsExport, Error, ExportRating | undefined>({
+    mutationFn: (rating) => exportContacts(rating),
+    onSuccess: ({ blob, filename }) => {
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = filename
+      anchor.click()
+      URL.revokeObjectURL(url)
+      toast.success('Export descargado')
+    },
+    onError: (error) => fail(error, 'No se pudo exportar los contactos.'),
   })
 }
 
