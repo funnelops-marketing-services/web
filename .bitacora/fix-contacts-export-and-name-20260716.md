@@ -6,4 +6,4 @@
 - Por qué: feedback de Natalia — la opción "cerrados" no aplica al Embudo; en Contactos exportar es siempre "todos" (sin preguntar); y no puede haber un contacto sin nombre. Espeja server#229 (nombre requerido en el schema).
 - Spec/decisión que respeta: export #113/server#176 (scope leads|contacts), ABM de contactos #101, identidad de lead #222.
 - Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes), `tsc --noEmit` limpio, `pnpm build` OK.
-- Commit:   (completar después del commit)
+- Commit: 3b18e5d — PR #151
