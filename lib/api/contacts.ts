@@ -47,3 +47,23 @@ export async function updateContact(contactId: string, body: ContactUpdate): Pro
 export async function deleteContact(contactId: string): Promise<void> {
   await apiClient.delete(`/crm/contacts/${contactId}`)
 }
+
+// ---------- Export CSV (#113, BE server#176) ----------
+
+export type ExportRating = 'hot' | 'medium' | 'cold'
+
+export interface ContactsExport {
+  blob: Blob
+  filename: string
+}
+
+/** Baja el CSV de leads: todos, o filtrado por calificación (`cold` = leads fríos). */
+export async function exportContacts(rating?: ExportRating): Promise<ContactsExport> {
+  const response = await apiClient.get<Blob>('/crm/contacts/export', {
+    params: rating ? { rating } : undefined,
+    responseType: 'blob',
+  })
+  const disposition = String(response.headers['content-disposition'] ?? '')
+  const filename = /filename="([^"]+)"/.exec(disposition)?.[1] ?? 'leads.csv'
+  return { blob: response.data, filename }
+}

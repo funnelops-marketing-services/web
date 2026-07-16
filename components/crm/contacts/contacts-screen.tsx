@@ -5,6 +5,7 @@ import { Plus, Users } from 'lucide-react'
 
 import { ContactCreateSheet } from '@/components/crm/contacts/contact-create'
 import { ContactDetail } from '@/components/crm/contacts/contact-detail'
+import { ContactsExportMenu } from '@/components/crm/contacts/contacts-export'
 import { ContactsTable } from '@/components/crm/contacts/contacts-table'
 import { Button } from '@/components/ui/button'
 import {
@@ -63,12 +64,15 @@ export function ContactsScreen() {
             {list.length} contactos · se crean al ganar una oportunidad.
           </p>
         </div>
-        <Button
-          onClick={() => setCreateOpen(true)}
-          className="gap-2 bg-gradient-to-b from-violet-500 to-violet-700 text-white"
-        >
-          <Plus className="size-4" /> Nuevo contacto
-        </Button>
+        <div className="flex items-center gap-2">
+          <ContactsExportMenu />
+          <Button
+            onClick={() => setCreateOpen(true)}
+            className="gap-2 bg-gradient-to-b from-violet-500 to-violet-700 text-white"
+          >
+            <Plus className="size-4" /> Nuevo contacto
+          </Button>
+        </div>
       </div>
 
       <Input
