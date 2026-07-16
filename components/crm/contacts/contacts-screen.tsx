@@ -5,8 +5,8 @@ import { Plus, Users } from 'lucide-react'
 
 import { ContactCreateSheet } from '@/components/crm/contacts/contact-create'
 import { ContactDetail } from '@/components/crm/contacts/contact-detail'
-import { ContactsExportMenu } from '@/components/crm/contacts/contacts-export'
 import { ContactsTable } from '@/components/crm/contacts/contacts-table'
+import { LeadsExportMenu } from '@/components/crm/leads-export-menu'
 import { Button } from '@/components/ui/button'
 import {
   Empty,
@@ -65,7 +65,7 @@ export function ContactsScreen() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <ContactsExportMenu />
+          <LeadsExportMenu />
           <Button
             onClick={() => setCreateOpen(true)}
             className="gap-2 bg-gradient-to-b from-violet-500 to-violet-700 text-white"

@@ -13,7 +13,7 @@ import {
   type ContactRead,
   type ContactUpdate,
   type ContactsExport,
-  type ExportRating,
+  type ExportParams,
 } from '@/lib/api/contacts'
 import { apiErrorMessage } from '@/lib/api/errors'
 
@@ -56,10 +56,10 @@ export function useUpdateContact() {
   })
 }
 
-/** Baja el CSV de leads y dispara la descarga en el browser (#113). */
+/** Baja el CSV de leads/contactos y dispara la descarga en el browser (#113). */
 export function useExportContacts() {
-  return useMutation<ContactsExport, Error, ExportRating | undefined>({
-    mutationFn: (rating) => exportContacts(rating),
+  return useMutation<ContactsExport, Error, ExportParams>({
+    mutationFn: (params) => exportContacts(params),
     onSuccess: ({ blob, filename }) => {
       const url = URL.createObjectURL(blob)
       const anchor = document.createElement('a')
