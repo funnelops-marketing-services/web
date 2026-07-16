@@ -146,6 +146,7 @@ export function OpportunityDetails({
         open={contactSheetOpen}
         onOpenChange={setContactSheetOpen}
         defaultPhone={card.phone}
+        defaultName={card.full_name ?? ''}
         onCreated={() =>
           queryClient.invalidateQueries({ queryKey: cardKeys.detail(card.id) })
         }

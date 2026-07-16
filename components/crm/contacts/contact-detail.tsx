@@ -31,9 +31,12 @@ export function ContactDetail({ contact, onClose }: ContactDetailProps) {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   const dirty = (contact.full_name ?? '') !== name
+  // El nombre es obligatorio: no se puede guardar en blanco (server#229).
+  const canSave = dirty && name.trim().length > 0 && !update.isPending
 
   function save() {
-    update.mutate({ contactId: contact.id, body: { full_name: name.trim() || null } })
+    if (!canSave) return
+    update.mutate({ contactId: contact.id, body: { full_name: name.trim() } })
   }
 
   function onDelete() {
@@ -76,7 +79,7 @@ export function ContactDetail({ contact, onClose }: ContactDetailProps) {
       <div className="flex items-center justify-between gap-2 pt-1">
         <Button
           onClick={save}
-          disabled={!dirty || update.isPending}
+          disabled={!canSave}
           className="bg-gradient-to-b from-violet-500 to-violet-700 text-white"
         >
           {update.isPending ? 'Guardando…' : 'Guardar'}
