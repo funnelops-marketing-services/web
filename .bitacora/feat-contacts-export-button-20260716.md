@@ -3,4 +3,4 @@
 - Por qué: issue #113 — Mirko necesita exportar la base de leads (en particular los fríos) para recontacto manual desde el CRM.
 - Spec/decisión que respeta: RBAC 3 niveles — export solo client_admin + platform_operator (misma matriz que Catálogo); staff no ve el botón y el endpoint igual responde 403. UI copy en español, dark theme y componentes shadcn existentes.
 - Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes), `tsc --noEmit` limpio, `pnpm build` OK. Prueba e2e manual pendiente de mergear server#227 (endpoint).
-- Commit:   (completar después del commit)
+- Commit: 85a3ca2 — PR #149
