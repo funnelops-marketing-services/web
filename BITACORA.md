@@ -21,6 +21,97 @@
 
 ## Entradas
 
+### 2026-07-16 · Natalia · crm/contactos — export por contexto + nombre obligatorio
+- Qué cambió:
+  1. Embudo de ventas: el menú Exportar ya NO muestra "Solo contactos (cerrados)" — solo "Todos los leads" y "Solo leads fríos" (`LeadsExportMenu`).
+  2. Contactos: el botón Exportar deja de ser menú y baja directo todos los contactos (`scope=contacts`) en un click (`ContactsExportButton`).
+  3. Nombre obligatorio en el ABM: form de alta (`contact-create`) y ficha de edición (`contact-detail`) exigen nombre no vacío para habilitar Guardar/Crear; interfaces `ContactCreate`/`ContactUpdate` con `full_name: string`. Alta desde la oportunidad precarga el nombre ya capturado (`defaultName`).
+- Por qué: feedback de Natalia — la opción "cerrados" no aplica al Embudo; en Contactos exportar es siempre "todos" (sin preguntar); y no puede haber un contacto sin nombre. Espeja server#229 (nombre requerido en el schema).
+- Spec/decisión que respeta: export #113/server#176 (scope leads|contacts), ABM de contactos #101, identidad de lead #222.
+- Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes), `tsc --noEmit` limpio, `pnpm build` OK.
+- Commit: 3b18e5d — PR #151
+
+### 2026-07-16 · Natalia · crm/contactos — botón de export (#113)
+- Qué cambió: menú "Exportar" compartido entre el Embudo de ventas y Contactos (`LeadsExportMenu`, mismo componente en ambos headers) con tres acciones: "Todos los leads", "Solo leads fríos" y "Solo contactos (cerrados)" (`?scope=contacts`). Baja el CSV de `GET /crm/contacts/export` (server#176) y dispara la descarga con el filename del `Content-Disposition`. Nuevos: `exportContacts` en `lib/api/contacts.ts`, `useExportContacts` (toast éxito/error), capacidad `canExportContacts` en `use-permissions`.
+- Por qué: issue #113 — Mirko necesita exportar la base de leads (en particular los fríos) para recontacto manual desde el CRM.
+- Spec/decisión que respeta: RBAC 3 niveles — export solo client_admin + platform_operator (misma matriz que Catálogo); staff no ve el botón y el endpoint igual responde 403. UI copy en español, dark theme y componentes shadcn existentes.
+- Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes), `tsc --noEmit` limpio, `pnpm build` OK. Prueba e2e manual pendiente de mergear server#227 (endpoint).
+- Commit: 85a3ca2 — PR #149; menú compartido Embudo+scope contacts: 034eef2 — PR #150
+
+### 2026-07-02 · innova67 · Usuarios y roles (/users)
+- Qué cambió: gestión de roles in-place en la tabla de usuarios (#138). Nuevo `UserRoleSelect` (select compacto por fila, `client_admin ↔ staff`) sobre el hook `useChangeUserRole` ya existente (update optimista + rollback + toast) y el endpoint `PUT /users/{id}/role` del server. La fila del operador (`is_superuser`) no expone selector: muestra badge fijo "Operador de plataforma" con tooltip de capacidades. Nomenclatura alineada al RBAC de 3 niveles y centralizada en `role-meta.ts` ("Superadmin" → "Operador de plataforma"; Admin/Staff con descripciones de qué puede hacer cada uno), compartida entre la tabla y el alta vía `RoleSelectItems`. Tooltip en el botón de eliminar que explica el deshabilitado de la fila propia ("No podés eliminar tu propia cuenta — anti-bloqueo"). Limpieza menor en el diálogo de alta (`cn()` estático, import huérfano).
+- Por qué: la columna de rol se había removido por incoherente (dropdown "Solo lectura" en filas de superadmin + estados inválidos posibles — contexto en server #151); quedaba el hook huérfano y sin UI. Esta re-introducción usa la forma coherente: el rol de tenant solo se edita donde tiene efecto real, y ninguno de los dos roles asignables gestiona usuarios, así que el cambio no puede generar auto-bloqueo. Cierra además el desalineo de nomenclatura UI ↔ spec detectado en la auditoría UI/UX.
+- Spec/decisión que respeta: FRONTEND_SPEC §RBAC (3 niveles: `platform_operator` global / `client_admin` / `staff`; server SPECS_MVP §RBAC) y el alcance front de server #151 ("superadmin no editable ni auto-degradable; sin el 'Solo lectura' confuso"). El backend revalida (`require_platform_operator`). Issue #138; los ítems de espacio y skeleton/empty ya se cubrieron en #140 (PR #141).
+- Mejora de flujo: `ROLE_META`/`PLATFORM_OPERATOR_META`/`ASSIGNABLE_ROLES` como fuente única de etiquetas de rol (antes duplicadas entre tabla y diálogo de alta con valores hardcodeados).
+- Prueba local: `pnpm lint` (0 errores; 5 warnings preexistentes fuera del cambio) · `pnpm tsc --noEmit` limpio · `pnpm build` ✓ exit 0 (10/10 páginas). Contrato validado contra el server: `PUT /users/{id}/role` existe y está testeado (`tests/test_users_roles.py`); no se corrió el server en vivo en esta sesión.
+- Commit: 0c2d30f · PR: https://github.com/funnelops-marketing-services/web/pull/142
+
+### 2026-07-02 · innova67 · Detalle de oportunidad (identidad del lead)
+- Qué cambió: el título del detalle cae al nombre del contacto vinculado (`card.contact.full_name`) cuando la card no tiene nombre propio, antes que al teléfono; el avatar usa esa inicial. Repro: card cerrada de `59169005037` linkeada a "Diego Gandarillas Ferrufino" pero titulada con el número.
+- Por qué: contraparte visual del fix de identidad card↔contacto del server (server#222 / PR server#223, que resuelve `title` como `conversation.full_name → contact.full_name → phone` en la API). Este fallback cubre el detalle mientras esa versión llega a prod y ante respuestas cacheadas.
+- Spec/decisión que respeta: FRONTEND_SPEC §Pantallas (identidad del lead unificada, #140); sin cambios de contrato (usa `card.contact` que ya viene en `CardDetailOut`).
+- Prueba local: `pnpm tsc --noEmit` limpio · `pnpm lint` 0 errores (5 warnings preexistentes) · `pnpm build` ✓ exit 0.
+- Commit: 5965088 · PR: https://github.com/funnelops-marketing-services/web/pull/144
+
+### 2026-07-02 · innova67 · CRM (tablero, detalle, contactos, agentes, catálogo, ajustes)
+- Qué cambió: segunda ronda de la auditoría UI/UX — ítems fáciles restantes de #133/#134/#135/#136/#137/#139, un commit por sección en una sola PR.
+  - #133 (4d99787): `BoardLegend` (popover con la semántica de llama/copo/alerta/IA-off/punto rosa/badge fucsia) + búsqueda a `w-72` con placeholder que entra completo.
+  - #134 (5685211): separadores de día "Hoy/Ayer/1 jul" en el hilo (`formatThreadDay`/`sameCalendarDay` en `lib/format.ts`), spinner en el botón de enviar mientras `isPending`, label del toggle según estado ("Agente IA apagado (respondés vos)"), tooltip en el lápiz de editar; header del detalle extraído a `opportunity-header.tsx` (mantiene <200 líneas).
+  - #135 (805389c): columnas Nombre/Alta ordenables client-side (asc/desc, "sin nombre" siempre al final) + chevron de apertura visible al hover/foco en cada fila.
+  - #136 (01d950b): header sticky del editor del agente (`agent-form-header.tsx`) con Guardar siempre a la vista + chip ámbar "Cambios sin guardar" + `beforeunload` cuando `isDirty` (la navegación interna del App Router no dispara beforeunload; el chip visible cubre ese caso), textarea del prompt más alto y redimensionable (`rows=18`, `resize-y`) + contador de caracteres (`useWatch`, no `watch()` global).
+  - #137 (fd21ba6): tooltip en el pill "En línea" explicando la relación con el switch Activo; "falta" en Documentos ahora es CTA "Subir material" que abre el editor del servicio.
+  - #139 (6d4ebbc): `ProfileCard` en Ajustes (nombre, email, organización, rol con badge y descripción de `role-meta`, solo lectura) + hint "Mínimo 8 caracteres" visible antes del primer error.
+- Por qué: cerrar la deuda de usabilidad detectada en la auditoría (#133–#140) que quedó tras las capas transversales (#140/PR #141) y roles (#138/PR #142). Ítems no-fáciles diferidos con comentario en cada issue: won/lost en "Cerrado" (modelo Fase 2), historial/rollback de versiones del agente (necesita API), paginado de contactos (diferido hasta que el volumen lo pida).
+- Spec/decisión que respeta: FRONTEND_SPEC §Pantallas (inbox/takeover/pipeline sin cambios funcionales, solo presentación y feedback), §Reglas (<200 líneas: extracciones `opportunity-header`/`agent-form-header`; copy en español; dark violeta/fucsia). El badge fucsia de tabs se mantiene como señal intencional de derivados sin atender — ahora explicado en la leyenda.
+- Mejora de flujo: `lib/format.ts` suma helpers de día para hilos; el header del detalle y el del form del agente quedan reutilizables.
+- Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes fuera del cambio) · `pnpm tsc --noEmit` limpio · `pnpm build` ✓ exit 0 (10/10). tsc corrido antes de cada commit parcial.
+- Commit: 4d99787 / 5685211 / 805389c / 01d950b / fd21ba6 / 6d4ebbc (uno por sección) · PR: https://github.com/funnelops-marketing-services/web/pull/143
+
+### 2026-07-02 · Nova67 · CRM transversal (tablero, detalle, contactos, catálogo, usuarios, ajustes, agentes)
+- Qué cambió: mejoras transversales de UI/UX (#140). Nuevo `lib/format.ts` canónico: `formatMoney` (Bs 1.800 / US$ 1.200, es-BO), `formatPhone` (+591 6900 5037) y `leadTitle`/`isUnnamedLead` (nombre real o teléfono formateado, nunca el wa_id crudo). Identidad de lead unificada en board-card, opportunity-details, conversation-panel y diálogo de baja (avatar con ícono de persona cuando no hay nombre, en vez de la inicial del número). Tooltips nativos (`title`) migrados a `components/ui/tooltip.tsx` (rating, alerta, bot-off, grip de reordenar, editar servicio, badge "sin responder", tag "bot" del servicio capturado). Estados de carga/vacío estandarizados con `Skeleton`/`Empty` (contactos, usuarios, catálogo). Eliminar contacto ahora pide confirmación con AlertDialog (consistente con oportunidades/usuarios/servicios). Páginas angostas centradas con max-width (contactos/catálogo max-w-6xl; usuarios/ajustes/agentes max-w-3xl). Accesibilidad: cards del tablero y filas de contactos operables por teclado (tabIndex + Enter/Espacio + focus-visible), touch target mayor en "quitar servicio", contraste subido en "Sin leads"/"Ver conversación" (zinc-700/600 → zinc-500). Búsqueda de contactos compara solo dígitos para tolerar el formato del teléfono.
+- Por qué: auditoría UI/UX (#133–#140) detectó identidad de lead ilegible (solo wa_id crudo), semántica de iconos sin explicación, moneda sin formato (`1800 · BOB`), estados vacíos pobres, borrado de contacto sin confirmación y desperdicio de espacio en pantallas grandes. Este cambio resuelve la capa transversal que destraba el resto de los issues.
+- Spec/decisión que respeta: FRONTEND_SPEC §Pantallas y §Reglas (UI copy en español, dark violeta/fucsia, componentes <200 líneas — `crm-board` 204→184 extrayendo `board-states.tsx`); RBAC intacto (guards `canManageConfig` sin cambios); sin tocar takeover/realtime/stages. Issue #140.
+- Mejora de flujo: `formatPrice`/`currencySymbol` legacy (sin usos) eliminados de `lib/validation/fields.ts` a favor del formateador canónico `lib/format.ts`; `BoardSkeleton`/`CenteredMessage` extraídos a `components/crm/board-states.tsx`.
+- Prueba local: `pnpm lint` (0 errores; 5 warnings preexistentes en archivos no tocados) · `pnpm tsc --noEmit` limpio · `pnpm build` ✓ (10/10 páginas). Lógica de formato verificada con Node (es-BO: `Bs 1.800`, `US$ 1.200`, `+591 6900 5037`, fallback ante valores inválidos).
+- Commit: a07852e · PR: https://github.com/funnelops-marketing-services/web/pull/141
+
+### 2026-07-01 · innova67 · crm (board-card / crm-board / lib-api)
+- Qué cambió: web#130 — señal "sin responder" en la card del board del CRM. (1)
+  `cardSchema` consume los campos nuevos del backend: `is_ai_active` y `awaiting_human`
+  (defaults `true`/`false` → degrada sin romper si el backend aún no los expone). (2)
+  `board-card.tsx`: chip "IA apagada" (icono BotOff) cuando `!is_ai_active`; cuando
+  `awaiting_human`, anillo rosa en la card + badge pulsante "Sin responder · te esperan".
+  (3) `crm-board.tsx`: contador rosa de "sin responder" por pestaña de pipeline
+  (`awaitingCount`), aplica a cualquier pipeline porque se puede apagar la IA en cualquier
+  oportunidad.
+- Por qué: al apagar el toggle de IA (takeover) los mensajes del lead seguían llegando pero
+  la card no señalizaba nada, así que el staff no se enteraba y el lead quedaba ignorado.
+- Spec/decisión que respeta: CLAUDE.md "Inbox + takeover" (toggle `is_ai_active` por
+  conversación; badge de estado en la lista). Solo lee `is_ai_active` para la señal, no toca
+  el toggle ni agrega realtime nuevo — se actualiza dentro del poll de 10s del board.
+  Contraparte backend: funnelops-marketing-services/server#209 (issue server#208).
+- Prueba local: `pnpm lint` 0 errores (6 warnings preexistentes ajenos) · `pnpm tsc --noEmit`
+  OK · `pnpm build` OK.
+- Mejora de flujo: `awaitingCount`/`cardCount`/`filterPipeline` quedan como helpers a nivel de
+  módulo (patrón ya existente en el archivo); la función-componente `CrmBoard` se mantiene
+  chica. Coherente con el badge fucsia de "Gestión Humana" ya existente.
+- Commit: 7e6c7b1 · PR #131
+
+### 2026-07-01 · Nova67 · CRM / conversation-message (ventana de chat de la oportunidad)
+- Qué cambió: los adjuntos del hilo (imagen/documento) ahora se pueden abrir/descargar desde el chat del CRM. La imagen es una miniatura clickeable que abre el original a tamaño completo; el documento se renderiza como chip con ícono, nombre de archivo (derivado de la URL) y acción de descarga (`download`).
+- Por qué: issue web#112 — la ventana de chat no ofrecía forma de abrir/descargar los adjuntos. Contraparte del BE server#175 (que ahora expone también la media saliente que el agente envía al lead).
+- Spec/decisión que respeta: FRONTEND_SPEC (Inbox + hilo espejo del CRM); consume `ThreadMessage.type` + `ThreadMessage.media_url` ya definidos en el contrato con el backend (server/docs/SPECS_MVP §M-CRM). Sin cambios de schema: el nombre del documento se deriva de la URL porque los adjuntos inbound de WhatsApp no traen filename amigable.
+- Prueba local: `pnpm lint` (0 errores), `pnpm tsc --noEmit` (limpio), `pnpm build` (OK).
+- Commit: 9fc6c97 (PR #129)
+
+### 2026-06-29 · Nova · crm/users — ABM: alta + baja de usuarios (#103)
+- Qué cambió: se reactiva el ABM de usuarios en `/crm/users` (solo `platform_operator`). (1) Cliente API ([lib/api/agent-config.ts](lib/api/agent-config.ts)): `createUser` (POST /users) y `deleteUser` (DELETE /users/{id}) + tipo `UserCreatePayload`. (2) Hooks ([hooks/use-users.ts](hooks/use-users.ts)): `useCreateUser` (invalida la lista) y `useDeleteUser` (toast + invalidación; los 400 anti-lockout llegan como `detail` del backend). (3) Diálogo de alta ([components/crm/config/user-create-dialog.tsx](components/crm/config/user-create-dialog.tsx)): email, nombre, rol (Admin/Staff) y contraseña inicial; email duplicado (422) → error inline en el campo. (4) Diálogo de baja ([components/crm/config/user-delete-dialog.tsx](components/crm/config/user-delete-dialog.tsx)): confirmación destructiva; deshabilitada en la fila propia (anti-self-lockout). (5) Tabla ([components/crm/config/users-table.tsx](components/crm/config/users-table.tsx)): toolbar "Nuevo usuario" + columna Acciones.
+- Por qué: cerrar #103 — un `platform_operator` puede crear y eliminar personas del staff desde la UI (antes solo por script). La edición de roles sigue fuera hasta el RBAC coherente (server #151).
+- Spec/decisión que respeta: FRONTEND_SPEC + SPECS_MVP §RBAC (config/users solo `platform_operator`; la página ya redirige y el backend devuelve 403). Contra el backend mergeado (server PR #173): POST alta con rol, DELETE con guardas anti-self-lockout y "≥1 operator". No reintroduce el dropdown de roles (queda en #151). `cn()` + dark mode violeta/fucsia; componentes <200 líneas; TS estricto sin `any`.
+- Prueba local: `pnpm lint` (0 errores, 6 warnings preexistentes en `use-mobile`), `pnpm tsc --noEmit` (OK), `pnpm build` (OK). Backend real ya integrado (endpoints en main del server).
+- Commit: (pendiente)
+
+
 ### 2026-06-29 · Nova · crm — tablas responsive en mobile + BoardSkeleton consistente (#109)
 - Qué cambió: (1) Tablas del CRM ([contacts-table.tsx](components/crm/contacts/contacts-table.tsx), [users-table.tsx](components/crm/config/users-table.tsx), [catalog-table.tsx](components/crm/catalog/catalog-table.tsx)): se les da `min-w` (`min-w-120`/`min-w-170`) para que el contenedor `overflow-x-auto` del primitivo `Table` de shadcn dispare **scroll horizontal en mobile** en vez de comprimir/romper las columnas. (2) `BoardSkeleton` ([crm-board.tsx](components/crm/crm-board.tsx)): reescrito para reflejar el layout responsive de `PipelineBoard` (flex + `w-[80vw]/sm:w-72/lg:flex-1`) y se quitó el `p-6` duplicado.
 - Por qué: continuación de #106 — el board ya era responsive pero las tablas se rompían en pantallas chicas y el skeleton de carga no coincidía con el board real.
