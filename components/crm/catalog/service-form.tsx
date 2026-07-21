@@ -106,7 +106,7 @@ export function SelectField<T extends string>({ name, control, options, labels }
       name={name}
       render={({ field }) => (
         <Select value={field.value} onValueChange={field.onChange}>
-          <SelectTrigger className="border-white/10 bg-white/[0.03] text-sm text-white">
+          <SelectTrigger className="w-full border-white/10 bg-white/[0.03] text-sm text-white">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

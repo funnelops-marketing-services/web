@@ -76,7 +76,7 @@ export function ServiceEditor({ service, defaultOrden, open, onOpenChange }: Ser
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full overflow-y-auto bg-zinc-950 text-white sm:max-w-lg">
+      <SheetContent side="right" className="w-full overflow-y-auto bg-zinc-950 text-white sm:max-w-2xl">
         <SheetHeader>
           <SheetTitle className="text-white">{isEdit ? 'Editar servicio' : 'Nuevo servicio'}</SheetTitle>
           <SheetDescription>El bot usa estos datos para resumir y enviar el material.</SheetDescription>
