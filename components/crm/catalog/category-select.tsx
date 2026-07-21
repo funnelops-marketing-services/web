@@ -23,7 +23,7 @@ export function CategorySelect({
   const { data: categories } = useServiceCategories()
   return (
     <Select value={value || NONE} onValueChange={(v) => onChange(v === NONE ? '' : v)}>
-      <SelectTrigger className="border-white/10 bg-white/[0.03] text-sm text-white">
+      <SelectTrigger className="w-full border-white/10 bg-white/[0.03] text-sm text-white">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

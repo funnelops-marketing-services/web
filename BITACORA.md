@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-07-21 · innova67 · crm/catálogo — editor de servicio más ancho
+- Qué cambió: el Sheet "Editar servicio" pasa de `sm:max-w-lg` a `sm:max-w-2xl`; los `SelectTrigger` de Categoría/Cierre/Moneda ahora llevan `w-full` para no desbordar su columna (el trigger base de shadcn usa `w-fit` y con nombres de categoría largos pisaba el campo vecino).
+- Por qué: el sidebar quedaba muy angosto y el select de categoría se superponía con el de cierre.
+- Spec/decisión que respeta: CLAUDE.md (dark mode, clean code, sin cambios de paradigma); solo layout, sin tocar contratos ni RBAC.
+- Prueba local: `pnpm lint` (0 errores), `pnpm tsc --noEmit` OK, `pnpm build` OK.
+- Commit: 079a09e
+
 ### 2026-07-16 · Natalia · crm/contactos — export por contexto + nombre obligatorio
 - Qué cambió:
   1. Embudo de ventas: el menú Exportar ya NO muestra "Solo contactos (cerrados)" — solo "Todos los leads" y "Solo leads fríos" (`LeadsExportMenu`).
