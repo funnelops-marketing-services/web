@@ -26,7 +26,7 @@
 - Por qué: el sidebar quedaba muy angosto y el select de categoría se superponía con el de cierre.
 - Spec/decisión que respeta: CLAUDE.md (dark mode, clean code, sin cambios de paradigma); solo layout, sin tocar contratos ni RBAC.
 - Prueba local: `pnpm lint` (0 errores), `pnpm tsc --noEmit` OK, `pnpm build` OK.
-- Commit:
+- Commit: 079a09e
 
 ### 2026-07-16 · Natalia · crm/contactos — export por contexto + nombre obligatorio
 - Qué cambió:
