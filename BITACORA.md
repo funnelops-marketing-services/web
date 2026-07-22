@@ -35,7 +35,7 @@
 - Spec/decisión que respeta: FRONTEND_SPEC §RBAC + CLAUDE.md (ambos actualizados doc-first en este PR); matriz RBAC de `server/docs/SPECS_MVP.md` §RBAC. UI copy en español, dark violeta/fucsia, sin `any`, componentes <200 líneas.
 - Prueba local: `pnpm lint` (0 errores, solo warnings preexistentes ajenos al cambio) · `pnpm tsc --noEmit` · `pnpm build` verdes. Contrato backend #200 verificado por API contra el Docker local (rama server e3383cc): client_admin `GET /users` 200 · staff 403 · client_admin→operador rol 403 · rol propio 400 · staff↔client_admin 200.
 - Mejora de flujo: `canManageUsers` desacopla "gestionar usuarios" de "config de plataforma" (antes ambos colgaban de `canManageConfig`), espejo exacto del split backend `require_user_manager` ≠ `require_platform_operator`. Coherente con el RBAC de 3 niveles; documentado en FRONTEND_SPEC/CLAUDE.md.
-- Commit: 89bbb96
+- Commit: 27277fa
 
 ### 2026-07-21 · innova67 · crm/catálogo — editor de servicio más ancho
 - Qué cambió: el Sheet "Editar servicio" pasa de `sm:max-w-lg` a `sm:max-w-2xl`; los `SelectTrigger` de Categoría/Cierre/Moneda ahora llevan `w-full` para no desbordar su columna (el trigger base de shadcn usa `w-fit` y con nombres de categoría largos pisaba el campo vecino).
