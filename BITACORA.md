@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-07-23 · innova67 · sentry — environment por deploy de Vercel (#159)
+- Qué cambió: los 3 inits de Sentry (`instrumentation-client.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`) setean `environment: process.env.NEXT_PUBLIC_VERCEL_ENV` → los eventos reportan `production` o `preview` según el deploy.
+- Por qué: sin `environment`, los errores de previews caían mezclados con producción en el dashboard. En local queda undefined (irrelevante: sin DSN el SDK es no-op). Complementa la activación runtime en Vercel (DSN del proyecto web + auth token para source maps), que es config, no código.
+- Spec/decisión que respeta: CLAUDE.md (clean code, sin `any`); setup Sentry existente fase 1 (no-op sin DSN, `tracesSampleRate: 0`, `sendDefaultPii: false` intactos — plan free).
+- Prueba local: `pnpm lint` (0 errores) · `pnpm tsc --noEmit` · `pnpm build` verdes.
+- Commit: (este) — PR #160
+
 ### 2026-07-22 · Natalia · crm/catálogo — documentos a nivel de categoría (#156)
 - Qué cambió: el material (PDF/JPG/PNG, ≤5) se sube en la **categoría**, no en el servicio. `CategoryManager`: cada fila muestra un indicador 📄 con el conteo; al editar aparece input + ✓ confirmar + dropzone; al agregar, input + Agregar + dropzone (reusa `MaterialsDropzone`). `ServiceEditor`: se quitó el dropzone y el "Envía:" del preview. `catalog-table`: se quitó la columna "Documentos" por servicio; el encabezado de cada categoría muestra el conteo de documentos. Contrato (`lib/api/catalogo.ts`): `ServiceCategoryRead` gana `slug`+`materials`, `ServiceCategory{Create,Update}` aceptan `asset_ids`; `ServiceRead` pierde `materials` y `Service{Create,Update}` pierden `asset_ids`.
 - Por qué: pedido del cliente (#156, server#235) — el bot ofrece la categoría, manda su documento una sola vez y los servicios se ofrecen sin reenviar archivos. Refleja el mockup del cliente (dropzone contextual en editar/agregar + indicador por fila).
