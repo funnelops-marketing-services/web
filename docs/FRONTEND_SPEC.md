@@ -12,13 +12,13 @@
 
 ## RBAC (front) — 3 niveles
 
-> **Actualizado 2026-06-06** (anula "admin = Mirko"). Modelo canónico: `server/docs/SPECS_MVP.md` §RBAC.
+> **Actualizado 2026-07-22** (split #126, server #200; anula "admin = Mirko" de 2026-06-06). Modelo canónico: `server/docs/SPECS_MVP.md` §RBAC.
 
-- **`platform_operator`** (Natalia + equipo, p. ej. Chris): ve **todo**, incl. config del agente, crear users/roles, settings.
-- **`client_admin`** (Mirko): **solo operación** de su organización — inbox + tablero CRM + sus leads. **NO** config, **NO** users/roles, **NO** edición del agente.
-- **`staff`** (la hermana): inbox + pipeline Gestión Humana + takeover. **NO** config.
+- **`platform_operator`** (Natalia + equipo, p. ej. Chris): ve **todo**, incl. config del agente, users/roles de cualquier tenant, settings.
+- **`client_admin`** (Mirko): operación de su organización — inbox + tablero CRM + sus leads + catálogo — **+ gestión de su propio staff** (`/crm/users`: alta/baja/cambio de rol `client_admin`↔`staff`; sin tocar operadores). **NO** config de plataforma, **NO** edición del agente.
+- **`staff`** (la hermana): inbox + pipeline Gestión Humana + takeover. **NO** config, **NO** usuarios.
 
-Guards de ruta + ocultar UI (reusar `use-permissions.ts` de Firefly-App); el backend **revalida** (no confiar solo en el front).
+Capacidades en `hooks/use-permissions.ts`: `canManageUsers` (operador ‖ client_admin) **separada** de `canManageConfig` (solo operador). Guardas de UI en la tabla de usuarios (espejo de la matriz backend): fila de operador sin selector de rol y sin acciones para client_admin; fila propia sin cambio de rol ni auto-baja. Guards de ruta + ocultar UI; el backend **revalida** (no confiar solo en el front).
 
 ## Realtime
 

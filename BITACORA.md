@@ -29,6 +29,14 @@
 - Commit: aa6df4d — PR #157
 
 
+### 2026-07-22 · Natalia · crm/usuarios — edición de roles + gating para client_admin (#126)
+- Qué cambió: `usePermissions` gana `canManageUsers` (platform_operator ‖ client_admin), separada de `canManageConfig` (solo operador). La página `/crm/users` y el ítem "Usuarios" del `Sidebar` pasan a gatear por `canManageUsers` (antes `canManageConfig`) → el cliente (Mirko) ya ve y opera su propio staff. `UsersTable`: la fila del operador (`is_superuser`) sigue sin selector y ahora **oculta la acción de borrado** para un client_admin (solo un operador la ve); la **fila propia** muestra el rol como badge con tooltip anti-bloqueo (sin selector), coherente con el 400 del backend. `useChangeUserRole` reporta el `detail` real del backend (403/400) en el toast. Copys de `listUsers`/`createUser` actualizados a "operador o client_admin".
+- Por qué: issue #126 (paso 2 del split RBAC, umbrella server #151) — `client_admin` gestiona el alta/baja/cambio de rol de su staff dentro de su tenant, sin tocar config de plataforma ni operadores. Depende de server #200 (PR #230, `require_user_manager` + guardas tenant-scoped).
+- Spec/decisión que respeta: FRONTEND_SPEC §RBAC + CLAUDE.md (ambos actualizados doc-first en este PR); matriz RBAC de `server/docs/SPECS_MVP.md` §RBAC. UI copy en español, dark violeta/fucsia, sin `any`, componentes <200 líneas.
+- Prueba local: `pnpm lint` (0 errores, solo warnings preexistentes ajenos al cambio) · `pnpm tsc --noEmit` · `pnpm build` verdes. Contrato backend #200 verificado por API contra el Docker local (rama server e3383cc): client_admin `GET /users` 200 · staff 403 · client_admin→operador rol 403 · rol propio 400 · staff↔client_admin 200.
+- Mejora de flujo: `canManageUsers` desacopla "gestionar usuarios" de "config de plataforma" (antes ambos colgaban de `canManageConfig`), espejo exacto del split backend `require_user_manager` ≠ `require_platform_operator`. Coherente con el RBAC de 3 niveles; documentado en FRONTEND_SPEC/CLAUDE.md.
+- Commit: 89bbb96
+
 ### 2026-07-21 · innova67 · crm/catálogo — editor de servicio más ancho
 - Qué cambió: el Sheet "Editar servicio" pasa de `sm:max-w-lg` a `sm:max-w-2xl`; los `SelectTrigger` de Categoría/Cierre/Moneda ahora llevan `w-full` para no desbordar su columna (el trigger base de shadcn usa `w-fit` y con nombres de categoría largos pisaba el campo vecino).
 - Por qué: el sidebar quedaba muy angosto y el select de categoría se superponía con el de cierre.

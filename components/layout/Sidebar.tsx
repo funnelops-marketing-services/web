@@ -33,16 +33,16 @@ interface NavItem {
   href: string
   icon: LucideIcon
   /** Capacidad requerida para ver el ítem; sin ella, visible para toda sesión CRM. */
-  requires?: 'canManageConfig' | 'canManageCatalog'
+  requires?: 'canManageConfig' | 'canManageCatalog' | 'canManageUsers'
 }
 
 const navItems: readonly NavItem[] = [
   { label: 'Embudo de ventas', href: '/', icon: Funnel },
   { label: 'Contactos', href: '/contacts', icon: Users },
-  // Agentes/Usuarios: solo platform_operator (superadmin). Catálogo: + client_admin.
+  // Agentes: solo platform_operator (superadmin). Catálogo/Usuarios: + client_admin (#126).
   { label: 'Agentes', href: '/agents', icon: Bot, requires: 'canManageConfig' },
   { label: 'Catálogo', href: '/catalogo', icon: BookOpen, requires: 'canManageCatalog' },
-  { label: 'Usuarios', href: '/users', icon: ShieldCheck, requires: 'canManageConfig' },
+  { label: 'Usuarios', href: '/users', icon: ShieldCheck, requires: 'canManageUsers' },
   { label: 'Ajustes', href: '/settings', icon: Settings },
 ]
 
