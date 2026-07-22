@@ -114,7 +114,7 @@ export async function changeUserRole(
   return userWithRoleSchema.parse(data)
 }
 
-/** Alta en el tenant activo (platform_operator only). Email duplicado → 422. */
+/** Alta en el tenant activo (platform_operator o client_admin, #126). Email duplicado → 422. */
 export async function createUser(payload: UserCreatePayload): Promise<UserWithRole> {
   const { data } = await apiClient.post('/users', payload)
   return userWithRoleSchema.parse(data)

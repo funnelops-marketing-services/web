@@ -8,17 +8,17 @@ import { UsersTable } from '@/components/crm/config/users-table'
 
 export default function UsersPage() {
   const router = useRouter()
-  const { canManageConfig } = usePermissions()
+  const { canManageUsers } = usePermissions()
 
-  // Solo platform_operator (superadmin). client_admin/staff se redirigen;
+  // platform_operator + client_admin (split #126, server #200). staff se redirige;
   // el backend además devuelve 403 en GET /users.
   useEffect(() => {
-    if (!canManageConfig) {
+    if (!canManageUsers) {
       router.replace('/crm')
     }
-  }, [canManageConfig, router])
+  }, [canManageUsers, router])
 
-  if (!canManageConfig) return null
+  if (!canManageUsers) return null
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 p-8">

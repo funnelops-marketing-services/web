@@ -21,7 +21,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { PLATFORM_OPERATOR_META } from '@/components/crm/config/role-meta'
+import {
+  PLATFORM_OPERATOR_META,
+  ROLE_META,
+  type RoleMeta,
+} from '@/components/crm/config/role-meta'
 import { UserCreateDialog } from '@/components/crm/config/user-create-dialog'
 import { UserDeleteDialog } from '@/components/crm/config/user-delete-dialog'
 import { UserRoleSelect } from '@/components/crm/config/user-role-select'
@@ -33,10 +37,12 @@ export function UsersTable() {
   const { data: users, isLoading, isError } = useUsers()
   const { session } = useAuth()
   const currentUserId = session?.user.id
+  const viewerIsOperator = session?.is_platform_operator ?? false
 
-  // ABM completo (#103 + #138): alta/baja + cambio de rol in-place (client_admin ↔ staff).
-  // Forma coherente de server #151: la fila del operador (is_superuser) no expone selector
-  // — su rol efectivo es global y no se gestiona desde este ABM.
+  // ABM completo (#103 + #138) abierto a client_admin (#126, server #200): alta/baja +
+  // cambio de rol in-place (client_admin ↔ staff). La fila del operador (is_superuser) no
+  // expone selector — su rol es global — y un client_admin tampoco ve acciones sobre ella
+  // (matriz RBAC de SPECS_MVP). La fila propia no permite cambiarse el rol (anti-bloqueo).
   // El ancho lo fija la página (max-w-3xl centrado, #140).
   return (
     <div className="space-y-4">
@@ -84,7 +90,12 @@ export function UsersTable() {
             </TableHeader>
             <TableBody>
               {users.map((user) => (
-                <UserRow key={user.id} user={user} isSelf={user.id === currentUserId} />
+                <UserRow
+                  key={user.id}
+                  user={user}
+                  isSelf={user.id === currentUserId}
+                  viewerIsOperator={viewerIsOperator}
+                />
               ))}
             </TableBody>
           </Table>
@@ -94,23 +105,25 @@ export function UsersTable() {
   )
 }
 
-function UserRow({ user, isSelf }: { user: UserWithRole; isSelf: boolean }) {
+interface UserRowProps {
+  user: UserWithRole
+  isSelf: boolean
+  viewerIsOperator: boolean
+}
+
+function UserRow({ user, isSelf, viewerIsOperator }: UserRowProps) {
   return (
     <TableRow className="border-white/5 hover:bg-white/[0.02]">
       <TableCell className="text-sm text-white">{user.email}</TableCell>
       <TableCell className="text-sm text-zinc-400">{user.full_name ?? '—'}</TableCell>
       <TableCell>
         {user.is_superuser ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge className={cn('font-medium', PLATFORM_OPERATOR_META.badgeClassName)}>
-                {PLATFORM_OPERATOR_META.label}
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent className="max-w-64">
-              {PLATFORM_OPERATOR_META.description}
-            </TooltipContent>
-          </Tooltip>
+          <RoleBadge meta={PLATFORM_OPERATOR_META} />
+        ) : isSelf ? (
+          <RoleBadge
+            meta={ROLE_META[user.role]}
+            tooltip="No podés cambiar tu propio rol (anti-bloqueo)"
+          />
         ) : (
           <UserRoleSelect
             userId={user.id}
@@ -120,12 +133,25 @@ function UserRow({ user, isSelf }: { user: UserWithRole; isSelf: boolean }) {
         )}
       </TableCell>
       <TableCell className="text-right">
-        <UserDeleteDialog
-          userId={user.id}
-          userLabel={user.full_name ?? user.email}
-          isSelf={isSelf}
-        />
+        {user.is_superuser && !viewerIsOperator ? null : (
+          <UserDeleteDialog
+            userId={user.id}
+            userLabel={user.full_name ?? user.email}
+            isSelf={isSelf}
+          />
+        )}
       </TableCell>
     </TableRow>
+  )
+}
+
+function RoleBadge({ meta, tooltip }: { meta: RoleMeta; tooltip?: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Badge className={cn('font-medium', meta.badgeClassName)}>{meta.label}</Badge>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-64">{tooltip ?? meta.description}</TooltipContent>
+    </Tooltip>
   )
 }

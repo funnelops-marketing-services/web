@@ -18,7 +18,7 @@ export const userKeys = {
   all: ['users'] as const,
 }
 
-/** Usuarios del tenant activo con su rol (platform_operator only). */
+/** Usuarios del tenant activo con su rol (platform_operator o client_admin, #126). */
 export function useUsers() {
   return useQuery<UserWithRole[]>({
     queryKey: userKeys.all,
@@ -52,11 +52,11 @@ export function useChangeUserRole() {
       }
       return { previous }
     },
-    onError: (_error, _vars, context) => {
+    onError: (error, _vars, context) => {
       if (context?.previous) {
         queryClient.setQueryData(userKeys.all, context.previous)
       }
-      toast.error('No se pudo cambiar el rol. Reintentá.')
+      toast.error(apiErrorMessage(error) ?? 'No se pudo cambiar el rol. Reintentá.')
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.all })

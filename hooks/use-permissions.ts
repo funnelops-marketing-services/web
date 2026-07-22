@@ -7,8 +7,10 @@ interface Capabilities {
   canViewCrm: boolean
   /** Operar el CRM: mover cards, toggle IA, responder. */
   canOperateCrm: boolean
-  /** Configurar agente y crear users/roles (pantallas agents/users). Solo platform_operator. */
+  /** Config de plataforma (pantalla agents, settings). Solo platform_operator. */
   canManageConfig: boolean
+  /** Gestionar usuarios/roles del tenant (pantalla users). client_admin + platform_operator (#126). */
+  canManageUsers: boolean
   /** Administrar el catálogo (servicios/materiales). client_admin + platform_operator. */
   canManageCatalog: boolean
   /** Exportar la base de leads (CSV, #113). client_admin + platform_operator. */
@@ -23,6 +25,7 @@ export function usePermissions(): Capabilities {
     canViewCrm: session !== null,
     canOperateCrm: session !== null,
     canManageConfig: isPlatformOperator,
+    canManageUsers: isPlatformOperator || session?.role === 'client_admin',
     canManageCatalog: isPlatformOperator || session?.role === 'client_admin',
     canExportContacts: isPlatformOperator || session?.role === 'client_admin',
   }

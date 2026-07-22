@@ -43,7 +43,7 @@ type FormValues = z.infer<typeof formSchema>
 
 const DEFAULTS: FormValues = { email: '', full_name: '', role: 'staff', password: '' }
 
-/** Alta de usuario en el tenant activo (platform_operator only). Email duplicado (422) → error inline. */
+/** Alta de usuario en el tenant activo (platform_operator o client_admin, #126). Email duplicado (422) → error inline. */
 export function UserCreateDialog() {
   const mutation = useCreateUser()
   const [open, setOpen] = useState(false)
