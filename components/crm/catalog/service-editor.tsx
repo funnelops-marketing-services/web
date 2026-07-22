@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -17,7 +16,6 @@ import {
 } from '@/components/ui/sheet'
 import { CategorySelect } from '@/components/crm/catalog/category-select'
 import { CLOSING_LABELS, CURRENCY_LABELS } from '@/components/crm/catalog/labels'
-import { MaterialsDropzone } from '@/components/crm/catalog/materials-dropzone'
 import { ServicePreview } from '@/components/crm/catalog/service-preview'
 import {
   Field,
@@ -28,12 +26,7 @@ import {
   serviceDefaults,
 } from '@/components/crm/catalog/service-form'
 import { useCreateService, useUpdateService } from '@/hooks/use-catalogo'
-import {
-  serviceClosings,
-  serviceCurrencies,
-  type AssetRead,
-  type ServiceRead,
-} from '@/lib/api/catalogo'
+import { serviceClosings, serviceCurrencies, type ServiceRead } from '@/lib/api/catalogo'
 
 interface ServiceEditorProps {
   service: ServiceRead | null
@@ -46,7 +39,6 @@ export function ServiceEditor({ service, defaultOrden, open, onOpenChange }: Ser
   const isEdit = service !== null
   const create = useCreateService()
   const update = useUpdateService()
-  const [materials, setMaterials] = useState<AssetRead[]>(service?.materials ?? [])
   const {
     control,
     register,
@@ -61,7 +53,6 @@ export function ServiceEditor({ service, defaultOrden, open, onOpenChange }: Ser
       ...form,
       category_id: form.category_id || null,
       detalle: form.detalle.trim() || null,
-      asset_ids: materials.map((m) => m.id),
     }
     if (isEdit) {
       await update.mutateAsync({ serviceId: service.id, body: payload })
@@ -79,7 +70,9 @@ export function ServiceEditor({ service, defaultOrden, open, onOpenChange }: Ser
       <SheetContent side="right" className="w-full overflow-y-auto bg-zinc-950 text-white sm:max-w-2xl">
         <SheetHeader>
           <SheetTitle className="text-white">{isEdit ? 'Editar servicio' : 'Nuevo servicio'}</SheetTitle>
-          <SheetDescription>El bot usa estos datos para resumir y enviar el material.</SheetDescription>
+          <SheetDescription>
+            El bot usa estos datos para ofrecer el servicio. El documento se sube en la categoría.
+          </SheetDescription>
         </SheetHeader>
 
         <form onSubmit={onSubmit} className="space-y-4 px-4 pb-8">
@@ -121,8 +114,6 @@ export function ServiceEditor({ service, defaultOrden, open, onOpenChange }: Ser
             </Field>
           </div>
 
-          <MaterialsDropzone materials={materials} onChange={setMaterials} />
-
           {isEdit && (
             <Controller
               control={control}
@@ -144,7 +135,6 @@ export function ServiceEditor({ service, defaultOrden, open, onOpenChange }: Ser
               precio: values.precio,
               moneda: values.moneda,
               flujo_cierre: values.flujo_cierre,
-              materialNames: materials.map((m) => m.filename),
             }}
           />
 

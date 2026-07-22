@@ -30,7 +30,7 @@ export function MaterialsDropzone({ materials, onChange }: MaterialsDropzoneProp
     if (!files?.length) return
     const slots = MAX_FILES - materials.length
     if (slots <= 0) {
-      toast.error(`Máximo ${MAX_FILES} archivos por servicio.`)
+      toast.error(`Máximo ${MAX_FILES} archivos.`)
       return
     }
     const valid = Array.from(files).filter((file) => {
