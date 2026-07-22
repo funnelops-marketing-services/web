@@ -26,7 +26,7 @@
 - Por qué: pedido del cliente (#156, server#235) — el bot ofrece la categoría, manda su documento una sola vez y los servicios se ofrecen sin reenviar archivos. Refleja el mockup del cliente (dropzone contextual en editar/agregar + indicador por fila).
 - Spec/decisión que respeta: CLAUDE.md (dark mode, clean code, sin `any`); contrato del backend server#235; RBAC intacto (client_admin + platform_operator administran el catálogo). Decisiones lockeadas: ≤5 docs/categoría, descartar material de servicio.
 - Prueba local: `pnpm lint` (0 errores) · `pnpm tsc --noEmit` · `pnpm build` verdes.
-- Commit: PENDIENTE — PR PENDIENTE
+- Commit: aa6df4d — PR #157
 
 
 ### 2026-07-21 · innova67 · crm/catálogo — editor de servicio más ancho
