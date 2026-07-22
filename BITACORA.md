@@ -21,6 +21,14 @@
 
 ## Entradas
 
+### 2026-07-22 · Natalia · crm/catálogo — documentos a nivel de categoría (#156)
+- Qué cambió: el material (PDF/JPG/PNG, ≤5) se sube en la **categoría**, no en el servicio. `CategoryManager`: cada fila muestra un indicador 📄 con el conteo; al editar aparece input + ✓ confirmar + dropzone; al agregar, input + Agregar + dropzone (reusa `MaterialsDropzone`). `ServiceEditor`: se quitó el dropzone y el "Envía:" del preview. `catalog-table`: se quitó la columna "Documentos" por servicio; el encabezado de cada categoría muestra el conteo de documentos. Contrato (`lib/api/catalogo.ts`): `ServiceCategoryRead` gana `slug`+`materials`, `ServiceCategory{Create,Update}` aceptan `asset_ids`; `ServiceRead` pierde `materials` y `Service{Create,Update}` pierden `asset_ids`.
+- Por qué: pedido del cliente (#156, server#235) — el bot ofrece la categoría, manda su documento una sola vez y los servicios se ofrecen sin reenviar archivos. Refleja el mockup del cliente (dropzone contextual en editar/agregar + indicador por fila).
+- Spec/decisión que respeta: CLAUDE.md (dark mode, clean code, sin `any`); contrato del backend server#235; RBAC intacto (client_admin + platform_operator administran el catálogo). Decisiones lockeadas: ≤5 docs/categoría, descartar material de servicio.
+- Prueba local: `pnpm lint` (0 errores) · `pnpm tsc --noEmit` · `pnpm build` verdes.
+- Commit: PENDIENTE — PR PENDIENTE
+
+
 ### 2026-07-21 · innova67 · crm/catálogo — editor de servicio más ancho
 - Qué cambió: el Sheet "Editar servicio" pasa de `sm:max-w-lg` a `sm:max-w-2xl`; los `SelectTrigger` de Categoría/Cierre/Moneda ahora llevan `w-full` para no desbordar su columna (el trigger base de shadcn usa `w-fit` y con nombres de categoría largos pisaba el campo vecino).
 - Por qué: el sidebar quedaba muy angosto y el select de categoría se superponía con el de cierre.

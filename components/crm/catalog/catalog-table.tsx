@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { FileText, FileWarning, GripVertical, Pencil } from 'lucide-react'
+import { FileText, GripVertical, Pencil } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { formatMoney } from '@/lib/format'
@@ -33,7 +33,10 @@ export function CatalogTable({ services, onEdit }: CatalogTableProps) {
 
   // Agrupa por categoría dinámica (#106); los sin categoría van al final.
   const groups = useMemo(() => {
-    const map = new Map<string, { label: string; orden: number; items: ServiceRead[] }>()
+    const map = new Map<
+      string,
+      { label: string; orden: number; docs: number; items: ServiceRead[] }
+    >()
     for (const service of services) {
       const key = service.category_id ?? NO_CATEGORY
       const existing = map.get(key)
@@ -43,6 +46,7 @@ export function CatalogTable({ services, onEdit }: CatalogTableProps) {
         map.set(key, {
           label: service.category?.nombre ?? 'Sin categoría',
           orden: service.category?.orden ?? Number.MAX_SAFE_INTEGER,
+          docs: service.category?.materials.length ?? 0, // documentos de la categoría (#235)
           items: [service],
         })
       }
@@ -75,7 +79,15 @@ export function CatalogTable({ services, onEdit }: CatalogTableProps) {
     <div className="space-y-8">
       {groups.map((group) => (
         <section key={group.key} className="space-y-2">
-          <h2 className="text-sm font-semibold text-zinc-300">{group.label}</h2>
+          <h2 className="flex items-center gap-2 text-sm font-semibold text-zinc-300">
+            {group.label}
+            {group.docs > 0 && (
+              <span className="flex items-center gap-1 text-xs font-normal text-zinc-500">
+                <FileText className="size-3.5 text-emerald-400/70" />
+                {group.docs} {group.docs === 1 ? 'documento' : 'documentos'}
+              </span>
+            )}
+          </h2>
           <div className="rounded-xl border border-white/5 bg-white/[0.02]">
             <Table className="min-w-170 table-fixed">
               <TableHeader>
@@ -83,7 +95,6 @@ export function CatalogTable({ services, onEdit }: CatalogTableProps) {
                   <TableHead className="w-10" />
                   <TableHead className="text-zinc-400">Servicio</TableHead>
                   <TableHead className="w-44 text-zinc-400">Precio</TableHead>
-                  <TableHead className="w-28 text-zinc-400">Documentos</TableHead>
                   <TableHead className="w-20 text-zinc-400">Activo</TableHead>
                   <TableHead className="w-24 text-right text-zinc-400">Acciones</TableHead>
                 </TableRow>
@@ -119,23 +130,6 @@ export function CatalogTable({ services, onEdit }: CatalogTableProps) {
                     </TableCell>
                     <TableCell className="text-sm text-zinc-300">
                       {formatMoney(service.precio, service.moneda)}
-                    </TableCell>
-                    <TableCell>
-                      {service.materials.length > 0 ? (
-                        <span className="flex items-center gap-1 text-xs text-zinc-400">
-                          <FileText className="size-3.5 text-emerald-400/70" /> {service.materials.length}
-                        </span>
-                      ) : (
-                        // CTA directo: abre el editor (ahí vive el dropzone de materiales) (#137).
-                        <button
-                          type="button"
-                          onClick={() => onEdit(service)}
-                          className="flex items-center gap-1 rounded text-xs text-amber-400/80 transition-colors hover:text-amber-300 focus-visible:ring-2 focus-visible:ring-violet-500/60 focus-visible:outline-none"
-                        >
-                          <FileWarning className="size-3.5" />
-                          <span className="underline-offset-2 hover:underline">Subir material</span>
-                        </button>
-                      )}
                     </TableCell>
                     <TableCell>
                       <Switch

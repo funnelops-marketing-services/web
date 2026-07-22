@@ -1,7 +1,5 @@
 'use client'
 
-import { FileText } from 'lucide-react'
-
 import { CLOSING_LABELS } from '@/components/crm/catalog/labels'
 import type { ServiceClosing } from '@/lib/api/catalogo'
 
@@ -12,10 +10,9 @@ interface PreviewService {
   precio: string
   moneda: string
   flujo_cierre: string
-  materialNames?: string[]
 }
 
-/** Cómo el bot le presenta este servicio al lead: resumen breve + precio + material. */
+/** Cómo el bot le presenta este servicio al lead: resumen breve + precio. */
 export function ServicePreview({ service }: { service: PreviewService }) {
   const isUsd = service.moneda === 'USD'
   const closing = CLOSING_LABELS[service.flujo_cierre as ServiceClosing] ?? service.flujo_cierre
@@ -40,12 +37,6 @@ export function ServicePreview({ service }: { service: PreviewService }) {
       </p>
       {service.detalle && (
         <p className="whitespace-pre-line text-xs text-zinc-400">{service.detalle}</p>
-      )}
-      {service.materialNames && service.materialNames.length > 0 && (
-        <p className="flex items-start gap-1.5 text-xs text-zinc-400">
-          <FileText className="mt-0.5 size-3.5 shrink-0 text-zinc-500" />
-          <span>Envía: {service.materialNames.join(', ')}</span>
-        </p>
       )}
       <p className="text-xs text-zinc-500">Cierre: {closing}</p>
     </div>

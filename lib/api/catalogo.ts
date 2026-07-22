@@ -25,7 +25,9 @@ export const serviceCategoryReadSchema = z.object({
   id: z.string(),
   organization_id: z.string(),
   nombre: z.string(),
+  slug: z.string(),
   orden: z.number(),
+  materials: z.array(assetReadSchema),
   created_at: z.string(),
   updated_at: z.string(),
 })
@@ -43,7 +45,6 @@ export const serviceReadSchema = z.object({
   precio: z.string(),
   moneda: z.string(),
   flujo_cierre: z.string(),
-  materials: z.array(assetReadSchema),
   orden: z.number(),
   is_active: z.boolean(),
   created_at: z.string(),
@@ -67,7 +68,6 @@ export interface ServiceCreate {
   precio: string
   moneda: ServiceCurrency
   flujo_cierre?: ServiceClosing
-  asset_ids?: string[]
   orden?: number
 }
 
@@ -79,7 +79,6 @@ export interface ServiceUpdate {
   precio?: string
   moneda?: ServiceCurrency
   flujo_cierre?: ServiceClosing
-  asset_ids?: string[]
   orden?: number
   is_active?: boolean
 }
@@ -87,11 +86,13 @@ export interface ServiceUpdate {
 export interface ServiceCategoryCreate {
   nombre: string
   orden?: number
+  asset_ids?: string[]
 }
 
 export interface ServiceCategoryUpdate {
   nombre?: string
   orden?: number
+  asset_ids?: string[]
 }
 
 // ---------- Llamadas tipadas: servicios ----------
