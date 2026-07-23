@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-07-23 · innova67 · crm/chat — imagen suelta + caption como en WhatsApp (#164)
+- Qué cambió: en `conversation-message.tsx`, los mensajes `type:'image'` se renderizan sin la burbuja del emisor (sin gradiente/padding/glow; aplica a lead y agente) y con el caption (`message.text`) como texto debajo de la imagen, con `whitespace-pre-wrap` (#121); el `alt` pasa a fijo "Imagen adjunta". Los `type:'document'` con caption muestran el texto debajo del chip, dentro de la misma burbuja.
+- Por qué: el QR de pago del agente se veía como un "cartelón" morado distinto a lo que recibe el cliente, y el caption no se mostraba (solo se usaba como `alt`) — issue #164. Los "saltos de línea raros" reportados son soft wraps: la burbuja tomaba `85%` del panel, así que en pantallas anchas quebraba distinto que el teléfono. Se agrega tope `max-w-[min(85%,26rem)]` (~49 chars/línea, calibrado con capturas reales) para aproximar el quiebre de WhatsApp en cualquier viewport; paridad exacta no es alcanzable (depende del dispositivo/fuente del cliente).
+- Spec/decisión que respeta: FRONTEND_SPEC §Inbox (hilo espejo con burbujas de `conversation-message.tsx`); contrato M-CRM (caption del media llega en `text` del mensaje imagen, server/docs/SPECS_MVP). Sin cambios de backend ni schema.
+- Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes fuera del archivo) · `tsc --noEmit` limpio · `pnpm build` OK. Casos: imagen con/sin caption, documento con caption, texto normal y mensajes del lead intactos.
+- Commit: faeea2a — PR #165
+
 ### 2026-07-22 · innova67 · crm/tablero — ganar exige nombre del lead (#162)
 - Qué cambió: nuevo `win-name-dialog.tsx`: al soltar una card en un stage `won` sin nombre de lead (`pendingWinFor`: stage `status_code === 'won'` + `isUnnamedLead`), en vez de mover se abre un modal que pide el nombre, hace `PATCH /crm/cards/{id}` con `full_name` y recién ahí `POST /move`. `crm-board.tsx` antepone ese gate en `handleMove`; `useMoveCard.onError` muestra el mensaje del server en un 422 de negocio en vez del toast genérico.
 - Por qué: los leads sin nombre ganados desde el funnel creaban contactos "Sin nombre" (hook 'won' del backend). El backend ahora rechaza ese move con 422 (server#241 / PR server#242); este modal completa el flujo sin fricción: nombrás y ganás en el mismo gesto.
