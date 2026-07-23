@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-07-23 · innova67 · crm/chat — fix 422 al adjuntar: multipart pisado por el Content-Type JSON (#171)
+- Qué cambió: `sendHumanMedia` (`lib/api/crm.ts`) pasa `headers: {'Content-Type': 'multipart/form-data'}` en el POST a `send-media`; Axios lo reemplaza por el boundary correcto al detectar FormData.
+- Por qué: el default `application/json` del `apiClient` pisaba el multipart → FastAPI no encontraba el campo `file` y respondía 422 "field required" (repro en prod al adjuntar, con o sin caption; el QR andaba porque no lleva body). El fix se había commiteado (d2952fc) en la rama de #169 **después** del merge del PR #170, así que nunca llegó a main — este PR lo re-aplica desde main (cherry-pick).
+- Spec/decisión que respeta: mismo patrón probado de `uploadAsset` del catálogo (`lib/api/catalogo.ts`); no cambia contrato ni UI.
+- Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes) · `tsc --noEmit` limpio · `pnpm build` OK (corridos sobre el mismo árbol: main + este commit = la punta de la rama #169 ya verificada).
+- Commit: (este) — PR #172
+
 ### 2026-07-23 · innova67 · crm/chat — composer con adjuntos (clip/drag & drop/paste) + botón QR de pago (#169)
 - Qué cambió: el composer del takeover se extrae a `conversation-composer.tsx` y suma media: botón clip (input file), pegar imagen desde el portapapeles y drag & drop sobre el hilo (`conversation-panel.tsx` marca la drop zone con outline violeta); validación cliente JPG/PNG/PDF ≤5 MB espejo del backend, preview del archivo con nombre/tamaño/quitar, y el texto pasa a ser el caption (≤1024). Botón nuevo "Enviar QR de pago" (ícono QrCode) que manda la imagen configurada en el sistema. API: `sendHumanMedia` (multipart a `POST /crm/cards/{id}/send-media`) y `sendPaymentQr` (`POST .../send-qr`) + hooks `useSendHumanMedia`/`useSendPaymentQr` (invalidan el detalle; errores 400/502 muestran el mensaje del server — ventana de 24 h incluida). El adjunto pendiente queda keyed por card (no se arrastra a otra conversación).
 - Por qué: #169 — el staff no podía arrastrar imágenes/archivos al chat ni enviar el QR de pago manualmente; solo el agente mandaba media. Las burbujas del hilo ya renderizaban `image`/`document` (#164/#166), ahora también para mensajes humanos.

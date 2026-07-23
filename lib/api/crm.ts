@@ -212,7 +212,11 @@ export async function sendHumanMedia(
   const form = new FormData()
   form.append('file', file)
   if (caption) form.append('caption', caption)
-  const { data } = await apiClient.post(`/crm/cards/${cardId}/send-media`, form)
+  // Override del 'application/json' por defecto del cliente: con FormData, Axios
+  // reemplaza este header por multipart/form-data con el boundary correcto.
+  const { data } = await apiClient.post(`/crm/cards/${cardId}/send-media`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
   return threadMessageSchema.parse(data)
 }
 
