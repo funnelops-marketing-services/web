@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-07-23 · innova67 · global — scrollbars finas acordes al tema oscuro (#167)
+- Qué cambió: en `app/globals.css` (`@layer base`) se estilan todas las scrollbars: propiedades estándar `scrollbar-width: thin` + `scrollbar-color` (thumb translúcido derivado de `--foreground`, track transparente) y fallback `::-webkit-scrollbar` (8px, thumb redondeado, hover más visible) para Safari.
+- Por qué: las scrollbars nativas de Windows (track claro, thumb gris grueso) rompían el tema oscuro del CRM — muy visible en las columnas del kanban, el hilo de conversación y el panel de detalle (#167).
+- Spec/decisión que respeta: CLAUDE.md §Estilo (dark mode por defecto); no toca rutas, RBAC ni contratos. Colores derivados de las variables del tema, sirve en dark y light.
+- Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes) · `tsc --noEmit` limpio · `pnpm build` OK. Cambio CSS puro, sin lógica; revisión visual en kanban/hilo/modales al probar en dev.
+- Commit:
+
 ### 2026-07-23 · innova67 · crm/chat — burbuja media con marco fino para imagen + caption (#164, seguimiento)
 - Qué cambió: en `conversation-message.tsx`, los mensajes `type:'image'` vuelven a renderizarse dentro de la burbuja del emisor pero con marco fino estilo WhatsApp (`p-1` en vez de `px-3.5 py-2.5`); la imagen pasa a `rounded-xl` y el caption va adentro de la burbuja con padding propio (`px-2 pt-1.5 pb-1`), heredando el color de texto de la burbuja.
 - Por qué: el PR #165 dejó la imagen con caption "suelta" sobre el fondo negro y no se veía el fondo de burbuja; en WhatsApp la imagen con caption va dentro de la burbuja del emisor con un marco fino. Feedback visual post-merge sobre #164 (reabierto).

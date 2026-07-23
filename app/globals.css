@@ -124,6 +124,27 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Thin theme-aware scrollbars; native Windows ones clash with the dark UI. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--foreground) 25%, transparent) transparent;
+  }
+  /* Safari fallback (Chromium/Firefox use the standard properties above). */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: color-mix(in oklab, var(--foreground) 25%, transparent);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--foreground) 40%, transparent);
+  }
 }
 
 /* ── Landing (rediseño de portafolio audiovisual) ───────────────────── */
