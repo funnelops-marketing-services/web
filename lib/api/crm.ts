@@ -202,3 +202,22 @@ export async function sendHumanReply(
   const { data } = await apiClient.post(`/crm/cards/${cardId}/send`, { text })
   return threadMessageSchema.parse(data)
 }
+
+/** Adjunto del takeover (#169): JPG/PNG/PDF ≤5 MB con caption opcional. */
+export async function sendHumanMedia(
+  cardId: string,
+  file: File,
+  caption: string,
+): Promise<ThreadMessage> {
+  const form = new FormData()
+  form.append('file', file)
+  if (caption) form.append('caption', caption)
+  const { data } = await apiClient.post(`/crm/cards/${cardId}/send-media`, form)
+  return threadMessageSchema.parse(data)
+}
+
+/** Envía el QR de pago configurado en el sistema (misma imagen que usa el agente). */
+export async function sendPaymentQr(cardId: string): Promise<ThreadMessage> {
+  const { data } = await apiClient.post(`/crm/cards/${cardId}/send-qr`)
+  return threadMessageSchema.parse(data)
+}

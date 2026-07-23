@@ -6,7 +6,7 @@
 ## Pantallas (en `/crm`)
 
 1. **Inbox de conversaciones** — lista (contacto, último mensaje, etapa del funnel, **badge 🔥 cuando `handed_off`**) + panel de hilo con burbujas. Reutilizable: burbujas de chat de Firefly-App (`conversation-message.tsx`).
-2. **Takeover** — toggle **IA on/off** por conversación (`is_ai_active`). Con IA on, el input se deshabilita; con IA off (humano tomó), el humano escribe por el hilo (envío vía backend → Meta).
+2. **Takeover** — toggle **IA on/off** por conversación (`is_ai_active`). Con IA on, el input se deshabilita; con IA off (humano tomó), el humano escribe por el hilo (envío vía backend → Meta). El composer además permite **adjuntar imagen/PDF** (clip, drag & drop sobre el hilo, o paste; JPG/PNG/PDF ≤5 MB, el texto acompaña como caption) y **enviar el QR de pago** del sistema con un botón dedicado (#169, server#251).
 3. **Pipeline "Gestión Humana"** (kanban) — los leads derivados (handoff) entran acá. Stages: `Por validar pago → Pago validado → Entrada enviada (Cerrado)` → [Fase 2] `Asistió / No asistió / Lost`. Acción **`/generarEntrada`** (dispara al backend) desde la card al validar el pago.
 4. **Config del agente (ABM) — solo `platform_operator` (Natalia + equipo):** editar system prompt (textarea), nivel de emojis (switch mucho/poco/nada), temperatura (slider); guardar crea `agent_version`. **Mirko (`client_admin`) y el staff NO** ven esta pantalla.
 
