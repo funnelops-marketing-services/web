@@ -26,7 +26,7 @@
 - Por qué: el PR #165 dejó la imagen con caption "suelta" sobre el fondo negro y no se veía el fondo de burbuja; en WhatsApp la imagen con caption va dentro de la burbuja del emisor con un marco fino. Feedback visual post-merge sobre #164 (reabierto).
 - Spec/decisión que respeta: FRONTEND_SPEC §Inbox (hilo espejo con burbujas); mismo contrato M-CRM (caption en `text` del mensaje imagen). Sin cambios de backend.
 - Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes fuera del archivo) · `tsc --noEmit` limpio · `pnpm build` OK. Casos: imagen con/sin caption (burbuja fina en ambos), documento y texto sin cambios.
-- Commit:
+- Commit: ca57593 — PR #166
 
 ### 2026-07-23 · innova67 · crm/chat — imagen suelta + caption como en WhatsApp (#164)
 - Qué cambió: en `conversation-message.tsx`, los mensajes `type:'image'` se renderizan sin la burbuja del emisor (sin gradiente/padding/glow; aplica a lead y agente) y con el caption (`message.text`) como texto debajo de la imagen, con `whitespace-pre-wrap` (#121); el `alt` pasa a fijo "Imagen adjunta". Los `type:'document'` con caption muestran el texto debajo del chip, dentro de la misma burbuja.
