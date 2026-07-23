@@ -26,7 +26,7 @@
 - Por qué: los leads sin nombre ganados desde el funnel creaban contactos "Sin nombre" (hook 'won' del backend). El backend ahora rechaza ese move con 422 (server#241 / PR server#242); este modal completa el flujo sin fricción: nombrás y ganás en el mismo gesto.
 - Spec/decisión que respeta: "no puede haber un contacto sin nombre" (server#229, ya aplicado al ABM manual); contratos M-CRM (`PATCH /crm/cards` actualiza `conversation.full_name`, server/docs/SPECS_MVP); componentes <200 líneas (gate extraído al módulo del dialog: board 190, dialog 131).
 - Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes fuera de los archivos tocados) · `tsc --noEmit` limpio · `pnpm build` OK. Flujo contra el contrato del server (PR #242 aún sin mergear: hasta entonces el gate del front evita el caso igual).
-- Commit: (completar después del commit)
+- Commit: f83be85 — PR #163
 
 ### 2026-07-23 · innova67 · sentry — environment por deploy de Vercel (#159)
 - Qué cambió: los 3 inits de Sentry (`instrumentation-client.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`) setean `environment: process.env.NEXT_PUBLIC_VERCEL_ENV` → los eventos reportan `production` o `preview` según el deploy.
