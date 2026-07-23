@@ -82,11 +82,17 @@ export function useMoveCard() {
       }
       return { previous }
     },
-    onError: (_error, _vars, context) => {
+    onError: (error, _vars, context) => {
       if (context?.previous) {
         queryClient.setQueryData(boardKeys.all, context.previous)
       }
-      toast.error('No se pudo mover la tarjeta. Reintentá.')
+      // 422 del server = regla de negocio (ej. ganar exige nombre, server#241):
+      // se muestra su mensaje en vez del genérico.
+      const detail =
+        isAxiosError(error) && error.response?.status === 422
+          ? apiErrorMessage(error)
+          : null
+      toast.error(detail ?? 'No se pudo mover la tarjeta. Reintentá.')
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: boardKeys.all })

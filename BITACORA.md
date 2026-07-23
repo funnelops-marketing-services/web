@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-07-22 · innova67 · crm/tablero — ganar exige nombre del lead (#162)
+- Qué cambió: nuevo `win-name-dialog.tsx`: al soltar una card en un stage `won` sin nombre de lead (`pendingWinFor`: stage `status_code === 'won'` + `isUnnamedLead`), en vez de mover se abre un modal que pide el nombre, hace `PATCH /crm/cards/{id}` con `full_name` y recién ahí `POST /move`. `crm-board.tsx` antepone ese gate en `handleMove`; `useMoveCard.onError` muestra el mensaje del server en un 422 de negocio en vez del toast genérico.
+- Por qué: los leads sin nombre ganados desde el funnel creaban contactos "Sin nombre" (hook 'won' del backend). El backend ahora rechaza ese move con 422 (server#241 / PR server#242); este modal completa el flujo sin fricción: nombrás y ganás en el mismo gesto.
+- Spec/decisión que respeta: "no puede haber un contacto sin nombre" (server#229, ya aplicado al ABM manual); contratos M-CRM (`PATCH /crm/cards` actualiza `conversation.full_name`, server/docs/SPECS_MVP); componentes <200 líneas (gate extraído al módulo del dialog: board 190, dialog 131).
+- Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes fuera de los archivos tocados) · `tsc --noEmit` limpio · `pnpm build` OK. Flujo contra el contrato del server (PR #242 aún sin mergear: hasta entonces el gate del front evita el caso igual).
+- Commit: (completar después del commit)
+
 ### 2026-07-23 · innova67 · sentry — environment por deploy de Vercel (#159)
 - Qué cambió: los 3 inits de Sentry (`instrumentation-client.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`) setean `environment: process.env.NEXT_PUBLIC_VERCEL_ENV` → los eventos reportan `production` o `preview` según el deploy.
 - Por qué: sin `environment`, los errores de previews caían mezclados con producción en el dashboard. En local queda undefined (irrelevante: sin DSN el SDK es no-op). Complementa la activación runtime en Vercel (DSN del proyecto web + auth token para source maps), que es config, no código.

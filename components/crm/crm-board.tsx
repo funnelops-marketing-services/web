@@ -17,6 +17,11 @@ import { BoardSkeleton, CenteredMessage } from '@/components/crm/board-states'
 import { CardDetailDialog } from '@/components/crm/card-detail-dialog'
 import { LeadsExportMenu } from '@/components/crm/leads-export-menu'
 import { OpportunityCreateSheet } from '@/components/crm/opportunity-create'
+import {
+  WinNameDialog,
+  pendingWinFor,
+  type PendingWin,
+} from '@/components/crm/win-name-dialog'
 import type { Card, Pipeline } from '@/lib/api/crm'
 
 /** Una card matchea si el texto está en el nombre (title) o los dígitos en el teléfono
@@ -57,6 +62,7 @@ export function CrmBoard() {
   const [activePipelineId, setActivePipelineId] = useState<string | null>(null)
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
+  const [pendingWin, setPendingWin] = useState<PendingWin | null>(null)
   const [query, setQuery] = useState('')
 
   const q = query.trim().toLowerCase()
@@ -67,8 +73,15 @@ export function CrmBoard() {
   }, [data, q, qDigits])
   const activeId = activePipelineId ?? pipelines[0]?.id ?? ''
 
-  const handleMove = (cardId: string, stageId: string) =>
+  const handleMove = (cardId: string, stageId: string) => {
+    // Ganar exige nombre (#162): sin nombre se abre el dialog en vez de mover.
+    const pending = pendingWinFor(data, cardId, stageId)
+    if (pending) {
+      setPendingWin(pending)
+      return
+    }
     moveCard.mutate({ cardId, stageId })
+  }
 
   return (
     <div className="h-[calc(100vh-4rem)]">
@@ -184,6 +197,7 @@ export function CrmBoard() {
         onClose={() => setSelectedCardId(null)}
       />
       <OpportunityCreateSheet open={createOpen} onOpenChange={setCreateOpen} />
+      <WinNameDialog pending={pendingWin} onClose={() => setPendingWin(null)} />
     </div>
   )
 }
