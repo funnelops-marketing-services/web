@@ -1,23 +1,23 @@
 'use client'
 
-import { Fragment, useState } from 'react'
-import { Bot, Loader2, MessageSquare, QrCode, Send, User, X } from 'lucide-react'
+import { Fragment, useState, type DragEvent } from 'react'
+import { Bot, MessageSquare, QrCode, User, X } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { cn } from '@/lib/utils'
 import { formatThreadDay, isUnnamedLead, leadTitle, sameCalendarDay } from '@/lib/format'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { useCard } from '@/hooks/use-card'
 import { useBoard } from '@/hooks/use-board'
-import {
-  useGenerateEntry,
-  useSendHumanReply,
-  useSetAiActive,
-} from '@/hooks/use-card-mutations'
+import { useGenerateEntry, useSetAiActive } from '@/hooks/use-card-mutations'
 import { usePermissions } from '@/hooks/use-permissions'
 import { ConversationMessage } from '@/components/crm/conversation-message'
+import {
+  composerFileError,
+  ConversationComposer,
+} from '@/components/crm/conversation-composer'
 
 function EmptyState({ text }: { text: string }) {
   return (
@@ -45,8 +45,9 @@ export function ConversationPanel({
   const { canOperateCrm } = usePermissions()
   const setAiActive = useSetAiActive(cardId ?? '')
   const generateEntryMutation = useGenerateEntry(cardId ?? '')
-  const sendReply = useSendHumanReply(cardId ?? '')
-  const [reply, setReply] = useState('')
+  // Keyed por card: un adjunto pendiente de otra conversación no se arrastra a esta.
+  const [attachment, setAttachment] = useState<{ cardId: string; file: File } | null>(null)
+  const [dragOver, setDragOver] = useState(false)
 
   if (!cardId) return <EmptyState text="Seleccioná un lead para ver la conversación" />
   if (isLoading) return <EmptyState text="Cargando conversación…" />
@@ -55,9 +56,24 @@ export function ConversationPanel({
   const stageName =
     boards?.pipelines.flatMap((p) => p.stages).find((s) => s.id === card.stage_id)?.name ?? ''
   const showGenerateEntry = stageName === 'Pago validado' && !card.is_ai_active
+  // Composer humano: solo en takeover (is_ai_active=false) y con permiso (#169).
+  const canReply = !card.is_ai_active && canOperateCrm
 
   const handleToggle = (next: boolean) => {
     setAiActive.mutate({ conversationId: card.conversation_id, isAiActive: next })
+  }
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setDragOver(false)
+    const dropped = e.dataTransfer.files?.[0]
+    if (!dropped) return
+    const error = composerFileError(dropped)
+    if (error) {
+      toast.error(error)
+      return
+    }
+    setAttachment({ cardId, file: dropped })
   }
 
   return (
@@ -89,7 +105,22 @@ export function ConversationPanel({
         </div>
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto p-4">
+      {/* Drop zone (#169): arrastrar un archivo sobre el hilo lo carga en el composer. */}
+      <div
+        className={cn(
+          'flex-1 space-y-3 overflow-y-auto p-4',
+          dragOver && 'bg-violet-500/5 outline-2 -outline-offset-2 outline-dashed outline-violet-500/60',
+        )}
+        onDragOver={canReply ? (e) => { e.preventDefault(); setDragOver(true) } : undefined}
+        onDragLeave={
+          canReply
+            ? (e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragOver(false)
+              }
+            : undefined
+        }
+        onDrop={canReply ? handleDrop : undefined}
+      >
         {card.thread.length === 0 ? (
           <p className="pt-8 text-center text-xs font-normal text-zinc-600">
             Sin mensajes todavía
@@ -162,38 +193,13 @@ export function ConversationPanel({
           </Button>
         )}
 
-        {/* Input humano: solo en takeover (is_ai_active=false) y con permiso. */}
-        {!card.is_ai_active && canOperateCrm && (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              const text = reply.trim()
-              if (!text || sendReply.isPending) return
-              sendReply.mutate(text, { onSuccess: () => setReply('') })
-            }}
-            className="flex gap-2"
-          >
-            <Input
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              placeholder="Escribí tu respuesta…"
-              maxLength={4096}
-              disabled={sendReply.isPending}
-              className="h-10 flex-1 rounded-full border-white/10 bg-white/[0.03] text-sm font-normal text-white placeholder:text-zinc-600 disabled:opacity-50"
-            />
-            <Button
-              type="submit"
-              disabled={sendReply.isPending || reply.trim().length === 0}
-              aria-label={sendReply.isPending ? 'Enviando…' : 'Enviar'}
-              className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-b from-violet-500 to-violet-700 p-0 hover:from-violet-400 hover:to-violet-600 disabled:opacity-40"
-            >
-              {sendReply.isPending ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Send className="size-4" />
-              )}
-            </Button>
-          </form>
+        {canReply && (
+          <ConversationComposer
+            key={cardId} // resetea el texto al cambiar de conversación
+            cardId={cardId}
+            file={attachment?.cardId === cardId ? attachment.file : null}
+            onFileChange={(file) => setAttachment(file ? { cardId, file } : null)}
+          />
         )}
       </div>
     </>

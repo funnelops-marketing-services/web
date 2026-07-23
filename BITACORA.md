@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-07-23 · innova67 · crm/chat — composer con adjuntos (clip/drag & drop/paste) + botón QR de pago (#169)
+- Qué cambió: el composer del takeover se extrae a `conversation-composer.tsx` y suma media: botón clip (input file), pegar imagen desde el portapapeles y drag & drop sobre el hilo (`conversation-panel.tsx` marca la drop zone con outline violeta); validación cliente JPG/PNG/PDF ≤5 MB espejo del backend, preview del archivo con nombre/tamaño/quitar, y el texto pasa a ser el caption (≤1024). Botón nuevo "Enviar QR de pago" (ícono QrCode) que manda la imagen configurada en el sistema. API: `sendHumanMedia` (multipart a `POST /crm/cards/{id}/send-media`) y `sendPaymentQr` (`POST .../send-qr`) + hooks `useSendHumanMedia`/`useSendPaymentQr` (invalidan el detalle; errores 400/502 muestran el mensaje del server — ventana de 24 h incluida). El adjunto pendiente queda keyed por card (no se arrastra a otra conversación).
+- Por qué: #169 — el staff no podía arrastrar imágenes/archivos al chat ni enviar el QR de pago manualmente; solo el agente mandaba media. Las burbujas del hilo ya renderizaban `image`/`document` (#164/#166), ahora también para mensajes humanos.
+- Spec/decisión que respeta: FRONTEND_SPEC §2 Takeover (actualizado en este PR: adjuntos + QR como parte del envío humano vía backend → Meta); CLAUDE.md (composer solo en takeover con permiso — `canOperateCrm` —, TS estricto, componentes <200 líneas: panel 194 / composer 168, UI español, dark violeta/fucsia). Contrato: server#251 (PR server#252) — `send-media`/`send-qr` + `type`/`media_url` en mensajes humanos del thread.
+- Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes en `use-mobile`) · `pnpm tsc --noEmit` limpio · `pnpm build` OK. **Depende del backend server#252**: mergear/desplegar ese PR antes (con `alembic upgrade head`); sin él, `send-media`/`send-qr` devuelven 404.
+- Commit: (este) — PR #170
+
 ### 2026-07-23 · innova67 · global — scrollbars finas acordes al tema oscuro (#167)
 - Qué cambió: en `app/globals.css` (`@layer base`) se estilan todas las scrollbars: propiedades estándar `scrollbar-width: thin` + `scrollbar-color` (thumb translúcido derivado de `--foreground`, track transparente) y fallback `::-webkit-scrollbar` (8px, thumb redondeado, hover más visible) para Safari.
 - Por qué: las scrollbars nativas de Windows (track claro, thumb gris grueso) rompían el tema oscuro del CRM — muy visible en las columnas del kanban, el hilo de conversación y el panel de detalle (#167).

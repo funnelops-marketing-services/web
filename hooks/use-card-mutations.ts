@@ -9,7 +9,9 @@ import {
   deleteCard,
   generateEntry,
   moveCard,
+  sendHumanMedia,
   sendHumanReply,
+  sendPaymentQr,
   setAiActive,
   updateCard,
   updateCardServices,
@@ -139,6 +141,38 @@ export function useSendHumanReply(cardId: string) {
     },
     onError: () => {
       toast.error('No se pudo enviar el mensaje. Reintentá.')
+    },
+  })
+}
+
+/** Adjunto humano en takeover (POST send-media, #169). Refresca el hilo al éxito.
+ * El 400 (archivo inválido) y el 502 (ventana de 24 h cerrada) traen mensaje del server. */
+export function useSendHumanMedia(cardId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation<ThreadMessage, Error, { file: File; caption: string }>({
+    mutationFn: ({ file, caption }) => sendHumanMedia(cardId, file, caption),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error) ?? 'No se pudo enviar el archivo. Reintentá.')
+    },
+  })
+}
+
+/** Envía el QR de pago del sistema en takeover (POST send-qr, #169). */
+export function useSendPaymentQr(cardId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation<ThreadMessage, Error>({
+    mutationFn: () => sendPaymentQr(cardId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
+      toast.success('QR de pago enviado.')
+    },
+    onError: (error) => {
+      toast.error(apiErrorMessage(error) ?? 'No se pudo enviar el QR de pago. Reintentá.')
     },
   })
 }
