@@ -26,7 +26,7 @@
 - Por qué: el QR de pago del agente se veía como un "cartelón" morado distinto a lo que recibe el cliente, y el caption no se mostraba (solo se usaba como `alt`) — issue #164. Los "saltos de línea raros" reportados son soft wraps por el ancho de burbuja distinto al de WhatsApp; no hay `\n` duros, sin cambio de código.
 - Spec/decisión que respeta: FRONTEND_SPEC §Inbox (hilo espejo con burbujas de `conversation-message.tsx`); contrato M-CRM (caption del media llega en `text` del mensaje imagen, server/docs/SPECS_MVP). Sin cambios de backend ni schema.
 - Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes fuera del archivo) · `tsc --noEmit` limpio · `pnpm build` OK. Casos: imagen con/sin caption, documento con caption, texto normal y mensajes del lead intactos.
-- Commit:
+- Commit: faeea2a — PR #165
 
 ### 2026-07-22 · innova67 · crm/tablero — ganar exige nombre del lead (#162)
 - Qué cambió: nuevo `win-name-dialog.tsx`: al soltar una card en un stage `won` sin nombre de lead (`pendingWinFor`: stage `status_code === 'won'` + `isUnnamedLead`), en vez de mover se abre un modal que pide el nombre, hace `PATCH /crm/cards/{id}` con `full_name` y recién ahí `POST /move`. `crm-board.tsx` antepone ese gate en `handleMove`; `useMoveCard.onError` muestra el mensaje del server en un 422 de negocio en vez del toast genérico.
