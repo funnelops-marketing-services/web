@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-07-23 · innova67 · crm/chat — burbuja media con marco fino para imagen + caption (#164, seguimiento)
+- Qué cambió: en `conversation-message.tsx`, los mensajes `type:'image'` vuelven a renderizarse dentro de la burbuja del emisor pero con marco fino estilo WhatsApp (`p-1` en vez de `px-3.5 py-2.5`); la imagen pasa a `rounded-xl` y el caption va adentro de la burbuja con padding propio (`px-2 pt-1.5 pb-1`), heredando el color de texto de la burbuja.
+- Por qué: el PR #165 dejó la imagen con caption "suelta" sobre el fondo negro y no se veía el fondo de burbuja; en WhatsApp la imagen con caption va dentro de la burbuja del emisor con un marco fino. Feedback visual post-merge sobre #164 (reabierto).
+- Spec/decisión que respeta: FRONTEND_SPEC §Inbox (hilo espejo con burbujas); mismo contrato M-CRM (caption en `text` del mensaje imagen). Sin cambios de backend.
+- Prueba local: `pnpm lint` 0 errores (5 warnings preexistentes fuera del archivo) · `tsc --noEmit` limpio · `pnpm build` OK. Casos: imagen con/sin caption (burbuja fina en ambos), documento y texto sin cambios.
+- Commit: ca57593 — PR #166
+
 ### 2026-07-23 · innova67 · crm/chat — imagen suelta + caption como en WhatsApp (#164)
 - Qué cambió: en `conversation-message.tsx`, los mensajes `type:'image'` se renderizan sin la burbuja del emisor (sin gradiente/padding/glow; aplica a lead y agente) y con el caption (`message.text`) como texto debajo de la imagen, con `whitespace-pre-wrap` (#121); el `alt` pasa a fijo "Imagen adjunta". Los `type:'document'` con caption muestran el texto debajo del chip, dentro de la misma burbuja.
 - Por qué: el QR de pago del agente se veía como un "cartelón" morado distinto a lo que recibe el cliente, y el caption no se mostraba (solo se usaba como `alt`) — issue #164. Los "saltos de línea raros" reportados son soft wraps: la burbuja tomaba `85%` del panel, así que en pantallas anchas quebraba distinto que el teléfono. Se agrega tope `max-w-[min(85%,26rem)]` (~49 chars/línea, calibrado con capturas reales) para aproximar el quiebre de WhatsApp en cualquier viewport; paridad exacta no es alcanzable (depende del dispositivo/fuente del cliente).
