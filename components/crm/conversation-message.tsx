@@ -27,36 +27,57 @@ const senderLabel: Record<ThreadMessage['sender'], string> = {
   human: 'Gestión Humana',
 }
 
+/** Un mensaje imagen se muestra suelto (sin burbuja), como en WhatsApp (#164). */
+function isBareImage(message: ThreadMessage): boolean {
+  return message.type === 'image' && Boolean(message.media_url)
+}
+
 /** Contenido de la burbuja según el tipo de mensaje (texto, imagen, documento). */
 function MessageContent({ message }: { message: ThreadMessage }) {
-  // Imagen: miniatura clickeable que abre el original a tamaño completo.
+  // Imagen: miniatura clickeable que abre el original a tamaño completo,
+  // con el caption (WhatsApp lo manda en el mismo mensaje) debajo (#164).
   if (message.type === 'image' && message.media_url) {
     return (
-      <a href={message.media_url} target="_blank" rel="noreferrer" className="block">
-        <img
-          src={message.media_url}
-          alt={message.text || 'Imagen adjunta'}
-          className="max-w-xs rounded-lg transition-opacity hover:opacity-90"
-        />
-      </a>
+      <div className="space-y-1">
+        <a href={message.media_url} target="_blank" rel="noreferrer" className="block">
+          <img
+            src={message.media_url}
+            alt="Imagen adjunta"
+            className="max-w-xs rounded-lg transition-opacity hover:opacity-90"
+          />
+        </a>
+        {message.text && (
+          <p className="whitespace-pre-wrap break-words text-sm font-normal leading-relaxed text-zinc-100">
+            {message.text}
+          </p>
+        )}
+      </div>
     )
   }
-  // Documento: chip con ícono, nombre y acción de abrir/descargar.
+  // Documento: chip con ícono, nombre y acción de abrir/descargar; el caption
+  // (si viene) va debajo del chip, dentro de la misma burbuja (#164).
   if (message.type === 'document' && message.media_url) {
     return (
-      <a
-        href={message.media_url}
-        target="_blank"
-        rel="noreferrer"
-        download
-        className="flex items-center gap-2.5 rounded-lg bg-black/20 px-3 py-2 transition-colors hover:bg-black/30"
-      >
-        <FileText className="size-5 shrink-0" />
-        <span className="min-w-0 flex-1 truncate text-sm font-normal">
-          {fileNameFromUrl(message.media_url)}
-        </span>
-        <Download className="size-4 shrink-0 opacity-70" />
-      </a>
+      <div className="space-y-1.5">
+        <a
+          href={message.media_url}
+          target="_blank"
+          rel="noreferrer"
+          download
+          className="flex items-center gap-2.5 rounded-lg bg-black/20 px-3 py-2 transition-colors hover:bg-black/30"
+        >
+          <FileText className="size-5 shrink-0" />
+          <span className="min-w-0 flex-1 truncate text-sm font-normal">
+            {fileNameFromUrl(message.media_url)}
+          </span>
+          <Download className="size-4 shrink-0 opacity-70" />
+        </a>
+        {message.text && (
+          <p className="whitespace-pre-wrap break-words text-sm font-normal leading-relaxed">
+            {message.text}
+          </p>
+        )}
+      </div>
     )
   }
   // WhatsApp preserva saltos de línea y listas; sin esto el CSS colapsa los `\n`
@@ -73,6 +94,7 @@ function MessageContent({ message }: { message: ThreadMessage }) {
 export function ConversationMessage({ message }: { message: ThreadMessage }) {
   const isLead = message.sender === 'lead'
   const isAgent = message.sender === 'agent'
+  const bare = isBareImage(message)
   const time = formatTime(message.at)
 
   return (
@@ -97,12 +119,15 @@ export function ConversationMessage({ message }: { message: ThreadMessage }) {
         )}
         <div
           className={cn(
-            'rounded-2xl px-3.5 py-2.5',
-            isLead &&
-              'rounded-bl-md border border-white/5 bg-white/5 text-white',
-            isAgent &&
-              'rounded-br-md bg-gradient-to-br from-violet-600 to-violet-700 text-white shadow-[0_0_20px_-10px_rgba(139,92,246,0.6)]',
-            !isLead && !isAgent && 'rounded-br-md bg-fuchsia-600 text-white',
+            // Imagen suelta como en WhatsApp: sin burbuja ni padding (#164).
+            !bare && [
+              'rounded-2xl px-3.5 py-2.5',
+              isLead &&
+                'rounded-bl-md border border-white/5 bg-white/5 text-white',
+              isAgent &&
+                'rounded-br-md bg-gradient-to-br from-violet-600 to-violet-700 text-white shadow-[0_0_20px_-10px_rgba(139,92,246,0.6)]',
+              !isLead && !isAgent && 'rounded-br-md bg-fuchsia-600 text-white',
+            ],
           )}
         >
           <MessageContent message={message} />
