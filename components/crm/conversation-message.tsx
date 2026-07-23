@@ -59,7 +59,14 @@ function MessageContent({ message }: { message: ThreadMessage }) {
       </a>
     )
   }
-  return <p className="text-sm font-normal leading-relaxed">{message.text}</p>
+  // WhatsApp preserva saltos de línea y listas; sin esto el CSS colapsa los `\n`
+  // del mensaje en un párrafo corrido (#121). break-words evita que URLs/strings
+  // largos desborden la burbuja.
+  return (
+    <p className="whitespace-pre-wrap break-words text-sm font-normal leading-relaxed">
+      {message.text}
+    </p>
+  )
 }
 
 /** Burbuja del hilo espejo de WhatsApp, según el emisor. */
