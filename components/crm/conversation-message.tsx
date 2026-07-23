@@ -99,7 +99,9 @@ export function ConversationMessage({ message }: { message: ThreadMessage }) {
 
   return (
     <div className={cn('flex', isLead ? 'justify-start' : 'justify-end')}>
-      <div className="max-w-[85%]">
+      {/* Tope tipo teléfono (~49 chars/línea): en paneles anchos la burbuja no
+          crece más que en WhatsApp, para que el quiebre de líneas se parezca (#164). */}
+      <div className="max-w-[min(85%,26rem)]">
         {!isLead && (
           <div className="mb-1 flex items-center justify-end gap-1">
             {isAgent ? (
