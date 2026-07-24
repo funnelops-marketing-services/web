@@ -1,11 +1,20 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Plus, Search } from 'lucide-react'
+import { ArrowUpDown, Plus, Search } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { digitsOnly } from '@/lib/validation/fields'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -70,13 +79,27 @@ export function CrmBoard() {
   const [pendingWin, setPendingWin] = useState<PendingWin | null>(null)
   const [pendingDisqualify, setPendingDisqualify] = useState<PendingDisqualify | null>(null)
   const [query, setQuery] = useState('')
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc')
 
   const q = query.trim().toLowerCase()
   const qDigits = digitsOnly(query)
   const pipelines = useMemo(() => {
     const sorted = [...(data?.pipelines ?? [])].sort((a, b) => a.position - b.position)
-    return q ? sorted.map((p) => filterPipeline(p, q, qDigits)) : sorted
-  }, [data, q, qDigits])
+    return sorted.map((p) => {
+      const filtered = q ? filterPipeline(p, q, qDigits) : p
+      return {
+        ...filtered,
+        stages: filtered.stages.map((stage) => {
+          const sortedCards = [...stage.cards].sort((a, b) => {
+            const timeA = new Date(a.created_at).getTime()
+            const timeB = new Date(b.created_at).getTime()
+            return sortOrder === 'desc' ? timeB - timeA : timeA - timeB
+          })
+          return { ...stage, cards: sortedCards }
+        }),
+      }
+    })
+  }, [data, q, qDigits, sortOrder])
   const activeId = activePipelineId ?? pipelines[0]?.id ?? ''
 
   const handleMove = (cardId: string, stageId: string) => {
@@ -118,6 +141,34 @@ export function CrmBoard() {
               />
             </div>
             <LeadsExportMenu className="h-10 flex-shrink-0 rounded-full px-4 text-sm font-medium" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "h-10 flex-shrink-0 gap-1.5 rounded-full border-white/10 px-4 text-sm font-medium hover:bg-white/10",
+                    sortOrder === 'asc'
+                      ? "bg-violet-500/20 text-violet-300 hover:bg-violet-500/30 border-violet-500/50"
+                      : "bg-white/[0.03] text-white"
+                  )}
+                >
+                  <ArrowUpDown className="size-4" />
+                  Ordenar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-zinc-950 border-white/10 text-zinc-300">
+                <DropdownMenuLabel>Ordenar mensajes</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/5" />
+                <DropdownMenuRadioGroup value={sortOrder} onValueChange={(v) => setSortOrder(v as 'asc' | 'desc')}>
+                  <DropdownMenuRadioItem value="desc" className="focus:bg-white/5 focus:text-white">
+                    Más recientes primero
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="asc" className="focus:bg-white/5 focus:text-white">
+                    Más antiguos primero
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               onClick={() => setCreateOpen(true)}
               className="h-10 flex-shrink-0 gap-1.5 rounded-full bg-gradient-to-b from-violet-500 to-violet-700 px-4 text-sm font-medium text-white hover:from-violet-400 hover:to-violet-600"

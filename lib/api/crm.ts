@@ -33,6 +33,7 @@ export const cardSchema = z.object({
   // IA apagada + último mensaje del lead sin respuesta humana/agente posterior: hay
   // alguien esperando y nadie contestó. Enciende el badge "Responder" en la card.
   awaiting_human: z.boolean().default(false),
+  created_at: z.string(),
 })
 
 // Un paso del historial de movimientos de la card (traceability del detalle #75/#55).

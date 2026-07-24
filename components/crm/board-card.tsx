@@ -3,7 +3,7 @@
 import { BotOff, GripVertical, MessageSquare } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
-import { formatPhone, isUnnamedLead, leadTitle } from '@/lib/format'
+import { formatPhone, formatTicketTime, isUnnamedLead, leadTitle } from '@/lib/format'
 import type { Card } from '@/lib/api/crm'
 import { RatingBadge } from '@/components/crm/rating-badge'
 import { AlertBadge } from '@/components/crm/alert-badge'
@@ -86,21 +86,24 @@ export function BoardCard({
               {formatPhone(card.phone)}
             </p>
           )}
-          {card.awaiting_human ? (
-            // Señal fuerte: hay un mensaje del lead sin responder y la IA está apagada.
-            <div className="flex items-center gap-1.5 text-[10px] font-semibold text-rose-400">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-rose-500/70" />
-                <span className="relative inline-flex size-2 rounded-full bg-rose-500" />
-              </span>
-              <span>Sin responder · te esperan</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5 text-[10px] text-zinc-500">
-              <MessageSquare className="size-2.5" />
-              <span className="font-normal">Ver conversación</span>
-            </div>
-          )}
+          <div className="mt-2 flex items-center justify-between">
+            {card.awaiting_human ? (
+              // Señal fuerte: hay un mensaje del lead sin responder y la IA está apagada.
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold text-rose-400">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-rose-500/70" />
+                  <span className="relative inline-flex size-2 rounded-full bg-rose-500" />
+                </span>
+                <span>Sin responder · te esperan</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-[10px] text-zinc-500">
+                <MessageSquare className="size-2.5" />
+                <span className="font-normal">Ver conversación</span>
+              </div>
+            )}
+            <span className="text-[10px] font-medium text-zinc-500/70">{formatTicketTime(card.created_at)}</span>
+          </div>
         </div>
       </div>
     </div>

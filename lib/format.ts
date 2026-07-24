@@ -61,3 +61,16 @@ export function formatThreadDay(iso: string, now: Date = new Date()): string {
   if (sameDay(date, yesterday)) return 'Ayer'
   return date.toLocaleDateString('es-BO', { day: 'numeric', month: 'short' })
 }
+
+/** Format time for tickets: "Hoy 14:30", "Ayer 09:15", "1 jul 18:20" */
+export function formatTicketTime(iso: string, now: Date = new Date()): string {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return ''
+  const time = date.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit', hour12: false })
+  if (sameDay(date, now)) return `Hoy ${time}`
+  const yesterday = new Date(now)
+  yesterday.setDate(now.getDate() - 1)
+  if (sameDay(date, yesterday)) return `Ayer ${time}`
+  const dayStr = date.toLocaleDateString('es-BO', { day: 'numeric', month: 'short' })
+  return `${dayStr} ${time}`
+}
