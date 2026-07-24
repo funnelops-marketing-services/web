@@ -32,6 +32,8 @@ import { cardKeys } from '@/hooks/use-card'
 interface MoveArgs {
   cardId: string
   stageId: string
+  // Motivo del move (#253); solo lo manda el flujo de Descalificado. El drag normal no.
+  reason?: string
 }
 
 interface MoveContext {
@@ -72,7 +74,7 @@ export function useMoveCard() {
   const queryClient = useQueryClient()
 
   return useMutation<Card, Error, MoveArgs, MoveContext>({
-    mutationFn: ({ cardId, stageId }) => moveCard(cardId, stageId),
+    mutationFn: ({ cardId, stageId, reason }) => moveCard(cardId, stageId, reason),
     onMutate: async ({ cardId, stageId }) => {
       await queryClient.cancelQueries({ queryKey: boardKeys.all })
       const previous = queryClient.getQueryData<Boards>(boardKeys.all)

@@ -22,6 +22,11 @@ import {
   pendingWinFor,
   type PendingWin,
 } from '@/components/crm/win-name-dialog'
+import {
+  DisqualifyReasonDialog,
+  pendingDisqualifyFor,
+  type PendingDisqualify,
+} from '@/components/crm/disqualify-reason-dialog'
 import type { Card, Pipeline } from '@/lib/api/crm'
 
 /** Una card matchea si el texto está en el nombre (title) o los dígitos en el teléfono
@@ -63,6 +68,7 @@ export function CrmBoard() {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [pendingWin, setPendingWin] = useState<PendingWin | null>(null)
+  const [pendingDisqualify, setPendingDisqualify] = useState<PendingDisqualify | null>(null)
   const [query, setQuery] = useState('')
 
   const q = query.trim().toLowerCase()
@@ -78,6 +84,12 @@ export function CrmBoard() {
     const pending = pendingWinFor(data, cardId, stageId)
     if (pending) {
       setPendingWin(pending)
+      return
+    }
+    // Descalificar exige motivo (web#173): al soltar en un stage 'lost' se pide el motivo.
+    const disqualify = pendingDisqualifyFor(data, cardId, stageId)
+    if (disqualify) {
+      setPendingDisqualify(disqualify)
       return
     }
     moveCard.mutate({ cardId, stageId })
@@ -198,6 +210,10 @@ export function CrmBoard() {
       />
       <OpportunityCreateSheet open={createOpen} onOpenChange={setCreateOpen} />
       <WinNameDialog pending={pendingWin} onClose={() => setPendingWin(null)} />
+      <DisqualifyReasonDialog
+        pending={pendingDisqualify}
+        onClose={() => setPendingDisqualify(null)}
+      />
     </div>
   )
 }
