@@ -46,6 +46,10 @@ function MoveRow({ move }: { move: CardMove }) {
         <p className="mt-0.5 text-xs font-normal text-zinc-500">
           {isCreation ? 'Creada' : movedByLabel(move.moved_by)} · {formatWhen(move.moved_at)}
         </p>
+        {/* Motivo del move (server#253); ausente en moves viejos y syncs del bot. */}
+        {move.reason && (
+          <p className="mt-1 text-xs font-normal text-zinc-400">{move.reason}</p>
+        )}
       </div>
     </li>
   )

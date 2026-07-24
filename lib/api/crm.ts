@@ -43,6 +43,8 @@ export const cardMoveSchema = z.object({
   stage_to_name: z.string(),
   stage_to_color: z.string().nullable(),
   moved_by: z.string(), // 'agent' | user_id
+  // Motivo del move manual (#253/server#253); null en filas viejas y syncs del bot.
+  reason: z.string().nullable(),
   moved_at: z.string(),
 })
 
@@ -144,9 +146,16 @@ export async function updateCardServices(
   return z.array(cardServiceSchema).parse(data)
 }
 
-export async function moveCard(cardId: string, stageId: string): Promise<Card> {
+/** Mueve la card a `stageId`. `reason` (opcional, ≤2000) queda en el audit del move
+ *  (#253); la UI lo exige solo al descalificar. Se omite del body si no viene. */
+export async function moveCard(
+  cardId: string,
+  stageId: string,
+  reason?: string,
+): Promise<Card> {
   const { data } = await apiClient.post(`/crm/cards/${cardId}/move`, {
     stage_id: stageId,
+    reason,
   })
   return cardSchema.parse(data)
 }
