@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
+  BadgeDollarSign,
   BookOpen,
   Bot,
   Funnel,
@@ -27,6 +28,7 @@ import {
 } from '@/components/ui/sheet'
 import { usePermissions } from '@/hooks/use-permissions'
 import { useUiStore } from '@/store/ui-store'
+import { PendingPaymentsBadge } from '@/components/crm/payments/pending-payments-badge'
 import { Logo } from './Logo'
 
 interface NavItem {
@@ -35,10 +37,14 @@ interface NavItem {
   icon: LucideIcon
   /** Capacidad requerida para ver el ítem; sin ella, visible para toda sesión CRM. */
   requires?: 'canManageConfig' | 'canManageCatalog' | 'canManageUsers'
+  /** Contador de trabajo pendiente al lado del ítem (web#184). */
+  badge?: 'payments'
 }
 
 const navItems: readonly NavItem[] = [
   { label: 'Embudo de ventas', href: '/', icon: Funnel },
+  // Conciliar es operación diaria de los 3 roles (server#274): sin `requires`.
+  { label: 'Pagos por confirmar', href: '/pagos', icon: BadgeDollarSign, badge: 'payments' },
   { label: 'Contactos', href: '/contacts', icon: Users },
   // Entradas: sin `requires` a propósito — quien atiende la puerta suele ser staff (#185).
   { label: 'Entradas', href: '/entradas', icon: ScanLine },
@@ -79,7 +85,7 @@ function NavList({ pathname, collapsed = false, onSelect }: NavListProps) {
             aria-label={collapsed ? item.label : undefined}
             title={collapsed ? item.label : undefined}
             className={cn(
-              'group flex items-center rounded-xl border py-2.5 text-sm font-normal transition-all',
+              'group relative flex items-center rounded-xl border py-2.5 text-sm font-normal transition-all',
               collapsed ? 'justify-center px-0' : 'gap-3 px-3',
               active
                 ? 'border-violet-500/30 bg-violet-500/15 text-white shadow-[0_0_25px_-12px_rgba(167,139,250,0.7)]'
@@ -95,6 +101,7 @@ function NavList({ pathname, collapsed = false, onSelect }: NavListProps) {
               )}
             />
             {!collapsed && <span className="truncate">{item.label}</span>}
+            {item.badge === 'payments' && <PendingPaymentsBadge collapsed={collapsed} />}
           </Link>
         )
       })}
