@@ -60,8 +60,8 @@ export function ServiceLinksManager({ serviceId }: { serviceId: string }) {
       )}
       {!isLoading && !isError && list.length === 0 && !adding && (
         <Hint>
-          Todavía no hay links. Sin links, la entrega virtual no manda nada: el equipo lo hace a
-          mano.
+          Todavía no hay links. Sin links, un servicio virtual no entrega nada y lo hace el equipo
+          a mano; uno híbrido entrega la entrada igual y avisa que falta el link.
         </Hint>
       )}
 
