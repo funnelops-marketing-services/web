@@ -8,6 +8,7 @@ import { z } from 'zod'
 import type { Boards } from '@/lib/api/crm'
 import { boardKeys } from '@/hooks/use-board'
 import { cardKeys } from '@/hooks/use-card'
+import { receiptKeys } from '@/hooks/use-receipt'
 import { useAuthStore } from '@/store/auth-store'
 
 // SPEC_B5_sse-front §2: contrato del stream `GET /crm/events?token=<jwt>`.
@@ -59,6 +60,10 @@ function handleEvent(event: CrmEvent, queryClient: QueryClient) {
     case 'card_moved':
       queryClient.invalidateQueries({ queryKey: boardKeys.all })
       queryClient.invalidateQueries({ queryKey: cardKeys.detail(event.card_id) })
+      // El comprobante lo procesa un worker y el move a "Por validar pago" es el
+      // momento exacto en que aparece (server#272): refrescarlo acá lo muestra en la
+      // card abierta sin esperar el poll.
+      queryClient.invalidateQueries({ queryKey: receiptKeys.detail(event.card_id) })
       break
     case 'handoff': {
       queryClient.invalidateQueries({ queryKey: boardKeys.all })
