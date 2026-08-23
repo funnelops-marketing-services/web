@@ -10,6 +10,7 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  ScanLine,
   Settings,
   ShieldCheck,
   Users,
@@ -39,6 +40,8 @@ interface NavItem {
 const navItems: readonly NavItem[] = [
   { label: 'Embudo de ventas', href: '/', icon: Funnel },
   { label: 'Contactos', href: '/contacts', icon: Users },
+  // Entradas: sin `requires` a propósito — quien atiende la puerta suele ser staff (#185).
+  { label: 'Entradas', href: '/entradas', icon: ScanLine },
   // Agentes: solo platform_operator (superadmin). Catálogo/Usuarios: + client_admin (#126).
   { label: 'Agentes', href: '/agents', icon: Bot, requires: 'canManageConfig' },
   { label: 'Catálogo', href: '/catalogo', icon: BookOpen, requires: 'canManageCatalog' },
