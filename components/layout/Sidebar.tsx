@@ -11,6 +11,7 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  ScanLine,
   Settings,
   ShieldCheck,
   Users,
@@ -45,6 +46,8 @@ const navItems: readonly NavItem[] = [
   // Conciliar es operación diaria de los 3 roles (server#274): sin `requires`.
   { label: 'Pagos por confirmar', href: '/pagos', icon: BadgeDollarSign, badge: 'payments' },
   { label: 'Contactos', href: '/contacts', icon: Users },
+  // Entradas: sin `requires` a propósito — quien atiende la puerta suele ser staff (#185).
+  { label: 'Entradas', href: '/entradas', icon: ScanLine },
   // Agentes: solo platform_operator (superadmin). Catálogo/Usuarios: + client_admin (#126).
   { label: 'Agentes', href: '/agents', icon: Bot, requires: 'canManageConfig' },
   { label: 'Catálogo', href: '/catalogo', icon: BookOpen, requires: 'canManageCatalog' },

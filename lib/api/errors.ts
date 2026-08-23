@@ -18,3 +18,9 @@ export function apiErrorMessage(error: unknown): string | null {
   }
   return null
 }
+
+/** True si el backend contestó 403. Sirve para no reintentar ni mostrar "reintentá" en
+ *  una pantalla que el rol simplemente no puede ver. */
+export function isForbidden(error: unknown): boolean {
+  return isAxiosError(error) && error.response?.status === 403
+}
