@@ -15,11 +15,13 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { CategorySelect } from '@/components/crm/catalog/category-select'
-import { CLOSING_LABELS, CURRENCY_LABELS } from '@/components/crm/catalog/labels'
+import { CLOSING_LABELS, CURRENCY_LABELS, MODALITY_NONE } from '@/components/crm/catalog/labels'
+import { ServiceDeliverySection } from '@/components/crm/catalog/service-delivery-section'
 import { ServicePreview } from '@/components/crm/catalog/service-preview'
 import {
   Field,
   FieldError,
+  Hint,
   LIMITS,
   RULES,
   SelectField,
@@ -49,10 +51,13 @@ export function ServiceEditor({ service, defaultOrden, open, onOpenChange }: Ser
   const values = watch()
 
   const onSubmit = handleSubmit(async (form) => {
+    // `null` explícito borra el valor en el PUT parcial del backend (#178).
     const payload = {
       ...form,
       category_id: form.category_id || null,
       detalle: form.detalle.trim() || null,
+      modality: form.modality === MODALITY_NONE ? null : form.modality,
+      price_amount: form.price_amount.trim() || null,
     }
     if (isEdit) {
       await update.mutateAsync({ serviceId: service.id, body: payload })
@@ -105,14 +110,23 @@ export function ServiceEditor({ service, defaultOrden, open, onOpenChange }: Ser
             <FieldError message={errors.detalle?.message} />
           </Field>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label="Precio (display)" htmlFor="precio">
+            <Field label="Precio (display, lo que lee el lead)" htmlFor="precio">
               <Input id="precio" inputMode="decimal" placeholder="650" {...register('precio', RULES.precio)} className="border-white/10 bg-white/[0.03] text-sm text-white" />
-              <FieldError message={errors.precio?.message} />
+              {errors.precio ? <FieldError message={errors.precio.message} /> : <Hint>Texto que el bot le dice al lead.</Hint>}
             </Field>
             <Field label="Moneda" htmlFor="moneda">
               <SelectField name="moneda" control={control} options={serviceCurrencies} labels={CURRENCY_LABELS} />
             </Field>
           </div>
+
+          <ServiceDeliverySection
+            control={control}
+            register={register}
+            errors={errors}
+            moneda={values.moneda}
+            priceAmount={values.price_amount}
+            serviceId={service?.id ?? null}
+          />
 
           {isEdit && (
             <Controller

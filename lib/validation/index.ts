@@ -15,4 +15,5 @@ export {
   priceText,
   priceInput,
   currency,
+  httpUrl,
 } from './fields'

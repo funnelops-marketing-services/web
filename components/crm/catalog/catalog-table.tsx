@@ -17,6 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { ServiceDeleteDialog } from '@/components/crm/catalog/service-delete-dialog'
+import { ServiceDeliveryBadge } from '@/components/crm/catalog/service-delivery-badge'
 import { useUpdateService } from '@/hooks/use-catalogo'
 import type { ServiceRead } from '@/lib/api/catalogo'
 
@@ -130,6 +131,7 @@ export function CatalogTable({ services, onEdit }: CatalogTableProps) {
                     </TableCell>
                     <TableCell className="text-sm text-zinc-300">
                       {formatMoney(service.precio, service.moneda)}
+                      <ServiceDeliveryBadge service={service} />
                     </TableCell>
                     <TableCell>
                       <Switch

@@ -6,9 +6,12 @@ import { apiClient } from '@/lib/api/client'
 
 export const serviceCurrencies = ['BOB', 'USD'] as const
 export const serviceClosings = ['pago_qr', 'handoff_consultivo'] as const
+// Modalidad de entrega post-pago (#178). Ausente/null = el servicio no entrega nada.
+export const serviceModalities = ['presencial', 'virtual'] as const
 
 export const currencySchema = z.enum(serviceCurrencies)
 export const closingSchema = z.enum(serviceClosings)
+export const modalitySchema = z.enum(serviceModalities)
 
 // ---------- Schemas (espejo del contrato server) ----------
 
@@ -32,6 +35,13 @@ export const serviceCategoryReadSchema = z.object({
   updated_at: z.string(),
 })
 
+// El backend serializa `price_amount` (Decimal) como string ("650.00"); se acepta
+// number por tolerancia y se normaliza a string para comparar/mostrar siempre igual.
+const priceAmountSchema = z
+  .union([z.string(), z.number()])
+  .nullable()
+  .transform((value) => (value === null ? null : String(value)))
+
 export const serviceReadSchema = z.object({
   id: z.string(),
   organization_id: z.string(),
@@ -47,6 +57,9 @@ export const serviceReadSchema = z.object({
   flujo_cierre: z.string(),
   orden: z.number(),
   is_active: z.boolean(),
+  // Un valor desconocido degrada a "sin entrega" en vez de romper el catálogo.
+  modality: modalitySchema.nullable().catch(null),
+  price_amount: priceAmountSchema,
   created_at: z.string(),
   updated_at: z.string(),
 })
@@ -58,6 +71,7 @@ export type ServiceCategoryRead = z.infer<typeof serviceCategoryReadSchema>
 export type ServiceRead = z.infer<typeof serviceReadSchema>
 export type ServiceCurrency = (typeof serviceCurrencies)[number]
 export type ServiceClosing = (typeof serviceClosings)[number]
+export type ServiceModality = (typeof serviceModalities)[number]
 
 export interface ServiceCreate {
   slug: string
@@ -69,8 +83,11 @@ export interface ServiceCreate {
   moneda: ServiceCurrency
   flujo_cierre?: ServiceClosing
   orden?: number
+  modality?: ServiceModality | null
+  price_amount?: string | null
 }
 
+// PUT parcial: omitir un campo lo deja intacto, mandar `null` explícito lo borra.
 export interface ServiceUpdate {
   nombre?: string
   category_id?: string | null
@@ -81,6 +98,8 @@ export interface ServiceUpdate {
   flujo_cierre?: ServiceClosing
   orden?: number
   is_active?: boolean
+  modality?: ServiceModality | null
+  price_amount?: string | null
 }
 
 export interface ServiceCategoryCreate {
