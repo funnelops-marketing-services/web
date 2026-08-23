@@ -15,11 +15,12 @@ export const MODALITY_NONE = 'none'
 
 export type ModalityChoice = ServiceModality | typeof MODALITY_NONE
 
-export const MODALITY_CHOICES = ['presencial', 'virtual', MODALITY_NONE] as const
+export const MODALITY_CHOICES = ['presencial', 'virtual', 'hibrido', MODALITY_NONE] as const
 
 export const MODALITY_LABELS: Record<ModalityChoice, string> = {
   presencial: 'Presencial (entrada con QR)',
   virtual: 'Virtual (links de acceso)',
+  hibrido: 'Híbrido (entrada con QR + links)',
   none: 'Sin entrega',
 }
 
@@ -27,6 +28,7 @@ export const MODALITY_LABELS: Record<ModalityChoice, string> = {
 export const MODALITY_SHORT: Record<ModalityChoice, string> = {
   presencial: 'Presencial',
   virtual: 'Virtual',
+  hibrido: 'Híbrido',
   none: 'Sin entrega',
 }
 

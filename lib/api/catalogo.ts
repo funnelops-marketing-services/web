@@ -7,7 +7,8 @@ import { apiClient } from '@/lib/api/client'
 export const serviceCurrencies = ['BOB', 'USD'] as const
 export const serviceClosings = ['pago_qr', 'handoff_consultivo'] as const
 // Modalidad de entrega post-pago (#178). Ausente/null = el servicio no entrega nada.
-export const serviceModalities = ['presencial', 'virtual'] as const
+// `hibrido` es presencial y virtual a la vez: entrada QR + links, en un solo mensaje.
+export const serviceModalities = ['presencial', 'virtual', 'hibrido'] as const
 
 export const currencySchema = z.enum(serviceCurrencies)
 export const closingSchema = z.enum(serviceClosings)

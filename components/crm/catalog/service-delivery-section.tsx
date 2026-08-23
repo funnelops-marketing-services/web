@@ -56,6 +56,8 @@ export function ServiceDeliverySection({
         <Hint>
           <span className="text-zinc-300">Presencial</span>: se entrega la entrada con QR ·{' '}
           <span className="text-zinc-300">Virtual</span>: se envían los links de abajo ·{' '}
+          <span className="text-zinc-300">Híbrido</span>: las dos cosas en un mismo mensaje, para un
+          curso que tiene módulos presenciales y por Zoom ·{' '}
           <span className="text-zinc-300">Sin entrega</span>: el bot no manda nada después del pago
           (el equipo sigue a mano).
         </Hint>
