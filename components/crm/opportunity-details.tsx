@@ -13,6 +13,7 @@ import { OpportunityDeleteDialog } from '@/components/crm/opportunity-delete-dia
 import { ContactCreateSheet } from '@/components/crm/contacts/contact-create'
 import { RatingBadge } from '@/components/crm/rating-badge'
 import { AlertBadge } from '@/components/crm/alert-badge'
+import { FlagBadges } from '@/components/crm/flag-badges'
 import { ServicesSelector } from '@/components/crm/services-selector'
 
 function StateMessage({ text }: { text: string }) {
@@ -81,6 +82,8 @@ export function OpportunityDetails({
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <RatingBadge rating={card.rating} showLabel className="px-2.5 py-0.5 text-xs" />
         <AlertBadge alert={card.alert} showLabel className="px-2.5 py-0.5 text-xs" />
+        {/* Avisos de la entrega automática (server#270); el detalle está en su tooltip. */}
+        <FlagBadges flags={card.flags} size="md" />
         {location && (
           <>
             <Badge>{location.pipelineName}</Badge>

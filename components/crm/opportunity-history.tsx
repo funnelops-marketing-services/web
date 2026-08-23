@@ -17,9 +17,16 @@ function formatWhen(at: string): string {
   })
 }
 
-/** 'agent' = reconcile automático del bot; cualquier otro valor = id de un operador. */
+// Actores no humanos de `card_move.moved_by`: 'agent' = reconcile del bot en su pipeline;
+// 'system' = entrega y cierre automáticos post-pago (server#270). Cualquier otro valor es
+// el id de un operador.
+const ACTORS: Record<string, string> = {
+  agent: 'Agente IA',
+  system: 'Sistema',
+}
+
 function movedByLabel(movedBy: string): string {
-  return movedBy === 'agent' ? 'Agente IA' : 'Operador'
+  return ACTORS[movedBy] ?? 'Operador'
 }
 
 function MoveRow({ move }: { move: CardMove }) {

@@ -7,7 +7,7 @@
 
 1. **Inbox de conversaciones** — lista (contacto, último mensaje, etapa del funnel, **badge 🔥 cuando `handed_off`**) + panel de hilo con burbujas. Reutilizable: burbujas de chat de Firefly-App (`conversation-message.tsx`).
 2. **Takeover** — toggle **IA on/off** por conversación (`is_ai_active`). Con IA on, el input se deshabilita; con IA off (humano tomó), el humano escribe por el hilo (envío vía backend → Meta). El composer además permite **adjuntar imagen/PDF** (clip, drag & drop sobre el hilo, o paste; JPG/PNG/PDF ≤5 MB, el texto acompaña como caption) y **enviar el QR de pago** del sistema con un botón dedicado (#169, server#251).
-3. **Pipeline "Gestión Humana"** (kanban) — los leads derivados (handoff) entran acá. Stages: `Por validar pago → Pago validado → Entrada enviada (Cerrado)` → [Fase 2] `Asistió / No asistió / Lost`. Acción **`/generarEntrada`** (dispara al backend) desde la card al validar el pago.
+3. **Pipeline "Gestión Humana"** (kanban) — los leads derivados (handoff) entran acá. Stages: `Por atender → Por validar pago → Pago validado → Entregado → Cerrado` → [Fase 2] `Asistió / No asistió / Lost`. Acción **`/generarEntrada`** (dispara al backend) desde la card al validar el pago; el backend la acepta **solo si el servicio aceptado es presencial** y devuelve el motivo en el `detail` del error si no. Los nombres de stage llegan del backend: el front no compara por string (usa `status_code` para won/lost).
 4. **Config del agente (ABM) — solo `platform_operator` (Natalia + equipo):** editar system prompt (textarea), nivel de emojis (switch mucho/poco/nada), temperatura (slider); guardar crea `agent_version`. **Mirko (`client_admin`) y el staff NO** ven esta pantalla.
 
 ## RBAC (front) — 3 niveles
@@ -28,6 +28,7 @@ Capacidades en `hooks/use-permissions.ts`: `canManageUsers` (operador ‖ client
 
 - API de conversaciones/mensajes · toggle `is_ai_active` · `GET/PUT /api/v1/agents/{id}/config` (admin-only) · endpoint que dispara `/generarEntrada`.
 - **Entrega post-pago (CR1, web#178 / server#268):** el servicio del catálogo agrega `modality` (`presencial` | `virtual` | `null` = sin entrega) y `price_amount` (monto comparable con el comprobante; `null` = validación manual) · links de entrega por servicio (`GET/POST /services/{id}/links`, `PUT/DELETE /service-links/{id}`, tope 5) · config de pagos por organización (`GET/PUT /crm/payment-settings`: beneficiario esperado + QR propio o global, `client_admin` ‖ `platform_operator`).
+- **Avisos de entrega (CR2, web#179 / server#270):** la card trae `flags: string[]` (default `[]`) en `/crm/boards`, `/crm/cards/{id}` y la respuesta de `move`. Son **códigos** (`needs_name`, `delivery_pending`, `extra_receipt`, `no_modality`, `missing_link`, `ambiguous_service`) y el copy en español vive en `components/crm/flag-badges.tsx`; un código desconocido se muestra crudo, nunca rompe el parse. `card_move.moved_by` agrega el literal `'system'` (entrega y cierre automáticos) además de `'agent'` y el uuid del operador.
 
 ## Reglas
 

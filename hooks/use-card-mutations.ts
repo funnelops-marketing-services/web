@@ -113,7 +113,10 @@ interface AiActiveContext {
   previous?: CardDetail
 }
 
-/** Genera entrada QR para una card en "Pago validado" (POST generate-entry). */
+/** Genera entrada QR para una card en "Pago validado" (POST generate-entry).
+ * El backend ahora rechaza lo que no es presencial (server#270: sin servicio aceptado,
+ * con más de uno, virtual o sin modalidad) con un `detail` explicativo. Ese mensaje se
+ * muestra tal cual: el viejo "La entrada ya fue generada" era falso para esos casos. */
 export function useGenerateEntry(cardId: string) {
   const queryClient = useQueryClient()
 
@@ -121,13 +124,10 @@ export function useGenerateEntry(cardId: string) {
     mutationFn: () => generateEntry(cardId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
+      queryClient.invalidateQueries({ queryKey: boardKeys.all })
     },
     onError: (error) => {
-      if (isAxiosError(error) && error.response?.status === 400) {
-        toast.info('La entrada ya fue generada.')
-      } else {
-        toast.error('No se pudo generar la entrada.')
-      }
+      toast.error(apiErrorMessage(error) ?? 'No se pudo generar la entrada. Reintentá.')
     },
   })
 }

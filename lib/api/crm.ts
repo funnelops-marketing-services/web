@@ -33,6 +33,11 @@ export const cardSchema = z.object({
   // IA apagada + último mensaje del lead sin respuesta humana/agente posterior: hay
   // alguien esperando y nadie contestó. Enciende el badge "Responder" en la card.
   awaiting_human: z.boolean().default(false),
+  // Avisos operativos de la entrega automática (server#270): por qué algo no se
+  // completó solo (falta el nombre, ventana de 24 h cerrada, comprobante extra…). Son
+  // códigos y el copy vive en `components/crm/flag-badges.tsx`. `z.string()` a
+  // propósito: un código de una versión más nueva del backend no debe romper el parse.
+  flags: z.array(z.string()).default([]),
   created_at: z.string(),
 })
 
@@ -43,7 +48,7 @@ export const cardMoveSchema = z.object({
   stage_from_color: z.string().nullable(),
   stage_to_name: z.string(),
   stage_to_color: z.string().nullable(),
-  moved_by: z.string(), // 'agent' | user_id
+  moved_by: z.string(), // 'agent' | 'system' | user_id
   // Motivo del move manual (#253/server#253); null en filas viejas y syncs del bot.
   reason: z.string().nullable(),
   moved_at: z.string(),
