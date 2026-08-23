@@ -7,6 +7,7 @@ import { formatPhone, formatTicketTime, isUnnamedLead, leadTitle } from '@/lib/f
 import type { Card } from '@/lib/api/crm'
 import { RatingBadge } from '@/components/crm/rating-badge'
 import { AlertBadge } from '@/components/crm/alert-badge'
+import { FlagBadges } from '@/components/crm/flag-badges'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface BoardCardProps {
@@ -85,6 +86,13 @@ export function BoardCard({
             <p className="mb-1.5 truncate text-xs font-normal text-zinc-500">
               {formatPhone(card.phone)}
             </p>
+          )}
+          {/* Avisos de la entrega en fila propia con wrap: varios a la vez bajan de línea
+              en vez de apretar el título (server#270). */}
+          {card.flags.length > 0 && (
+            <div className="mb-1.5 flex flex-wrap items-center gap-1">
+              <FlagBadges flags={card.flags} />
+            </div>
           )}
           <div className="mt-2 flex items-center justify-between">
             {card.awaiting_human ? (

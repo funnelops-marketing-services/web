@@ -1,6 +1,14 @@
 'use client'
 
-import { BotOff, Flame, HelpCircle, Snowflake, Thermometer, TriangleAlert } from 'lucide-react'
+import {
+  BotOff,
+  Clock,
+  Flame,
+  HelpCircle,
+  Snowflake,
+  Thermometer,
+  TriangleAlert,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -40,6 +48,10 @@ export function BoardLegend() {
           <li className="flex items-center gap-2">
             <TriangleAlert className="size-3.5 shrink-0 text-amber-400" />
             Pidió algo fuera del catálogo
+          </li>
+          <li className="flex items-center gap-2">
+            <Clock className="size-3.5 shrink-0 text-amber-400" />
+            Avisos en ámbar · la entrega necesita una mano (pasá el mouse por el aviso)
           </li>
           <li className="flex items-center gap-2">
             <BotOff className="size-3.5 shrink-0 text-zinc-400" />
