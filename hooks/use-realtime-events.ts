@@ -8,6 +8,7 @@ import { z } from 'zod'
 import type { Boards } from '@/lib/api/crm'
 import { boardKeys } from '@/hooks/use-board'
 import { cardKeys } from '@/hooks/use-card'
+import { paymentKeys } from '@/hooks/use-payments'
 import { receiptKeys } from '@/hooks/use-receipt'
 import { useAuthStore } from '@/store/auth-store'
 
@@ -64,6 +65,10 @@ function handleEvent(event: CrmEvent, queryClient: QueryClient) {
       // momento exacto en que aparece (server#272): refrescarlo acá lo muestra en la
       // card abierta sin esperar el poll.
       queryClient.invalidateQueries({ queryKey: receiptKeys.detail(event.card_id) })
+      // Un pago entra a la cola de conciliación en el mismo instante en que el sistema
+      // lo aprueba y mueve la card (server#274): refrescar el contador acá lo muestra
+      // sin esperar el poll.
+      queryClient.invalidateQueries({ queryKey: paymentKeys.pending })
       break
     case 'handoff': {
       queryClient.invalidateQueries({ queryKey: boardKeys.all })
