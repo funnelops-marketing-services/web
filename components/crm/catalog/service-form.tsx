@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { MODALITY_NONE, type ModalityChoice } from '@/components/crm/catalog/labels'
 import type { ServiceClosing, ServiceCurrency, ServiceRead } from '@/lib/api/catalogo'
 
 export interface FormValues {
@@ -21,6 +22,10 @@ export interface FormValues {
   moneda: ServiceCurrency
   flujo_cierre: ServiceClosing
   is_active: boolean
+  /** Modalidad de entrega post-pago; el centinela 'none' viaja como null (#178). */
+  modality: ModalityChoice
+  /** Monto comparable con el comprobante; '' viaja como null (#178). */
+  price_amount: string
 }
 
 // Límites alineados con la validación server-side (#107).
@@ -52,6 +57,17 @@ export const RULES = {
     pattern: { value: /^\d+(\.\d{1,2})?$/, message: 'Solo números, hasta 2 decimales.' },
     validate: (v: string) => Number(v) <= PRECIO_MAX || `Máx. ${PRECIO_MAX}.`,
   },
+  // Monto estructurado: opcional (vacío = validación manual del pago), > 0, 2 decimales.
+  price_amount: {
+    validate: (v: string) => {
+      const cleaned = v.trim()
+      if (cleaned === '') return true
+      if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) return 'Solo números, hasta 2 decimales.'
+      const amount = Number(cleaned)
+      if (amount <= 0) return 'El monto debe ser mayor a 0.'
+      return amount <= PRECIO_MAX || `Máx. ${PRECIO_MAX}.`
+    },
+  },
 } as const
 
 export function serviceDefaults(service: ServiceRead | null): FormValues {
@@ -65,12 +81,18 @@ export function serviceDefaults(service: ServiceRead | null): FormValues {
     moneda: (service?.moneda as ServiceCurrency) ?? 'BOB',
     flujo_cierre: (service?.flujo_cierre as ServiceClosing) ?? 'pago_qr',
     is_active: service?.is_active ?? true,
+    modality: service?.modality ?? MODALITY_NONE,
+    price_amount: service?.price_amount ?? '',
   }
 }
 
 export function FieldError({ message }: { message?: string }) {
   if (!message) return null
   return <p className="text-[11px] text-rose-400">{message}</p>
+}
+
+export function Hint({ children }: { children: React.ReactNode }) {
+  return <p className="text-[11px] text-zinc-500">{children}</p>
 }
 
 export function Field({
@@ -93,7 +115,7 @@ export function Field({
 }
 
 interface SelectFieldProps<T extends string> {
-  name: 'moneda' | 'flujo_cierre'
+  name: 'moneda' | 'flujo_cierre' | 'modality'
   control: Control<FormValues>
   options: readonly T[]
   labels: Record<T, string>

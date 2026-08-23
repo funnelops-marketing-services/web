@@ -8,5 +8,7 @@ export const validationMessages = {
   currency: 'Moneda inválida',
   priceRequired: 'Precio requerido',
   priceAmount: 'El precio debe ser mayor a 0',
+  linkScheme: 'El link debe empezar con http:// o https://',
+  linkSpaces: 'El link no puede tener espacios',
   maxLength: (max: number) => `Máximo ${max} caracteres`,
 } as const

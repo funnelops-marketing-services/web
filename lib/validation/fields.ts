@@ -72,4 +72,15 @@ export const priceInput = z
 
 export const currency = enumField(['BOB', 'USD'], m.currency)
 
+// HTTP(S) link, espejo de la validación server-side (#178): el valor termina dentro
+// de un mensaje de WhatsApp, así que se corta acá y no en el 422.
+export const httpUrl = (max: number) =>
+  z
+    .string()
+    .trim()
+    .min(1, m.required)
+    .max(max, m.maxLength(max))
+    .refine((v) => /^https?:\/\//.test(v), m.linkScheme)
+    .refine((v) => !/\s/.test(v), m.linkSpaces)
+
 // Price/currency display formatting lives in lib/format.ts (formatMoney, #140).

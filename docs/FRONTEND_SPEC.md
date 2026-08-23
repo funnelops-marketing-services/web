@@ -27,6 +27,7 @@ Capacidades en `hooks/use-permissions.ts`: `canManageUsers` (operador ‖ client
 ## Contratos que consume (del backend — ver `server/docs/SPECS_MVP.md`)
 
 - API de conversaciones/mensajes · toggle `is_ai_active` · `GET/PUT /api/v1/agents/{id}/config` (admin-only) · endpoint que dispara `/generarEntrada`.
+- **Entrega post-pago (CR1, web#178 / server#268):** el servicio del catálogo agrega `modality` (`presencial` | `virtual` | `null` = sin entrega) y `price_amount` (monto comparable con el comprobante; `null` = validación manual) · links de entrega por servicio (`GET/POST /services/{id}/links`, `PUT/DELETE /service-links/{id}`, tope 5) · config de pagos por organización (`GET/PUT /crm/payment-settings`: beneficiario esperado + QR propio o global, `client_admin` ‖ `platform_operator`).
 
 ## Reglas
 
