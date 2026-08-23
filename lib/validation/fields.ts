@@ -83,4 +83,17 @@ export const httpUrl = (max: number) =>
     .refine((v) => /^https?:\/\//.test(v), m.linkScheme)
     .refine((v) => !/\s/.test(v), m.linkSpaces)
 
+export const NOTE_MIN_LENGTH = 3
+
+// Nota auditada obligatoria (override del comprobante, server#272). Los espacios se
+// normalizan **antes** de medir el mínimo, igual que el validador del backend: así una
+// nota de puros espacios se corta acá y no depende del 422. El valor parseado es el que
+// hay que mandar (ya normalizado).
+export const auditNote = (max: number) =>
+  z
+    .string()
+    .max(max, m.maxLength(max))
+    .transform((v) => v.split(/\s+/).filter(Boolean).join(' '))
+    .refine((v) => v.length >= NOTE_MIN_LENGTH, m.noteMin(NOTE_MIN_LENGTH))
+
 // Price/currency display formatting lives in lib/format.ts (formatMoney, #140).

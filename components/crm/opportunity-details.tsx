@@ -14,7 +14,9 @@ import { ContactCreateSheet } from '@/components/crm/contacts/contact-create'
 import { RatingBadge } from '@/components/crm/rating-badge'
 import { AlertBadge } from '@/components/crm/alert-badge'
 import { FlagBadges } from '@/components/crm/flag-badges'
+import { SectionTitle } from '@/components/crm/section-title'
 import { ServicesSelector } from '@/components/crm/services-selector'
+import { ReceiptPanel } from '@/components/crm/receipt/receipt-panel'
 
 function StateMessage({ text }: { text: string }) {
   return (
@@ -38,14 +40,6 @@ function Badge({ children }: { children: string }) {
     <span className="inline-flex items-center rounded-full border border-violet-500/20 bg-violet-500/10 px-2.5 py-0.5 text-xs font-medium text-violet-300">
       {children}
     </span>
-  )
-}
-
-function SectionTitle({ children }: { children: string }) {
-  return (
-    <h3 className="mb-3 text-xs font-semibold tracking-wide text-zinc-400 uppercase">
-      {children}
-    </h3>
   )
 }
 
@@ -129,6 +123,10 @@ export function OpportunityDetails({
             <SectionTitle>Servicios</SectionTitle>
             <ServicesSelector cardId={card.id} services={card.services} />
           </div>
+
+          {/* Comprobante (server#272): va debajo de Servicios porque se decide
+              comparando contra el precio del servicio que está justo arriba. */}
+          <ReceiptPanel cardId={card.id} />
 
           <div className="mt-5 border-t border-white/5 pt-5">
             <SectionTitle>Historial de movimientos</SectionTitle>

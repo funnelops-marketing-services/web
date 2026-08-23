@@ -1,11 +1,13 @@
 'use client'
 
 import {
+  BadgeDollarSign,
   Clock,
   Layers,
   Link2Off,
   PackageX,
   ReceiptText,
+  ScanEye,
   TriangleAlert,
   UserPen,
   type LucideIcon,
@@ -54,6 +56,17 @@ const FLAGS: Record<string, FlagConfig> = {
     label: 'Más de un servicio',
     hint: 'La oportunidad tiene más de un servicio aceptado: revisá cuál corresponde entregar.',
     icon: Layers,
+  },
+  // Validación del comprobante por visión (server#272).
+  receipt_review: {
+    label: 'Revisar comprobante',
+    hint: 'El comprobante que mandó el lead no pasó las verificaciones automáticas: mirá el panel del comprobante en la card y decidí.',
+    icon: ScanEye,
+  },
+  payment_unconfirmed: {
+    label: 'Pago por confirmar',
+    hint: 'El pago se aprobó solo y todavía falta confirmarlo contra el banco.',
+    icon: BadgeDollarSign,
   },
 }
 

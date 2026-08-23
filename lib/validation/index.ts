@@ -16,4 +16,6 @@ export {
   priceInput,
   currency,
   httpUrl,
+  auditNote,
+  NOTE_MIN_LENGTH,
 } from './fields'
