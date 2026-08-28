@@ -38,3 +38,37 @@ export async function listEvents(): Promise<EventRead[]> {
   const { data } = await apiClient.get('/crm/agenda')
   return z.array(eventSchema).parse(data)
 }
+
+/** Alta de un evento. `service_id` lo elige el operador entre los del catálogo. */
+export interface EventCreate {
+  service_id: string
+  nombre: string
+  /** ISO 8601. El backend lo interpreta como el instante de inicio. */
+  starts_at: string
+  location?: string | null
+  maps_url?: string | null
+  /** `null` = sin límite de cupo. */
+  capacity?: number | null
+  status?: string
+}
+
+/** Edición parcial: sólo viajan los campos presentes. `service_id` no se cambia — un
+ *  evento pertenece al servicio con el que nació, y moverlo dejaría entradas emitidas
+ *  apuntando a otra cosa. */
+export type EventUpdate = Partial<Omit<EventCreate, 'service_id'>>
+
+export async function createEvent(body: EventCreate): Promise<EventRead> {
+  const { data } = await apiClient.post('/crm/agenda', body)
+  return eventSchema.parse(data)
+}
+
+export async function updateEvent(eventId: string, body: EventUpdate): Promise<EventRead> {
+  const { data } = await apiClient.put(`/crm/agenda/${eventId}`, body)
+  return eventSchema.parse(data)
+}
+
+/** Borra el evento. Las entradas ya emitidas **no** se borran: quedan sin evento (el
+ *  backend hace `SET NULL`) y el escáner las admite con advertencia. */
+export async function deleteEvent(eventId: string): Promise<void> {
+  await apiClient.delete(`/crm/agenda/${eventId}`)
+}
