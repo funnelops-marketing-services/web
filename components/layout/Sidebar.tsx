@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import {
   BadgeDollarSign,
   BookOpen,
+  CalendarDays,
   Bot,
   Funnel,
   Menu,
@@ -51,6 +52,9 @@ const navItems: readonly NavItem[] = [
   // Agentes: solo platform_operator (superadmin). Catálogo/Usuarios: + client_admin (#126).
   { label: 'Agentes', href: '/agents', icon: Bot, requires: 'canManageConfig' },
   { label: 'Catálogo', href: '/catalogo', icon: BookOpen, requires: 'canManageCatalog' },
+  // Agenda: las fechas concretas de los servicios presenciales. Mismo permiso que el
+  // catálogo — el backend exige client_admin (event_router.EventManager).
+  { label: 'Agenda', href: '/agenda', icon: CalendarDays, requires: 'canManageCatalog' },
   { label: 'Usuarios', href: '/users', icon: ShieldCheck, requires: 'canManageUsers' },
   { label: 'Ajustes', href: '/settings', icon: Settings },
 ]
