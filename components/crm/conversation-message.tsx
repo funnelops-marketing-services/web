@@ -4,6 +4,7 @@ import { Bot, Download, FileText, UserRound } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import type { ThreadMessage } from '@/lib/api/crm'
+import { AgentErrorEvent } from '@/components/crm/agent-error-event'
 
 function formatTime(at: string): string {
   const date = new Date(at)
@@ -25,6 +26,7 @@ const senderLabel: Record<ThreadMessage['sender'], string> = {
   lead: 'Lead',
   agent: 'Agente IA',
   human: 'Gestión Humana',
+  system: 'Sistema',
 }
 
 /** Mensaje imagen: burbuja con marco fino estilo WhatsApp, caption adentro (#164). */
@@ -92,6 +94,8 @@ function MessageContent({ message }: { message: ThreadMessage }) {
 
 /** Burbuja del hilo espejo de WhatsApp, según el emisor. */
 export function ConversationMessage({ message }: { message: ThreadMessage }) {
+  // Evento de error del agente (server#288): chip centrado, no burbuja del agente.
+  if (message.sender === 'system') return <AgentErrorEvent message={message} />
   const isLead = message.sender === 'lead'
   const isAgent = message.sender === 'agent'
   const isImage = isImageMessage(message)

@@ -33,6 +33,13 @@ const crmEventSchema = z.discriminatedUnion('type', [
     conversation_id: z.string(),
     is_ai_active: z.boolean(),
   }),
+  // server#288: el turno del agente falló fuera del flujo de handoff (error interno /
+  // envío). El evento de sistema ya está persistido en el hilo.
+  z.object({
+    type: z.literal('agent_error'),
+    conversation_id: z.string(),
+    category: z.string().optional(),
+  }),
 ])
 
 type CrmEvent = z.infer<typeof crmEventSchema>
@@ -83,6 +90,15 @@ function handleEvent(event: CrmEvent, queryClient: QueryClient) {
     case 'ai_active_changed': {
       queryClient.invalidateQueries({ queryKey: boardKeys.all })
       // El evento trae conversation_id; cardKeys.detail se indexa por card.id.
+      const cardId = findCardIdByConversation(queryClient, event.conversation_id)
+      if (cardId) {
+        queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })
+      }
+      break
+    }
+    case 'agent_error': {
+      // Refrescar board + card abierta para que el chip de error aparezca sin esperar el poll.
+      queryClient.invalidateQueries({ queryKey: boardKeys.all })
       const cardId = findCardIdByConversation(queryClient, event.conversation_id)
       if (cardId) {
         queryClient.invalidateQueries({ queryKey: cardKeys.detail(cardId) })

@@ -5,11 +5,13 @@ import { TriangleAlert } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
-// Etiqueta de alerta de la oportunidad, derivada del motivo de handoff (#94). Solo
-// 'unknown_service' (el lead pidió un servicio fuera del catálogo) tiene representación
-// visible; cualquier otro valor (o null) no renderiza nada.
+// Etiqueta de alerta de la oportunidad, derivada del motivo de handoff (#94):
+// 'unknown_service' (el lead pidió un servicio fuera del catálogo) y 'agent_error' (el
+// agente no pudo responder y derivó, server#288). Cualquier otro valor (o null) no
+// renderiza nada.
 const ALERTS: Record<string, string> = {
   unknown_service: 'Solicitud desconocida',
+  agent_error: 'Error del agente IA',
 }
 
 /** Badge de alerta de la card. `showLabel` muestra el texto (detalle); en la cara de la
