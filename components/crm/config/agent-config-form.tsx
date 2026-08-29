@@ -47,6 +47,10 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
   const { dirtyFields, isDirty } = formState
   // Contador del prompt: re-renderiza solo por este campo (no watch() global).
   const promptValue = useWatch({ control, name: 'system_prompt' })
+  // El modelo elegido puede no aceptar `temperature` (server#288): se anota, el backend la omite.
+  const modelValue = useWatch({ control, name: 'model' })
+  const temperatureUnsupported =
+    (models ?? []).find((m) => m.id === modelValue)?.supports_temperature === false
 
   // Red de seguridad ante cerrar/recargar la pestaña con cambios sin guardar (#136).
   // La navegación interna (App Router) no dispara beforeunload: el chip visible cubre eso.
@@ -154,6 +158,12 @@ export function AgentConfigForm({ agent }: { agent: AgentRead }) {
                 onValueChange={(v) => field.onChange(v[0])}
                 className="py-3"
               />
+              {temperatureUnsupported && (
+                <p className="text-xs text-amber-400">
+                  Este modelo no acepta temperatura: el valor se guarda pero no se envía al
+                  proveedor.
+                </p>
+              )}
             </Field>
           )}
         />

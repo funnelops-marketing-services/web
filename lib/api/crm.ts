@@ -6,9 +6,10 @@ import { apiClient } from '@/lib/api/client'
 // Los ids llegan como strings opacos; el contrato (SPEC_CRM_FRONT §3) no fija
 // formato, así que no asumimos uuid para no romper el parse.
 
-export const threadSenderSchema = z.enum(['lead', 'agent', 'human'])
+// 'system' = evento de error del agente (server#288): no es una burbuja de chat.
+export const threadSenderSchema = z.enum(['lead', 'agent', 'human', 'system'])
 
-// type: 'text' | 'image' | 'document' — plain string so unknown types
+// type: 'text' | 'image' | 'document' | 'error' — plain string so unknown types
 // degrade to the text fallback instead of failing the parse.
 export const threadMessageSchema = z.object({
   sender: threadSenderSchema,
@@ -16,6 +17,9 @@ export const threadMessageSchema = z.object({
   at: z.string(),
   type: z.string().default('text'),
   media_url: z.string().nullable().optional(),
+  // Código de la falla del agente cuando type='error' (server#288): 'auth' | 'rate_limit' |
+  // 'bad_request' | 'provider' | 'network' | 'internal' | 'delivery'. El copy vive en el front.
+  category: z.string().nullable().optional(),
 })
 
 export const cardSchema = z.object({
@@ -26,7 +30,8 @@ export const cardSchema = z.object({
   phone: z.string(), // external_id (wa_id) de la conversación; habilita búsqueda por número
   rating: z.string(), // 'hot' | 'medium' | 'cold' — calificación del lead (badge)
   // Etiqueta de alerta derivada del motivo de handoff (#94): 'unknown_service' cuando
-  // el lead pidió un servicio fuera del catálogo; null/ausente si no hay alerta.
+  // el lead pidió un servicio fuera del catálogo; 'agent_error' cuando el agente no pudo
+  // responder y derivó (server#288); null/ausente si no hay alerta.
   alert: z.string().nullable().optional(),
   // Takeover: la IA responde por vos (true) o está apagada y atendés vos (false).
   is_ai_active: z.boolean().default(true),

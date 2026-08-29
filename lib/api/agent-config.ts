@@ -40,6 +40,9 @@ export const modelReadSchema = z.object({
   reasoning: z.boolean(),
   reasoning_effort: z.string().nullable(),
   pricing: modelPricingReadSchema.nullable(),
+  // False cuando el API del modelo no acepta `temperature` (server#288): el form lo anota,
+  // el backend la omite solo. Default true para tolerar un backend previo al campo.
+  supports_temperature: z.boolean().default(true),
 })
 
 export const userWithRoleSchema = z.object({
