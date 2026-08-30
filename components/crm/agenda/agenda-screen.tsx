@@ -36,11 +36,14 @@ export function AgendaScreen() {
   // `?service=<id>`: llega desde el catálogo ("N eventos próximos") ya filtrado por
   // ese servicio; el alta preselecciona el mismo servicio para no elegirlo dos veces.
   const router = useRouter()
-  const serviceFilter = useSearchParams().get('service')
+  const requestedService = useSearchParams().get('service')
   const { data: services } = useServices()
-  const filterName = serviceFilter
-    ? (services?.find((s) => s.id === serviceFilter)?.nombre ?? 'servicio')
-    : null
+  // El filtro se aplica **solo contra un servicio que existe**. Un `?service=` que no
+  // resuelve (link viejo, servicio borrado del catálogo) dejaría la pantalla diciendo
+  // "0 eventos" sobre una agenda que sí los tiene: se ignora y se lista todo.
+  const filtered = services?.find((s) => s.id === requestedService) ?? null
+  const serviceFilter = filtered?.id ?? null
+  const filterName = filtered?.nombre ?? null
 
   const all = events ?? []
   const list = serviceFilter ? all.filter((e) => e.service_id === serviceFilter) : all
@@ -150,7 +153,10 @@ export function AgendaScreen() {
         <EventEditor
           key={editing?.id ?? 'new'}
           event={editing}
-          defaultServiceId={serviceFilter}
+          // Solo se preselecciona un servicio que el Select del alta puede mostrar: la
+          // lista de opciones filtra por `is_active`, y preseleccionar uno inactivo
+          // dejaría el campo requerido vacío a la vista pero el form válido.
+          defaultServiceId={filtered?.is_active ? filtered.id : null}
           open={editorOpen}
           onOpenChange={setEditorOpen}
         />
