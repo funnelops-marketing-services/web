@@ -26,7 +26,7 @@
 - Por qué: feedback de las pruebas cruzadas con el otro dev: el sidebar de crear/editar servicio tenía poca ergonomía (botón al fondo del scroll, sin cancelar, preview invisible, slug críptico) y la relación servicio↔evento era invisible desde el catálogo — "Agenda con eventos" se leía como un módulo redundante frente a "cursos presenciales", cuando es 1:N (el servicio es lo que se vende; el evento, la edición con fecha, sede y cupo).
 - Spec/decisión que respeta: `server/docs/FLUJO_PAGO_Y_EVENTOS.md` §6 (evento = edición de un servicio, tabla propia) y §7 (`no_event`/`capacity_full`); complementa #192 (que tradujo los avisos y explicó catálogo vs agenda en texto) haciendo el vínculo **navegable y con dato vivo**. CLAUDE.md: TS estricto sin `any`/`as`, componentes <200 líneas (editor 197, secciones 105/114/131), UI en español, dark violeta.
 - Prueba local: `tsc --noEmit` limpio, ESLint 0 errores (1 warning preexistente de `watch()` de react-hook-form con React Compiler, ya estaba en el editor original), `next build` OK con las 13 rutas estáticas (incluida `/agenda` con su boundary de Suspense).
-- Commit:
+- Commit: a7901cd
 
 ### 2026-08-30 · innova67 · crm/detalle — panel del comprobante con estado real: aprobado, validado a mano, confirmado, rechazado (#194)
 - Qué cambió: (1) `lib/api/receipt.ts`: `approved_at` / `approved_by` (server#292; nullable **con default** para que un backend anterior siga parseando), `SYSTEM_ACTOR`, `ReceiptState` y `receiptState()` con precedencia `rejected > confirmed > approved > pending | review`, `approvedBySystem()`. (2) **`components/crm/receipt/receipt-status.tsx` nuevo**: badge del estado + sellos de tiempo ("Recibido" siempre; "Aprobado"/"Validado"/"Confirmado"/"Rechazado" según el estado) + hint con qué sigue; "Aprobado por el sistema" linkea a `/pagos` mientras falte el cotejo. (3) `receipt-panel.tsx`: usa `ReceiptStatus`; la nota humana se titula "Validado a mano. Motivo:" o "Rechazado. Motivo:" (en rojo); **las acciones solo se muestran en `pending`/`review`**. (4) `FRONTEND_SPEC.md` §Contratos: "Estado del comprobante".
@@ -56,7 +56,7 @@
 - Spec/decisión que respeta: `server/docs/FLUJO_PAGO_Y_EVENTOS.md` §3 (el evento es una fecha concreta de un servicio, ciclo de vida propio) y el RBAC de 3 niveles: el ABM exige `client_admin` server-side (`event_router.EventManager`), y en el front se refleja con `canManageCatalog` — misma capacidad, misma gente. El `status` se muestra por etiqueta pero viaja como `string`, igual que los `flags` de la card: un estado nuevo del backend no rompe la pantalla.
 - Decisión de diseño: **el servicio no se puede cambiar al editar**. Un evento nace ligado a un servicio y moverlo dejaría las entradas ya emitidas apuntando a otra cosa. Y el borrado explica en el propio diálogo que las entradas emitidas sobreviven (el backend hace `SET NULL`): quien la tiene en el teléfono sigue con su QR, así que para un evento que ya pasó conviene **Cerrado** antes que borrar.
 - Prueba local: `pnpm lint` (0 errores; los 5 warnings son preexistentes en archivos no tocados), `pnpm tsc --noEmit` limpio y `pnpm build` OK con `/agenda` entre las rutas generadas. Verificado contra el contrato real leído de `event_schemas.py`: campos, límites (nombre 120, lugar 300, cupo 1–100000), validación del `maps_url` con `http(s)://` y `capacity` nulo = sin tope.
-- Commit:
+- Commit: df49956
 
 
 ### 2026-08-23 · Natalia · crm/catalogo — modalidad híbrida en el form del servicio
