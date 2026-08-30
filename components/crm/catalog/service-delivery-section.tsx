@@ -35,16 +35,20 @@ interface ServiceDeliverySectionProps {
 }
 
 /** Qué implica cada modalidad, dicho solo para la elegida — el párrafo con las cuatro
- *  juntas obligaba a leerlas todas para entender una. Conserva la semántica de #192:
- *  el evento es la fecha, el lugar y el cupo; sin evento el pago se confirma igual y
- *  la oportunidad queda con el aviso "Sin evento en Agenda". */
+ *  juntas obligaba a leerlas todas para entender una.
+ *
+ *  Presencial e híbrido llevan **el encuadre completo de #192**, palabra por palabra: el
+ *  servicio es lo que se cobra y el evento es la fecha, el lugar y el cupo. Es la
+ *  explicación de por qué Catálogo y Agenda no son lo mismo, y las dos modalidades que
+ *  emiten entrada la necesitan por igual — #192 existió justamente para poner a híbrido
+ *  a la par de presencial. */
 const MODALITY_HINTS: Record<ModalityChoice, string> = {
   presencial:
-    'Al validarse el pago se emite la entrada con QR. La fecha, el lugar y el cupo salen de la Agenda: sin un evento próximo cargado, el pago se confirma pero la entrada no sale y la oportunidad queda con el aviso "Sin evento en Agenda".',
+    'Al validarse el pago se emite la entrada con QR. El servicio es lo que se cobra; el evento es la fecha, el lugar y el cupo a los que da acceso la entrada, y se carga en la Agenda: sin una fecha próxima cargada, el pago se confirma pero la entrada no sale y la oportunidad queda con el aviso "Sin evento en Agenda".',
   virtual:
     'Al validarse el pago se envían los links de abajo (grupo, reunión). Sin links no se entrega nada y sigue el equipo a mano.',
   hibrido:
-    'Entrega la entrada con QR y los links en un mismo mensaje, para un curso con módulos presenciales y por Zoom. La fecha sale de la Agenda: sin evento próximo, el pago se confirma pero la entrada no sale ("Sin evento en Agenda").',
+    'Entrega la entrada con QR y los links en un mismo mensaje, para un curso con módulos presenciales y por Zoom. El servicio es lo que se cobra; el evento es la fecha, el lugar y el cupo a los que da acceso la entrada, y se carga en la Agenda: sin una fecha próxima cargada, el pago se confirma pero la entrada no sale y la oportunidad queda con el aviso "Sin evento en Agenda".',
   none: 'Al lead solo se le confirma el pago; el bot no manda nada más y el equipo sigue a mano.',
 }
 
