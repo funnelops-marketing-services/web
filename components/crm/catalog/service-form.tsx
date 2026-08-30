@@ -2,6 +2,7 @@
 
 import { Controller, type Control } from 'react-hook-form'
 import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 import {
   Select,
   SelectContent,
@@ -86,6 +87,19 @@ export function serviceDefaults(service: ServiceRead | null): FormValues {
   }
 }
 
+/** Slug legible desde el nombre: sin tildes, minúsculas y guiones (mismo patrón que
+ *  valida `RULES.slug`). Se corta en el límite sin dejar guión colgando. */
+export function slugify(nombre: string): string {
+  return nombre
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, LIMITS.slug)
+    .replace(/-+$/g, '')
+}
+
 export function FieldError({ message }: { message?: string }) {
   if (!message) return null
   return <p className="text-[11px] text-rose-400">{message}</p>
@@ -113,6 +127,71 @@ export function Field({
     </div>
   )
 }
+
+/** Cuántos caracteres van; en ámbar al llegar al tope, que el input ya no deja pasar. */
+export function Counter({ value, max }: { value: string; max: number }) {
+  return (
+    <span
+      className={cn(
+        'text-[11px] tabular-nums',
+        value.length >= max ? 'text-amber-300/90' : 'text-zinc-600',
+      )}
+    >
+      {value.length}/{max}
+    </span>
+  )
+}
+
+/** Campo con contador de caracteres en la línea del label. */
+export function CountedField({
+  label,
+  htmlFor,
+  value,
+  max,
+  children,
+}: {
+  label: string
+  htmlFor: string
+  value: string
+  max: number
+  children: React.ReactNode
+}) {
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-baseline justify-between gap-2">
+        <Label htmlFor={htmlFor} className="text-xs font-medium text-zinc-400">
+          {label}
+        </Label>
+        <Counter value={value} max={max} />
+      </div>
+      {children}
+    </div>
+  )
+}
+
+/** Grupo visual del form: las ~10 preguntas en bloques con propósito, en vez de una
+ *  columna corrida donde identidad, conversación y entrega se leían como lo mismo. */
+export function FormSection({
+  title,
+  hint,
+  children,
+}: {
+  title: string
+  hint?: string
+  children: React.ReactNode
+}) {
+  return (
+    <section className="space-y-4 rounded-xl border border-white/5 bg-white/[0.02] p-4">
+      <div>
+        <p className="text-sm font-semibold text-white">{title}</p>
+        {hint && <Hint>{hint}</Hint>}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+export const formInputClasses = 'border-white/10 bg-white/[0.03] text-sm text-white'
 
 interface SelectFieldProps<T extends string> {
   name: 'moneda' | 'flujo_cierre' | 'modality'

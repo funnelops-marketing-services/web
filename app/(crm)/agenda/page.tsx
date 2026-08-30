@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { AgendaScreen } from '@/components/crm/agenda/agenda-screen'
@@ -20,5 +20,10 @@ export default function AgendaPage() {
 
   if (!canManageCatalog) return null
 
-  return <AgendaScreen />
+  // La pantalla lee `?service=` con useSearchParams, que exige un boundary de Suspense.
+  return (
+    <Suspense fallback={null}>
+      <AgendaScreen />
+    </Suspense>
+  )
 }

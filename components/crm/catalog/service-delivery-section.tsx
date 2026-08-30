@@ -1,10 +1,15 @@
 'use client'
 
 import Link from 'next/link'
+import { CalendarDays } from 'lucide-react'
 import type { Control, FieldErrors, UseFormRegister } from 'react-hook-form'
 
 import { Input } from '@/components/ui/input'
-import { MODALITY_CHOICES, MODALITY_LABELS } from '@/components/crm/catalog/labels'
+import {
+  MODALITY_CHOICES,
+  MODALITY_LABELS,
+  type ModalityChoice,
+} from '@/components/crm/catalog/labels'
 import {
   Field,
   FieldError,
@@ -13,6 +18,7 @@ import {
   SelectField,
   type FormValues,
 } from '@/components/crm/catalog/service-form'
+import { ServiceEventsLink } from '@/components/crm/catalog/service-events-link'
 import { ServiceLinksManager } from '@/components/crm/catalog/service-links-manager'
 import type { ServiceCurrency } from '@/lib/api/catalogo'
 
@@ -22,8 +28,24 @@ interface ServiceDeliverySectionProps {
   errors: FieldErrors<FormValues>
   moneda: ServiceCurrency
   priceAmount: string
+  /** La modalidad elegida en el form: decide qué explicación y qué avisos se muestran. */
+  modality: ModalityChoice
   /** null mientras el servicio no existe: los links necesitan un id. */
   serviceId: string | null
+}
+
+/** Qué implica cada modalidad, dicho solo para la elegida — el párrafo con las cuatro
+ *  juntas obligaba a leerlas todas para entender una. Conserva la semántica de #192:
+ *  el evento es la fecha, el lugar y el cupo; sin evento el pago se confirma igual y
+ *  la oportunidad queda con el aviso "Sin evento en Agenda". */
+const MODALITY_HINTS: Record<ModalityChoice, string> = {
+  presencial:
+    'Al validarse el pago se emite la entrada con QR. La fecha, el lugar y el cupo salen de la Agenda: sin un evento próximo cargado, el pago se confirma pero la entrada no sale y la oportunidad queda con el aviso "Sin evento en Agenda".',
+  virtual:
+    'Al validarse el pago se envían los links de abajo (grupo, reunión). Sin links no se entrega nada y sigue el equipo a mano.',
+  hibrido:
+    'Entrega la entrada con QR y los links en un mismo mensaje, para un curso con módulos presenciales y por Zoom. La fecha sale de la Agenda: sin evento próximo, el pago se confirma pero la entrada no sale ("Sin evento en Agenda").',
+  none: 'Al lead solo se le confirma el pago; el bot no manda nada más y el equipo sigue a mano.',
 }
 
 /** Entrega post-pago (#178): modalidad, monto comparable y links. */
@@ -33,9 +55,12 @@ export function ServiceDeliverySection({
   errors,
   moneda,
   priceAmount,
+  modality,
   serviceId,
 }: ServiceDeliverySectionProps) {
   const manualReview = priceAmount.trim() === '' || moneda === 'USD'
+  // Narrow explícito: `ModalityChoice` incluye el centinela 'none', que no viaja.
+  const agendaModality = modality === 'presencial' || modality === 'hibrido' ? modality : null
 
   return (
     <section className="space-y-4 rounded-xl border border-violet-500/20 bg-violet-500/[0.04] p-4">
@@ -54,23 +79,18 @@ export function ServiceDeliverySection({
           options={MODALITY_CHOICES}
           labels={MODALITY_LABELS}
         />
-        <Hint>
-          <span className="text-zinc-300">Presencial</span>: se entrega la entrada con QR ·{' '}
-          <span className="text-zinc-300">Virtual</span>: se envían los links de abajo ·{' '}
-          <span className="text-zinc-300">Híbrido</span>: las dos cosas en un mismo mensaje, para un
-          curso que tiene módulos presenciales y por Zoom ·{' '}
-          <span className="text-zinc-300">Sin entrega</span>: al lead solo se le confirma el pago
-          y el equipo sigue a mano.
-        </Hint>
-        <Hint>
-          Presencial e híbrido necesitan además <span className="text-zinc-300">un evento en</span>{' '}
-          <Link href="/agenda" className="text-violet-300 underline-offset-2 hover:underline">
-            Agenda
-          </Link>
-          : el servicio es lo que se cobra; el evento es la fecha, el lugar y el cupo a los que da
-          acceso la entrada. Sin una fecha próxima cargada, el pago se confirma pero la entrada no
-          sale y la oportunidad queda con el aviso &quot;Sin evento en Agenda&quot;.
-        </Hint>
+        <Hint>{MODALITY_HINTS[modality]}</Hint>
+        {agendaModality !== null &&
+          (serviceId ? (
+            <ServiceEventsLink serviceId={serviceId} modality={agendaModality} />
+          ) : (
+            <Link
+              href="/agenda"
+              className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-violet-300 hover:text-violet-200"
+            >
+              <CalendarDays className="size-3" /> Las fechas y sedes se cargan en la Agenda
+            </Link>
+          ))}
       </Field>
 
       <Field label="Monto a cobrar (para comparar con el comprobante)" htmlFor="price_amount">
@@ -100,7 +120,8 @@ export function ServiceDeliverySection({
         <ServiceLinksManager serviceId={serviceId} />
       ) : (
         <Hint>
-          Guardá el servicio primero y volvé a abrirlo para cargar los links de entrega.
+          Los links de entrega se cargan después de guardar: si el servicio tiene entrega, el
+          editor queda abierto para hacerlo al toque.
         </Hint>
       )}
     </section>
