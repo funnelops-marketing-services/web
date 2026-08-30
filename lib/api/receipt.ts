@@ -10,6 +10,10 @@ export const NOTE_MAX = 2000
 
 export const VERDICT_PASS = 'pass'
 
+/** `approved_by` del sistema (checks en verde); cualquier otro valor es el uuid del
+ *  operador que validó (1 click, override o arrastre a "Pago validado"). */
+export const SYSTEM_ACTOR = 'system'
+
 /** `code` es un string libre a propósito: un check nuevo del backend no debe romper el
  *  parse (mismo criterio que los `flags` de la card). El copy corto vive en el front;
  *  `detail` ya viene en español y listo para mostrar. */
@@ -28,6 +32,11 @@ export const receiptSchema = z.object({
   // Un campo ilegible llega en `null`, y puede faltar la clave entera.
   extracted: z.record(z.string(), z.string().nullable()),
   image_url: z.string().nullable(),
+  // Quién aprobó el pago y cuándo (server#292): `'system'` o el uuid del operador; null
+  // si nadie todavía. Con default para que un backend anterior siga parseando (ahí el
+  // panel no puede saber si ya se validó y vuelve a ofrecer el botón).
+  approved_at: z.string().nullable().default(null),
+  approved_by: z.string().nullable().default(null),
   human_confirmed_at: z.string().nullable(),
   human_rejected_at: z.string().nullable(),
   human_note: z.string().nullable(),
@@ -43,6 +52,25 @@ export type Receipt = z.infer<typeof receiptSchema>
 
 export function receiptPassed(receipt: Receipt): boolean {
   return receipt.verdict === VERDICT_PASS
+}
+
+/** Estado del comprobante tal como lo ve el operador. Solo `pending` y `review` tienen
+ *  acciones: en los otros tres el pago ya se decidió y volver a "validar" re-entregaría
+ *  al lead (server#292). */
+export type ReceiptState = 'review' | 'pending' | 'approved' | 'confirmed' | 'rejected'
+
+/** Precedencia: el rechazo manda sobre todo (revocó la entrada), después la confirmación
+ *  contra el banco, después la aprobación (del sistema o de una persona) y recién
+ *  entonces el veredicto de los checks. Misma regla que documenta el backend. */
+export function receiptState(receipt: Receipt): ReceiptState {
+  if (receipt.human_rejected_at) return 'rejected'
+  if (receipt.human_confirmed_at) return 'confirmed'
+  if (receipt.approved_at) return 'approved'
+  return receiptPassed(receipt) ? 'pending' : 'review'
+}
+
+export function approvedBySystem(receipt: Receipt): boolean {
+  return receipt.approved_by === SYSTEM_ACTOR
 }
 
 export async function getReceipt(cardId: string): Promise<Receipt | null> {
