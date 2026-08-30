@@ -2,6 +2,7 @@
 
 import {
   BadgeDollarSign,
+  CalendarOff,
   Clock,
   Layers,
   Link2Off,
@@ -10,6 +11,7 @@ import {
   ScanEye,
   TriangleAlert,
   UserPen,
+  Users,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -67,6 +69,18 @@ const FLAGS: Record<string, FlagConfig> = {
     label: 'Pago por confirmar',
     hint: 'El pago se aprobó solo y todavía falta confirmarlo contra el banco.',
     icon: BadgeDollarSign,
+  },
+  // Eventos y cupo (server#276 / server#290). El lead ya recibió la confirmación del pago;
+  // lo que falta es la fecha a la que da acceso la entrada.
+  no_event: {
+    label: 'Sin evento en Agenda',
+    hint: 'El servicio es presencial o híbrido pero no tiene ninguna fecha próxima cargada en Agenda. Creá el evento y la entrada sale sola.',
+    icon: CalendarOff,
+  },
+  capacity_full: {
+    label: 'Cupo lleno',
+    hint: 'El evento llegó a su cupo, así que no se emitió la entrada. Ampliá el cupo o cargá otra fecha en Agenda y la entrega se reintenta sola.',
+    icon: Users,
   },
 }
 
