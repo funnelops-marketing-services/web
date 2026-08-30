@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { CalendarDays, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -64,10 +65,16 @@ export function AgendaScreen() {
 
       <p className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-zinc-400">
         Cada evento es <span className="text-zinc-300">una fecha concreta</span> de un servicio
-        presencial. Sin un evento cargado, al validarse el pago la entrada{' '}
-        <span className="text-zinc-300">no sale sola</span> y queda para que la mande alguien a
-        mano. La fecha y el lugar viajan en el mensaje que recibe quien compra, y en la puerta el
-        escáner rechaza las entradas de otra fecha.
+        presencial o híbrido. El servicio (nombre, precio, modalidad) se carga en{' '}
+        <Link href="/catalogo" className="text-violet-300 underline-offset-2 hover:underline">
+          Catálogo
+        </Link>
+        ; acá va la edición: cuándo, dónde y para cuántos. Sin un evento próximo cargado, al
+        validarse el pago se le confirma al lead pero la entrada{' '}
+        <span className="text-zinc-300">no sale sola</span> y la oportunidad queda con el aviso
+        &quot;Sin evento en Agenda&quot;; en cuanto lo cargás acá, esas entradas salen solas. La
+        fecha y el lugar viajan en el mensaje que recibe quien compra, y en la puerta el escáner
+        rechaza las entradas de otra fecha.
       </p>
 
       {isLoading && (

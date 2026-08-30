@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import type { Control, FieldErrors, UseFormRegister } from 'react-hook-form'
 
 import { Input } from '@/components/ui/input'
@@ -58,8 +59,17 @@ export function ServiceDeliverySection({
           <span className="text-zinc-300">Virtual</span>: se envían los links de abajo ·{' '}
           <span className="text-zinc-300">Híbrido</span>: las dos cosas en un mismo mensaje, para un
           curso que tiene módulos presenciales y por Zoom ·{' '}
-          <span className="text-zinc-300">Sin entrega</span>: el bot no manda nada después del pago
-          (el equipo sigue a mano).
+          <span className="text-zinc-300">Sin entrega</span>: al lead solo se le confirma el pago
+          y el equipo sigue a mano.
+        </Hint>
+        <Hint>
+          Presencial e híbrido necesitan además <span className="text-zinc-300">un evento en</span>{' '}
+          <Link href="/agenda" className="text-violet-300 underline-offset-2 hover:underline">
+            Agenda
+          </Link>
+          : el servicio es lo que se cobra; el evento es la fecha, el lugar y el cupo a los que da
+          acceso la entrada. Sin una fecha próxima cargada, el pago se confirma pero la entrada no
+          sale y la oportunidad queda con el aviso &quot;Sin evento en Agenda&quot;.
         </Hint>
       </Field>
 
