@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { CalendarDays, Plus } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { CalendarDays, Plus, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -18,6 +19,7 @@ import { EventEditor } from '@/components/crm/agenda/event-editor'
 import { EventTable } from '@/components/crm/agenda/event-table'
 import { hasPassed } from '@/components/crm/agenda/labels'
 import { useEvents } from '@/hooks/use-agenda'
+import { useServices } from '@/hooks/use-catalogo'
 import type { EventRead } from '@/lib/api/agenda'
 
 /** Agenda de eventos (web#189 / server#276).
@@ -31,7 +33,17 @@ export function AgendaScreen() {
   const [editing, setEditing] = useState<EventRead | null>(null)
   const [deleting, setDeleting] = useState<EventRead | null>(null)
 
-  const list = events ?? []
+  // `?service=<id>`: llega desde el catálogo ("N eventos próximos") ya filtrado por
+  // ese servicio; el alta preselecciona el mismo servicio para no elegirlo dos veces.
+  const router = useRouter()
+  const serviceFilter = useSearchParams().get('service')
+  const { data: services } = useServices()
+  const filterName = serviceFilter
+    ? (services?.find((s) => s.id === serviceFilter)?.nombre ?? 'servicio')
+    : null
+
+  const all = events ?? []
+  const list = serviceFilter ? all.filter((e) => e.service_id === serviceFilter) : all
   const proximos = list.filter((event) => !hasPassed(event)).length
 
   function openNew() {
@@ -50,8 +62,12 @@ export function AgendaScreen() {
         <div>
           <h1 className="text-2xl font-bold text-white">Agenda</h1>
           <p className="text-sm text-zinc-500">
+            Fechas y sedes de los servicios presenciales. Sin un evento cargado, el bot no entrega
+            la entrada.
+          </p>
+          <p className="mt-1 text-xs text-zinc-600">
             {proximos} {proximos === 1 ? 'evento próximo' : 'eventos próximos'} de {list.length} en
-            total.
+            total{filterName ? ' para este servicio' : ''}.
           </p>
         </div>
         <Button
@@ -62,6 +78,22 @@ export function AgendaScreen() {
           <Plus className="size-4" /> Nuevo evento
         </Button>
       </div>
+
+      {filterName && (
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/25 bg-violet-500/[0.08] px-2.5 py-1 text-xs text-violet-300">
+            Filtrado por servicio: {filterName}
+            <button
+              type="button"
+              aria-label="Quitar filtro"
+              onClick={() => router.replace('/agenda')}
+              className="rounded-full p-0.5 hover:bg-white/10"
+            >
+              <X className="size-3" />
+            </button>
+          </span>
+        </div>
+      )}
 
       <p className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-zinc-400">
         Cada evento es <span className="text-zinc-300">una fecha concreta</span> de un servicio
@@ -100,10 +132,13 @@ export function AgendaScreen() {
             <EmptyMedia variant="icon" className="bg-white/5 text-zinc-400">
               <CalendarDays />
             </EmptyMedia>
-            <EmptyTitle className="text-white">Todavía no hay eventos</EmptyTitle>
+            <EmptyTitle className="text-white">
+              {filterName ? `"${filterName}" no tiene eventos` : 'Todavía no hay eventos'}
+            </EmptyTitle>
             <EmptyDescription className="text-zinc-500">
-              Creá el primero con “Nuevo evento”: hasta entonces, los cursos presenciales no
-              entregan la entrada solos.
+              {filterName
+                ? 'Creá la primera fecha con “Nuevo evento”: hasta entonces este servicio no entrega la entrada solo.'
+                : 'Creá el primero con “Nuevo evento”: hasta entonces, los cursos presenciales no entregan la entrada solos.'}
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
@@ -115,6 +150,7 @@ export function AgendaScreen() {
         <EventEditor
           key={editing?.id ?? 'new'}
           event={editing}
+          defaultServiceId={serviceFilter}
           open={editorOpen}
           onOpenChange={setEditorOpen}
         />

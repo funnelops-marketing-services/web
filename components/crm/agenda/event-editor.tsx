@@ -21,13 +21,15 @@ import type { EventRead } from '@/lib/api/agenda'
 interface EventEditorProps {
   /** `null` = alta. */
   event: EventRead | null
+  /** Preselección del servicio en el alta (llega del filtro `?service=` del catálogo). */
+  defaultServiceId?: string | null
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-function defaults(event: EventRead | null): FormValues {
+function defaults(event: EventRead | null, defaultServiceId?: string | null): FormValues {
   return {
-    service_id: event?.service_id ?? '',
+    service_id: event?.service_id ?? defaultServiceId ?? '',
     nombre: event?.nombre ?? '',
     starts_at: event ? toLocalInput(event.starts_at) : '',
     location: event?.location ?? '',
@@ -39,14 +41,14 @@ function defaults(event: EventRead | null): FormValues {
 
 /** Alta y edición del evento. El servicio sólo se elige al crear: moverlo después
  *  dejaría las entradas ya emitidas apuntando a otra cosa. */
-export function EventEditor({ event, open, onOpenChange }: EventEditorProps) {
+export function EventEditor({ event, defaultServiceId, open, onOpenChange }: EventEditorProps) {
   const isNew = event === null
   const create = useCreateEvent()
   const update = useUpdateEvent()
   const pending = create.isPending || update.isPending
 
   const { control, handleSubmit, formState } = useForm<FormValues>({
-    defaultValues: defaults(event),
+    defaultValues: defaults(event, defaultServiceId),
     mode: 'onBlur',
   })
 

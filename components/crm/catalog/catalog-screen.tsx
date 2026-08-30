@@ -116,6 +116,9 @@ export function CatalogScreen() {
           defaultOrden={nextOrden}
           open={editorOpen}
           onOpenChange={setEditorOpen}
+          // Un alta con entrega sigue en modo edición (la key remonta el form con el
+          // id nuevo) para cargar los links sin cerrar y volver a abrir.
+          onCreated={setEditing}
         />
       )}
     </div>

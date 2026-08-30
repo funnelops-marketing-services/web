@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/table'
 import { ServiceDeleteDialog } from '@/components/crm/catalog/service-delete-dialog'
 import { ServiceDeliveryBadge } from '@/components/crm/catalog/service-delivery-badge'
+import { ServiceEventsLink } from '@/components/crm/catalog/service-events-link'
 import { useUpdateService } from '@/hooks/use-catalogo'
 import type { ServiceRead } from '@/lib/api/catalogo'
 
@@ -125,13 +126,15 @@ export function CatalogTable({ services, onEdit }: CatalogTableProps) {
                         <TooltipContent>Arrastrá para reordenar</TooltipContent>
                       </Tooltip>
                     </TableCell>
-                    <TableCell>
+                    {/* La celda del nombre abre el editor: el lápiz sigue como vía accesible. */}
+                    <TableCell className="cursor-pointer" onClick={() => onEdit(service)}>
                       <p className="text-sm font-medium text-white">{service.nombre}</p>
                       <p className="line-clamp-1 text-xs text-zinc-500">{service.resumen}</p>
                     </TableCell>
                     <TableCell className="text-sm text-zinc-300">
                       {formatMoney(service.precio, service.moneda)}
                       <ServiceDeliveryBadge service={service} />
+                      <ServiceEventsLink serviceId={service.id} modality={service.modality} />
                     </TableCell>
                     <TableCell>
                       <Switch
