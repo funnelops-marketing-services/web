@@ -1,67 +1,49 @@
 'use client'
 
-import { CircleCheck, TriangleAlert } from 'lucide-react'
-
 import { cn } from '@/lib/utils'
-import { formatTicketTime } from '@/lib/format'
-import { receiptPassed, type Receipt } from '@/lib/api/receipt'
+import { receiptState, type Receipt, type ReceiptState } from '@/lib/api/receipt'
 import { useReceipt } from '@/hooks/use-receipt'
 import { SectionTitle } from '@/components/crm/section-title'
 import { ReceiptActions } from '@/components/crm/receipt/receipt-actions'
 import { ReceiptChecks } from '@/components/crm/receipt/receipt-checks'
 import { ReceiptExtracted } from '@/components/crm/receipt/receipt-extracted'
 import { ReceiptImage } from '@/components/crm/receipt/receipt-image'
+import { ReceiptStatus } from '@/components/crm/receipt/receipt-status'
 
-function VerdictBadge({ passed }: { passed: boolean }) {
-  const Icon = passed ? CircleCheck : TriangleAlert
+/** La nota humana es el motivo de un override o de un rechazo: el título dice cuál. */
+function noteLabel(state: ReceiptState): string {
+  if (state === 'rejected') return 'Rechazado. Motivo:'
+  if (state === 'approved') return 'Validado a mano. Motivo:'
+  return 'Nota del operador:'
+}
+
+function HumanNote({ state, note }: { state: ReceiptState; note: string }) {
+  const rejected = state === 'rejected'
   return (
-    <span
+    <div
       className={cn(
-        'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium',
-        passed
-          ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
-          : 'border-amber-500/30 bg-amber-500/10 text-amber-300',
+        'rounded-lg border px-2.5 py-2',
+        rejected ? 'border-red-500/20 bg-red-500/[0.07]' : 'border-violet-500/20 bg-violet-500/[0.07]',
       )}
     >
-      <Icon className="size-3 shrink-0" />
-      {passed ? 'Las verificaciones cerraron' : 'Necesita tu revisión'}
-    </span>
-  )
-}
-
-function VerdictHint({ passed }: { passed: boolean }) {
-  return (
-    <p className="text-xs font-normal text-zinc-400">
-      {passed
-        ? 'El monto, el destinatario y la fecha coinciden con lo esperado: podés validar el pago con un click y la entrega sale sola.'
-        : 'El sistema no lo aprobó solo. Mirá abajo qué no cerró y, si igual corresponde cobrarlo, validalo dejando escrito por qué.'}
-    </p>
-  )
-}
-
-function HumanNote({ note }: { note: string }) {
-  return (
-    <div className="rounded-lg border border-violet-500/20 bg-violet-500/[0.07] px-2.5 py-2">
-      <p className="text-[11px] font-medium text-violet-300">Validado a mano. Motivo:</p>
+      <p className={cn('text-[11px] font-medium', rejected ? 'text-red-300' : 'text-violet-300')}>
+        {noteLabel(state)}
+      </p>
       <p className="text-xs font-normal whitespace-pre-wrap text-zinc-300">{note}</p>
     </div>
   )
 }
 
 function ReceiptBody({ receipt }: { receipt: Receipt }) {
-  const passed = receiptPassed(receipt)
+  const state = receiptState(receipt)
   const okCount = receipt.checks.filter((check) => check.passed).length
+  // Solo mientras nadie decidió: sobre un pago aprobado, confirmado o rechazado el
+  // botón no tiene sentido — y "validar" de nuevo re-entregaba al lead (web#194).
+  const actionable = state === 'pending' || state === 'review'
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <VerdictBadge passed={passed} />
-        <span className="text-[11px] font-normal text-zinc-500">
-          Recibido {formatTicketTime(receipt.created_at)}
-        </span>
-      </div>
-
-      <VerdictHint passed={passed} />
+      <ReceiptStatus receipt={receipt} />
 
       <div className="grid gap-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]">
         <ReceiptImage url={receipt.image_url} />
@@ -75,9 +57,9 @@ function ReceiptBody({ receipt }: { receipt: Receipt }) {
         <ReceiptChecks checks={receipt.checks} />
       </div>
 
-      {receipt.human_note && <HumanNote note={receipt.human_note} />}
+      {receipt.human_note && <HumanNote state={state} note={receipt.human_note} />}
 
-      <ReceiptActions cardId={receipt.card_id} passed={passed} />
+      {actionable && <ReceiptActions cardId={receipt.card_id} passed={state === 'pending'} />}
     </div>
   )
 }
