@@ -26,10 +26,7 @@ export function PaymentSettingsCard() {
   }
 
   // key: los defaults del form se toman al montar; un refetch con datos nuevos remonta.
-  return (
-    <PaymentSettingsForm
-      key={`${settings.expected_beneficiary ?? ''}|${settings.payment_qr_url}`}
-      settings={settings}
-    />
-  )
+  // Solo el beneficiario entra: el QR es un archivo con estado propio y remontar por
+  // cada subida le borraría al operador lo que estuviera tipeando.
+  return <PaymentSettingsForm key={settings.expected_beneficiary ?? ''} settings={settings} />
 }
