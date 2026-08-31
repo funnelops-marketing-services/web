@@ -27,7 +27,7 @@
 - Spec/decisión que respeta: `FRONTEND_SPEC.md` §Pantallas (los nombres de stage y pipeline llegan del backend; el front no compara por string) y `server/docs/SPECS_MVP.md` §M-CRM. Sin cambios de contrato: `pipeline.name` ya venía en `/crm/boards`.
 - Prueba local: `tsc --noEmit` limpio · `next build` OK. Verificado con grep que fuera de BITACORA no queda ninguna referencia a los nombres viejos en código ni docs vivos.
 - Dependencia de deploy: **primero el backend** (`alembic upgrade head`), si no el tablero sigue mostrando los nombres viejos — que igual funciona, porque nada rutea por el nombre.
-- Commit: pendiente
+- Commit: 055b8cb
 
 ### 2026-08-30 · Natalia · crm/atención — una cola con lo que la IA no pudo resolver sola
 - Qué cambió: (1) Nueva pantalla **"Requiere atención"** (`/atencion`): las oportunidades de **los dos embudos** que esperan a una persona, en una sola lista — quién espera, por qué (los mismos pills del tablero), en qué stage/embudo quedó, y el botón que abre la oportunidad. Orden fijo: primero lo bloqueante (franja rosa), después lo revisable (ámbar); dentro de cada grupo, lo más viejo primero. (2) Contador en el menú lateral, con la misma forma que el de "Pagos por confirmar": badge rosa con lo bloqueante, nada cuando la cola está vacía. (3) `flag-badges.tsx` aprende tres motivos que no viven en `flags` sino en el estado de la card (`agent_error`, `unknown_service`, `awaiting_human`), con `tone: 'rose'` para separar "alguien espera respuesta" de "se trabó la entrega". (4) El contador del tab del tablero pasa a usar el mismo criterio que la cola (`attentionInPipeline`) en vez de contar solo `awaiting_human`.
