@@ -65,7 +65,8 @@ function cardCount(pipeline: Pipeline): number {
 // El mismo criterio que la pantalla "Requiere atención": un solo lugar decide qué cuenta
 // como trabajo humano, así el tab y el menú nunca muestran números distintos.
 
-/** Tablero CRM real: tabs por pipeline (IA + Gestión Humana) + panel del hilo. */
+/** Tablero CRM real: tabs por pipeline (Gestión Venta + Gestión Postventa) + panel
+ *  del hilo. Los nombres llegan del backend: acá no se compara por string. */
 export function CrmBoard() {
   const { data, isLoading, isError } = useBoard()
   const moveCard = useMoveCard()

@@ -30,7 +30,7 @@ Leé `CLAUDE.md` + `docs/FRONTEND_SPEC.md`. Verificá que el cambio respeta **to
 |---|---|
 | CRM en `/crm` | sin subdominio separado; todo el CRM bajo la ruta `/crm` |
 | Takeover | toggle `is_ai_active` implementado en el inbox (no workarounds) |
-| Pipeline | kanban llamado "Gestión Humana", columnas alineadas con los stages del funnel |
+| Pipeline | kanban llamado "Gestión Postventa" (`kind: 'human'`), columnas alineadas con los stages del funnel |
 | Config del agente | endpoints de config solo visibles para rol `admin`; el `staff` NO los ve |
 | Realtime | WebSocket/SSE propio (NO socket.io ni librerías de terceros para realtime) |
 | TypeScript estricto | cero `any` explícito |

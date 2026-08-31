@@ -25,7 +25,7 @@ function fileNameFromUrl(url: string): string {
 const senderLabel: Record<ThreadMessage['sender'], string> = {
   lead: 'Lead',
   agent: 'Agente IA',
-  human: 'Gestión Humana',
+  human: 'Equipo',
   system: 'Sistema',
 }
 
