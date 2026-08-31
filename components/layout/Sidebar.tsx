@@ -9,6 +9,7 @@ import {
   CalendarDays,
   Bot,
   Funnel,
+  Inbox,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
@@ -30,6 +31,7 @@ import {
 import { usePermissions } from '@/hooks/use-permissions'
 import { useUiStore } from '@/store/ui-store'
 import { PendingPaymentsBadge } from '@/components/crm/payments/pending-payments-badge'
+import { AttentionBadge } from '@/components/crm/attention/attention-badge'
 import { Logo } from './Logo'
 
 interface NavItem {
@@ -39,11 +41,14 @@ interface NavItem {
   /** Capacidad requerida para ver el ítem; sin ella, visible para toda sesión CRM. */
   requires?: 'canManageConfig' | 'canManageCatalog' | 'canManageUsers'
   /** Contador de trabajo pendiente al lado del ítem (web#184). */
-  badge?: 'payments'
+  badge?: 'payments' | 'attention'
 }
 
 const navItems: readonly NavItem[] = [
   { label: 'Embudo de ventas', href: '/', icon: Funnel },
+  // Lo que la IA no pudo resolver sola, de los dos embudos juntos. Va segundo y sin
+  // `requires`: es la primera pantalla que mira quien atiende, y atienden los 3 roles.
+  { label: 'Requiere atención', href: '/atencion', icon: Inbox, badge: 'attention' },
   // Conciliar es operación diaria de los 3 roles (server#274): sin `requires`.
   { label: 'Pagos por confirmar', href: '/pagos', icon: BadgeDollarSign, badge: 'payments' },
   { label: 'Contactos', href: '/contacts', icon: Users },
@@ -106,6 +111,7 @@ function NavList({ pathname, collapsed = false, onSelect }: NavListProps) {
             />
             {!collapsed && <span className="truncate">{item.label}</span>}
             {item.badge === 'payments' && <PendingPaymentsBadge collapsed={collapsed} />}
+            {item.badge === 'attention' && <AttentionBadge collapsed={collapsed} />}
           </Link>
         )
       })}

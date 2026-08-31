@@ -2,13 +2,16 @@
 
 import {
   BadgeDollarSign,
+  BotOff,
   CalendarOff,
   Clock,
   Layers,
   Link2Off,
+  MessageSquareWarning,
   PackageX,
   ReceiptText,
   ScanEye,
+  SearchX,
   TriangleAlert,
   UserPen,
   Users,
@@ -24,6 +27,9 @@ interface FlagConfig {
   /** Qué pasó y qué hacer, en el tooltip. */
   hint: string
   icon: LucideIcon
+  /** Rosa para lo que dejó a alguien esperando una respuesta; ámbar (default) para lo
+   *  que trabó la entrega. Mismo criterio de color que la card del tablero. */
+  tone?: 'amber' | 'rose'
 }
 
 // Avisos operativos de la entrega automática (server#270). El backend manda códigos y
@@ -82,6 +88,27 @@ const FLAGS: Record<string, FlagConfig> = {
     hint: 'El evento llegó a su cupo, así que no se emitió la entrada. Ampliá el cupo o cargá otra fecha en Agenda y la entrega se reintenta sola.',
     icon: Users,
   },
+  // Motivos que no viven en `flags` sino en el estado de la card (`alert`,
+  // `awaiting_human`). El copy está acá para que la cola de atención los muestre con el
+  // mismo pill que los avisos: para quien atiende, todos son lo mismo — algo que mirar.
+  agent_error: {
+    label: 'Error del agente',
+    hint: 'El agente IA no pudo responder (proveedor caído o mal configurado) y derivó la conversación. Contestá vos y reactivá la IA cuando se recupere.',
+    icon: BotOff,
+    tone: 'rose',
+  },
+  unknown_service: {
+    label: 'Servicio desconocido',
+    hint: 'El lead pidió algo que no figura en el catálogo. Respondé vos o cargá el servicio si corresponde.',
+    icon: SearchX,
+    tone: 'rose',
+  },
+  awaiting_human: {
+    label: 'Sin responder',
+    hint: 'La IA está apagada y el lead escribió sin que nadie le contestara.',
+    icon: MessageSquareWarning,
+    tone: 'rose',
+  },
 }
 
 /** Un código que el front todavía no conoce (backend más nuevo) se muestra crudo en vez
@@ -96,17 +123,22 @@ function flagConfig(code: string): FlagConfig {
   )
 }
 
-const PILL =
-  'inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 font-medium text-amber-400'
+const PILL = 'inline-flex items-center gap-1 rounded-full border font-medium'
+
+const TONE = {
+  amber: 'border-amber-500/30 bg-amber-500/10 text-amber-400',
+  rose: 'border-rose-500/40 bg-rose-500/10 text-rose-300',
+} as const
 
 function FlagPill({ code, size }: { code: string; size: 'sm' | 'md' }) {
-  const { label, hint, icon: Icon } = flagConfig(code)
+  const { label, hint, icon: Icon, tone } = flagConfig(code)
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <span
           className={cn(
             PILL,
+            TONE[tone ?? 'amber'],
             size === 'sm' ? 'px-1.5 py-0.5 text-[10px]' : 'px-2.5 py-0.5 text-xs',
           )}
         >

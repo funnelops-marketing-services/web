@@ -21,7 +21,7 @@ Package manager is **pnpm** (`npx pnpm`).
 
 - La app es el **CRM/Inbox del staff** (en `/crm`) + la landing pública (`mirkocalzadilla.com`). Sin subdominio `app.` (el CRM vive en `/crm`, sin routing por hostname).
 - **Inbox + takeover:** lista de conversaciones + hilo; toggle **IA on/off** por conversación (`is_ai_active`); badge 🔥 cuando `handed_off`.
-- **Pipeline "Gestión Humana"** (kanban): los leads derivados entran acá; acción `/generarEntrada` al validar el pago.
+- **Pipeline "Gestión Postventa"** (kanban, `kind: 'human'`): los leads derivados entran acá; acción `/generarEntrada` al validar el pago. Se llamaba "Gestión Humana" hasta el rename de 2026-08-30 (server 0035): el nombre describía al ejecutor, y la validación del pago y la entrega pasaron a ser automáticas. El primer pipeline (`kind: 'ia'`) es **"Gestión Venta"**. **El front nunca rutea por el nombre del pipeline** — usa `kind` y `status_code`.
 - **Config del agente (ABM): solo `platform_operator`** (Natalia + equipo, p. ej. Chris) — prompt, nivel de emojis (mucho/poco/nada), temperatura. El **cliente (`client_admin` = Mirko) y el `staff` NO** lo ven. **Users/roles: operador o `client_admin`** — el cliente gestiona su propio staff dentro de su tenant (`canManageUsers` ≠ `canManageConfig`, split #126 / server #200). RBAC de 3 niveles, ver `server/docs/SPECS_MVP.md` §RBAC.
 - **Realtime:** mensajes nuevos llegan por WebSocket/SSE propio alimentado desde Redis Pub/Sub del backend — **NO** socket.io de terceros.
 - Contratos con el backend: `server/docs/SPECS_MVP.md`.
