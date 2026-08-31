@@ -47,6 +47,14 @@ const crmEventSchema = z.discriminatedUnion('type', [
     card_id: z.string(),
     conversation_id: z.string().optional(),
   }),
+  // UAT 2026-08-31: la validación automática dejó el comprobante en revisión. La card no
+  // se mueve (no hay card_moved), así que sin esto el aviso, la nota del resumen IA y el
+  // semáforo del panel esperaban al poll.
+  z.object({
+    type: z.literal('receipt_needs_review'),
+    card_id: z.string(),
+    conversation_id: z.string(),
+  }),
 ])
 
 type CrmEvent = z.infer<typeof crmEventSchema>
@@ -87,6 +95,13 @@ function handleEvent(event: CrmEvent, queryClient: QueryClient) {
     case 'card_attended':
       queryClient.invalidateQueries({ queryKey: boardKeys.all })
       queryClient.invalidateQueries({ queryKey: cardKeys.detail(event.card_id) })
+      break
+    case 'receipt_needs_review':
+      // Board (aviso "revisar comprobante"), card (resumen IA con la nota) y panel
+      // (semáforo) cambiaron sin que la card se mueva: refrescar los tres.
+      queryClient.invalidateQueries({ queryKey: boardKeys.all })
+      queryClient.invalidateQueries({ queryKey: cardKeys.detail(event.card_id) })
+      queryClient.invalidateQueries({ queryKey: receiptKeys.detail(event.card_id) })
       break
     case 'handoff': {
       queryClient.invalidateQueries({ queryKey: boardKeys.all })
