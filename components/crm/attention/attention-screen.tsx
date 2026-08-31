@@ -86,6 +86,7 @@ export function AttentionScreen() {
   const [openCardId, setOpenCardId] = useState<string | null>(null)
 
   const hasItems = items.length > 0
+  const waiting = items.length - blocking
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6 p-8">
@@ -96,9 +97,18 @@ export function AttentionScreen() {
             <h1 className="text-2xl font-bold text-white">Requiere atención</h1>
             <p className="max-w-2xl text-sm text-zinc-500">
               La IA lleva la venta sola de punta a punta. Acá quedan las oportunidades
-              donde no pudo: un comprobante que no pasó las verificaciones, una entrega
-              sin fecha o sin link, un lead esperando respuesta.
+              donde no pudo. Arriba, lo que no avanza sin una decisión tuya: un
+              comprobante que no pasó las verificaciones, una entrega sin fecha o sin
+              link. Debajo, lo que solo hay que revisar.
             </p>
+            {waiting > 0 && (
+              <p className="mt-1 max-w-2xl text-sm text-zinc-500">
+                <span className="font-medium text-amber-300">{waiting}</span>{' '}
+                {waiting === 1 ? 'espera revisión' : 'esperan revisión'}. Si ya no hay
+                nada pendiente en una, marcala como <strong>atendida</strong> y sale de
+                la lista.
+              </p>
+            )}
           </div>
         </div>
       </div>

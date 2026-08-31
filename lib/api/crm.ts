@@ -43,6 +43,12 @@ export const cardSchema = z.object({
   // códigos y el copy vive en `components/crm/flag-badges.tsx`. `z.string()` a
   // propósito: un código de una versión más nueva del backend no debe romper el parse.
   flags: z.array(z.string()).default([]),
+  // Lo último que pasó en la conversación (mensaje del lead o respuesta). `null` si no
+  // hubo ninguno (alta manual de oportunidad). Ordena la cola de atención por cuánto
+  // lleva esperando — no por cuándo se creó la card, que no es lo mismo.
+  last_activity_at: z.string().nullable().optional(),
+  // Cuándo una persona la marcó como atendida (server 0036); `null` si nadie lo hizo.
+  attended_at: z.string().nullable().optional(),
   created_at: z.string(),
 })
 
@@ -238,6 +244,12 @@ export async function sendHumanMedia(
     headers: { 'Content-Type': 'multipart/form-data' },
   })
   return threadMessageSchema.parse(data)
+}
+
+/** Marca la oportunidad como atendida: sale de la cola de "Requiere atención" hasta
+ *  que el lead vuelva a escribir. No la cierra ni limpia sus avisos de entrega. */
+export async function markCardAttended(cardId: string): Promise<void> {
+  await apiClient.post(`/crm/cards/${cardId}/attended`)
 }
 
 /** Envía el QR de pago configurado en el sistema (misma imagen que usa el agente). */
