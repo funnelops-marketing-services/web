@@ -34,6 +34,16 @@ const FLAG_SEVERITY: Record<string, AttentionSeverity> = {
   extra_receipt: 'pending',
 }
 
+// `awaiting_human` no es bloqueante, aunque lo parezca. Que los checks fallen es un
+// hecho; que el lead haya hablado último es una conjetura — y así termina casi toda
+// conversación exitosa ("gracias", y no hay nada que contestar). Ponerlo al nivel de un
+// comprobante en revisión llenaba el contador de urgencias con conversaciones cerradas.
+const STATE_SEVERITY: Record<string, AttentionSeverity> = {
+  agent_error: 'blocking',
+  unknown_service: 'blocking',
+  awaiting_human: 'pending',
+}
+
 /** Motivos que no son `flags` de la card sino estado propio: la IA derivó con error, o
  *  hay un mensaje del lead sin responder. Se listan como un motivo más para que la fila
  *  explique por qué está en la cola sin que el operador tenga que abrirla. */
@@ -42,7 +52,7 @@ export const REASON_UNKNOWN_SERVICE = 'unknown_service'
 export const REASON_AWAITING_HUMAN = 'awaiting_human'
 
 export function flagSeverity(code: string): AttentionSeverity {
-  return FLAG_SEVERITY[code] ?? 'blocking'
+  return STATE_SEVERITY[code] ?? FLAG_SEVERITY[code] ?? 'blocking'
 }
 
 export interface AttentionItem {
@@ -69,10 +79,13 @@ function reasonsOf(card: Card): string[] {
 /** `blocking` si cualquiera de sus motivos lo es: la card se ordena por lo más urgente
  *  que tenga encima, no por el promedio. */
 function severityOf(reasons: string[]): AttentionSeverity {
-  const blockingReasons = [REASON_AGENT_ERROR, REASON_UNKNOWN_SERVICE, REASON_AWAITING_HUMAN]
-  return reasons.some((r) => blockingReasons.includes(r) || flagSeverity(r) === 'blocking')
-    ? 'blocking'
-    : 'pending'
+  return reasons.some((r) => flagSeverity(r) === 'blocking') ? 'blocking' : 'pending'
+}
+
+/** Cuándo pasó algo por última vez en esta oportunidad. Sin actividad en el hilo cae al
+ *  alta de la card: es lo último que pasó igual. */
+export function waitingSince(card: Card): string {
+  return card.last_activity_at ?? card.created_at
 }
 
 const SEVERITY_RANK: Record<AttentionSeverity, number> = { blocking: 0, pending: 1 }
@@ -100,7 +113,8 @@ export function collectAttention(board: Boards | undefined): AttentionItem[] {
   return items.sort((a, b) => {
     const bySeverity = SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]
     if (bySeverity !== 0) return bySeverity
-    return new Date(a.card.created_at).getTime() - new Date(b.card.created_at).getTime()
+    // Dentro de cada grupo, lo que lleva más tiempo sin moverse va primero.
+    return new Date(waitingSince(a.card)).getTime() - new Date(waitingSince(b.card)).getTime()
   })
 }
 

@@ -10,13 +10,11 @@ import {
 import type { AttentionItem } from '@/lib/crm/attention'
 import { AttentionRow } from '@/components/crm/attention/attention-row'
 
-/** "Oportunidad creada" y no "esperando desde": el board no guarda cuándo apareció el
- *  aviso, así que se muestra el único dato cierto en vez de inventar una antigüedad. */
 const COLUMNS: readonly string[] = [
   'Lead',
   'Qué pasó',
   'Dónde quedó',
-  'Oportunidad creada',
+  'Última actividad',
 ]
 
 interface AttentionTableProps {
@@ -25,7 +23,7 @@ interface AttentionTableProps {
 }
 
 /** Cola de atención. El orden viene de `collectAttention`: primero lo que no avanza sin
- *  una persona, y dentro de cada grupo lo más viejo. No se reordena acá. */
+ *  una persona, y dentro de cada grupo lo que lleva más tiempo quieto. No se reordena acá. */
 export function AttentionTable({ items, onOpenCard }: AttentionTableProps) {
   return (
     <div className="overflow-x-auto rounded-xl border border-white/5 bg-white/[0.02]">

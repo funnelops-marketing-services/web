@@ -40,6 +40,13 @@ const crmEventSchema = z.discriminatedUnion('type', [
     conversation_id: z.string(),
     category: z.string().optional(),
   }),
+  // server 0036: alguien marcó la oportunidad como atendida y sale de la cola. Llega a
+  // las demás sesiones para que no sigan viendo trabajo que ya se tomó otra persona.
+  z.object({
+    type: z.literal('card_attended'),
+    card_id: z.string(),
+    conversation_id: z.string().optional(),
+  }),
 ])
 
 type CrmEvent = z.infer<typeof crmEventSchema>
@@ -76,6 +83,10 @@ function handleEvent(event: CrmEvent, queryClient: QueryClient) {
       // lo aprueba y mueve la card (server#274): refrescar el contador acá lo muestra
       // sin esperar el poll.
       queryClient.invalidateQueries({ queryKey: paymentKeys.pending })
+      break
+    case 'card_attended':
+      queryClient.invalidateQueries({ queryKey: boardKeys.all })
+      queryClient.invalidateQueries({ queryKey: cardKeys.detail(event.card_id) })
       break
     case 'handoff': {
       queryClient.invalidateQueries({ queryKey: boardKeys.all })
