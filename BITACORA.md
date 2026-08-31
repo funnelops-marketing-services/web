@@ -21,6 +21,13 @@
 
 ## Entradas
 
+### 2026-08-31 · innova67 · crm/realtime — el hook SSE aprende `receipt_needs_review` (#201, server#309)
+- Qué cambió: `hooks/use-realtime-events.ts` agrega al `z.discriminatedUnion` el evento `receipt_needs_review` (`{card_id, conversation_id}`) y su handler: invalida `boardKeys.all` (aviso "revisar comprobante"), `cardKeys.detail` (el resumen IA ahora trae la nota con qué subsanar, server#306) y `receiptKeys.detail` (semáforo del panel).
+- Por qué: UAT 2026-08-31 — cuando la validación automática deja el comprobante en revisión la card **no se mueve**, así que no llega `card_moved` y el aviso, la nota del resumen y el semáforo esperaban al poll. El server ahora publica este evento (server#309) y el front lo aprovecha para refrescar al instante.
+- Spec/decisión que respeta: realtime por SSE propio alimentado de Redis Pub/Sub (CLAUDE.md §Realtime, sin libs de terceros); contrato del canal en `server/src/server/shared/pubsub.py` y `FLUJO_PAGO_Y_EVENTOS.md` §4. Deploy-safe en cualquier orden: un tipo desconocido se ignora vía `safeParse` y el poll de `use-board`/`use-card` sigue de fallback.
+- Prueba local: `pnpm lint` (0 errores; 5 warnings pre-existentes en otros archivos) · `tsc --noEmit` limpio · `pnpm build` OK. La validación e2e del evento queda para el UAT contra el backend con server#309 deployado.
+- Commit: (este) — PR #202
+
 ### 2026-08-31 · Natalia · crm/config de pagos — el QR de pago se sube, se reemplaza y se elimina desde el CRM (server 0037)
 - Qué cambió: (1) Nuevo `payment-qr-field.tsx`: preview de la imagen vigente + dropzone (arrastrar o clic) que **reemplaza** el QR, y "Eliminar el QR y volver al global" con confirmación en `AlertDialog`. Valida JPG/PNG y ≤5 MB antes de mandar, para no gastar un round-trip en un archivo que el backend va a rechazar igual. (2) **Se fue el input de URL**: el campo de texto donde se pegaba un link externo ya no existe. (3) `uploadPaymentQr` / `deletePaymentQr` (`POST`/`DELETE /crm/payment-settings/qr`, multipart) + `useUploadPaymentQr` / `useDeletePaymentQr`, que escriben la respuesta en la cache con `setQueryData` (los dos endpoints devuelven la config completa, así que no hace falta refetch). (4) `paymentSettingsReadSchema` aprende `is_qr_uploaded`; se fue `QR_URL_MAX`, que ya no valida nada. (5) El `key` del form deja de incluir `payment_qr_url`.
 - Por qué: configurar el QR obligaba a hostear la imagen en otro lado y pegar el link — en prod es un `raw.githubusercontent.com` del repo de este front. Cargar un QR nuevo no era una tarea de operación, era un cambio de repo.
