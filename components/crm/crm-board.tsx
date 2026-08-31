@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBoard } from '@/hooks/use-board'
+import { attentionInPipeline } from '@/lib/crm/attention'
 import { useMoveCard } from '@/hooks/use-card-mutations'
 import { PipelineBoard } from '@/components/crm/pipeline-board'
 import { BoardLegend } from '@/components/crm/board-legend'
@@ -60,14 +61,9 @@ function cardCount(pipeline: Pipeline): number {
   return pipeline.stages.reduce((n, s) => n + s.cards.length, 0)
 }
 
-// Cards "sin responder": IA apagada + mensaje del lead sin contestar. Se cuenta por
-// pipeline para el badge de alerta del tab (podés apagar la IA en cualquier oportunidad).
-function awaitingCount(pipeline: Pipeline): number {
-  return pipeline.stages.reduce(
-    (n, s) => n + s.cards.filter((c) => c.awaiting_human).length,
-    0,
-  )
-}
+// Cards que esperan a una persona (avisos de entrega, error del agente, sin responder).
+// El mismo criterio que la pantalla "Requiere atención": un solo lugar decide qué cuenta
+// como trabajo humano, así el tab y el menú nunca muestran números distintos.
 
 /** Tablero CRM real: tabs por pipeline (IA + Gestión Humana) + panel del hilo. */
 export function CrmBoard() {
@@ -194,7 +190,7 @@ export function CrmBoard() {
             <TabsList className="w-fit border border-white/5 bg-white/[0.03]">
               {pipelines.map((pipeline) => {
                 const count = cardCount(pipeline)
-                const awaiting = awaitingCount(pipeline)
+                const attention = attentionInPipeline(pipeline)
                 // El pipeline humano con leads = derivados sin atender → señal de alerta.
                 const alert = pipeline.kind === 'human' && count > 0
                 return (
@@ -214,18 +210,20 @@ export function CrmBoard() {
                         {count}
                       </span>
                     )}
-                    {awaiting > 0 && (
+                    {attention > 0 && (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <span
-                            aria-label={`${awaiting} sin responder`}
+                            aria-label={`${attention} requieren atención`}
                             className="ml-1 inline-flex h-5 min-w-5 items-center justify-center gap-1 rounded-full bg-rose-500 px-1.5 text-xs font-semibold text-white"
                           >
                             <span className="size-1.5 rounded-full bg-white" />
-                            {awaiting}
+                            {attention}
                           </span>
                         </TooltipTrigger>
-                        <TooltipContent>{awaiting} sin responder</TooltipContent>
+                        <TooltipContent>
+                          {attention} {attention === 1 ? 'requiere' : 'requieren'} atención
+                        </TooltipContent>
                       </Tooltip>
                     )}
                   </TabsTrigger>
